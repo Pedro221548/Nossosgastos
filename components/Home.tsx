@@ -24,11 +24,11 @@ interface HomeProps {
 
 const PremiumLogo = ({ className = "" }: { className?: string }) => (
   <div className={`relative flex items-center justify-center ${className}`}>
-    <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full animate-pulse"></div>
-    <div className="relative w-14 h-14 bg-neutral-900 border-2 border-primary/30 rounded-[1.5rem] flex items-center justify-center shadow-glow overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent"></div>
-      <Heart size={28} className="text-primary logo-glow" fill="currentColor" strokeWidth={0} />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-5 bg-neutral-900/40 rounded-full blur-[1px]"></div>
+    <div className="relative w-16 h-16 bg-neutral-900 border border-neutral-800 rounded-[1.8rem] flex items-center justify-center shadow-2xl overflow-hidden group">
+      <div className="absolute inset-0 bg-[#FACC15] group-hover:scale-110 transition-transform duration-500"></div>
+      <svg viewBox="0 0 512 512" className="relative w-full h-full p-2.5 z-10">
+          <path d="M256 450l-25-23C110 320 40 250 40 160 40 85 95 30 170 30c45 0 85 20 110 55 25-35 65-55 110-55 75 0 130 55 130 130 0 90-70 160-191 267l-25 23z" fill="#0F0F0F"/>
+      </svg>
     </div>
   </div>
 );
@@ -86,8 +86,8 @@ export const Home: React.FC<HomeProps> = ({
   };
 
   return (
-    <div className="space-y-6 md:space-y-10 animate-slide-up pb-24 md:pb-0 px-2 sm:px-0">
-      <div className="flex flex-col items-center justify-center text-center space-y-4 md:space-y-5 pt-2">
+    <div className="space-y-8 md:space-y-12 animate-slide-up pb-24 md:pb-0 px-2 sm:px-0">
+      <div className="flex flex-col items-center justify-center text-center space-y-4 md:space-y-5 pt-4">
         <PremiumLogo />
         <div className="space-y-1 px-4">
           <div className="flex items-center justify-center space-x-2">
@@ -100,7 +100,7 @@ export const Home: React.FC<HomeProps> = ({
             <p className="text-[8px] md:text-[9px] font-black text-neutral-500 uppercase tracking-[0.2em]">{formattedDate}</p>
             <span className="text-neutral-300 dark:text-neutral-800 opacity-30">|</span>
             <div className="flex items-center space-x-1.5">
-              <Clock size={10} className="text-primary animate-pulse" />
+              <Clock size={10} className="text-primary" />
               <p className="text-[8px] md:text-[9px] font-black text-neutral-600 dark:text-neutral-400 uppercase tracking-widest tabular-nums">{formattedTime}</p>
             </div>
           </div>
@@ -108,7 +108,6 @@ export const Home: React.FC<HomeProps> = ({
       </div>
 
       <div className="relative group overflow-hidden bg-neutral-950 rounded-[2.5rem] md:rounded-[3rem] p-6 sm:p-8 md:p-12 shadow-2xl transition-all border border-neutral-800 mx-1 sm:mx-0">
-        <div className="absolute top-0 right-0 w-48 h-48 md:w-64 md:h-64 bg-primary/5 blur-[80px] md:blur-[100px] rounded-full -mr-24 -mt-24"></div>
         <div className="relative z-10 space-y-4 md:space-y-8 text-center md:text-left">
           <div className="flex items-center justify-center md:justify-between">
             <div className="flex items-center space-x-2 bg-white/5 md:bg-transparent px-3 py-1 md:p-0 rounded-full">
@@ -126,11 +125,11 @@ export const Home: React.FC<HomeProps> = ({
             </div>
             <div className="flex flex-col sm:flex-row gap-3">
               <button onClick={() => onNavigate('dashboard')} className="flex-1 flex items-center justify-center space-x-3 bg-white/5 border border-white/10 px-5 py-3 md:px-6 md:py-4 rounded-2xl md:rounded-[1.5rem] transition-all active:scale-95 group/btn">
-                <TrendingUp size={16} className="text-primary group-hover/btn:translate-x-1 transition-transform" />
+                <TrendingUp size={16} className="text-primary" />
                 <span className="text-[9px] md:text-[10px] font-black text-white uppercase tracking-widest italic">Ver Extrato</span>
               </button>
               <button onClick={handleShareWhatsApp} className="flex-1 flex items-center justify-center space-x-3 bg-emerald-500/10 border border-emerald-500/20 px-5 py-3 md:px-6 md:py-4 rounded-2xl md:rounded-[1.5rem] transition-all active:scale-95 group/share">
-                <Share2 size={16} className="text-emerald-500 group-hover/share:scale-110 transition-transform" />
+                <Share2 size={16} className="text-emerald-500" />
                 <span className="text-[9px] md:text-[10px] font-black text-emerald-500 uppercase tracking-widest italic">Compartilhar</span>
               </button>
             </div>
