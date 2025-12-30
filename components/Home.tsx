@@ -10,7 +10,6 @@ import {
   Heart,
   Clock,
   ShieldCheck,
-  ChevronRight,
   Share2
 } from 'lucide-react';
 
@@ -28,7 +27,7 @@ const PremiumLogo = ({ className = "" }: { className?: string }) => (
     <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full animate-pulse"></div>
     <div className="relative w-12 h-12 md:w-14 md:h-14 bg-neutral-900 border-2 border-primary/30 rounded-2xl md:rounded-[1.5rem] flex items-center justify-center shadow-glow overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent"></div>
-      <Heart size={28} className="text-primary logo-glow" fill="currentColor" strokeWidth={0} />
+      <Heart className="w-7 h-7 md:w-8 md:h-8 text-primary logo-glow" fill="currentColor" strokeWidth={0} />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-5 bg-neutral-900/40 rounded-full blur-[1px]"></div>
     </div>
   </div>
@@ -82,7 +81,6 @@ export const Home: React.FC<HomeProps> = ({
       `📈 *Ganhos:* R$ ${totalIncome.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}\n` +
       `💸 *Gastos Pagos:* R$ ${paidExpenses.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}\n\n` +
       `Sincronizado via *Nossa Carteira* 🚀`;
-    
     const encodedMessage = encodeURIComponent(message);
     window.open(`https://api.whatsapp.com/send?text=${encodedMessage}`, '_blank');
   };
@@ -94,14 +92,10 @@ export const Home: React.FC<HomeProps> = ({
         <div className="space-y-1 px-4">
           <div className="flex items-center justify-center space-x-2">
             <span className="h-px w-4 sm:w-6 bg-neutral-200 dark:bg-neutral-800"></span>
-            <p className="text-[9px] md:text-[10px] font-black text-neutral-400 uppercase tracking-[0.4em] italic">
-              {now.getHours() < 12 ? 'BOM DIA' : now.getHours() < 18 ? 'BOA TARDE' : 'BOA NOITE'}
-            </p>
+            <p className="text-[9px] md:text-[10px] font-black text-neutral-400 uppercase tracking-[0.4em] italic">{now.getHours() < 12 ? 'BOM DIA' : now.getHours() < 18 ? 'BOA TARDE' : 'BOA NOITE'}</p>
             <span className="h-px w-4 sm:w-6 bg-neutral-200 dark:bg-neutral-800"></span>
           </div>
-          <h2 className="text-3xl md:text-5xl font-display font-black text-neutral-900 dark:text-white uppercase tracking-tighter italic leading-tight">
-            {familyName.split(' ')[0]} <span className="text-primary italic">Sinc</span>
-          </h2>
+          <h2 className="text-3xl md:text-5xl font-display font-black text-neutral-900 dark:text-white uppercase tracking-tighter italic leading-tight">{familyName.split(' ')[0]} <span className="text-primary italic">Sinc</span></h2>
           <div className="flex items-center justify-center space-x-2 mt-1">
             <p className="text-[8px] md:text-[9px] font-black text-neutral-500 uppercase tracking-[0.2em]">{formattedDate}</p>
             <span className="text-neutral-300 dark:text-neutral-800 opacity-30">|</span>
@@ -127,24 +121,16 @@ export const Home: React.FC<HomeProps> = ({
               <p className="text-neutral-400 text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em]">Fluxo Disponível Hoje</p>
               <div className="flex items-baseline justify-center md:justify-start space-x-2">
                 <span className="text-lg md:text-xl font-black text-primary italic">R$</span>
-                <h3 className="text-4xl xs:text-5xl md:text-7xl font-display font-black text-white tracking-tighter italic tabular-nums leading-none">
-                  {balance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                </h3>
+                <h3 className="text-4xl xs:text-5xl md:text-7xl font-display font-black text-white tracking-tighter italic tabular-nums leading-none">{balance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</h3>
               </div>
             </div>
             <div className="flex flex-col sm:flex-row gap-3">
-              <button 
-                onClick={() => onNavigate('dashboard')}
-                className="flex-1 flex items-center justify-center space-x-3 bg-white/5 border border-white/10 px-5 py-3 md:px-6 md:py-4 rounded-2xl md:rounded-[1.5rem] transition-all active:scale-95 group/btn"
-              >
-                <TrendingUp size={16} className="text-primary group-hover/btn:translate-x-1 transition-transform" />
+              <button onClick={() => onNavigate('dashboard')} className="flex-1 flex items-center justify-center space-x-3 bg-white/5 border border-white/10 px-5 py-3 md:px-6 md:py-4 rounded-2xl md:rounded-[1.5rem] transition-all active:scale-95 group/btn">
+                <TrendingUp className="w-4 h-4 md:w-5 md:h-5 text-primary group-hover/btn:translate-x-1 transition-transform" />
                 <span className="text-[9px] md:text-[10px] font-black text-white uppercase tracking-widest italic">Ver Extrato</span>
               </button>
-              <button 
-                onClick={handleShareWhatsApp}
-                className="flex-1 flex items-center justify-center space-x-3 bg-emerald-500/10 border border-emerald-500/20 px-5 py-3 md:px-6 md:py-4 rounded-2xl md:rounded-[1.5rem] transition-all active:scale-95 group/share"
-              >
-                <Share2 size={16} className="text-emerald-500 group-hover/share:scale-110 transition-transform" />
+              <button onClick={handleShareWhatsApp} className="flex-1 flex items-center justify-center space-x-3 bg-emerald-500/10 border border-emerald-500/20 px-5 py-3 md:px-6 md:py-4 rounded-2xl md:rounded-[1.5rem] transition-all active:scale-95 group/share">
+                <Share2 className="w-4 h-4 md:w-5 md:h-5 text-emerald-500 group-hover/share:scale-110 transition-transform" />
                 <span className="text-[9px] md:text-[10px] font-black text-emerald-500 uppercase tracking-widest italic">Compartilhar</span>
               </button>
             </div>
@@ -153,10 +139,10 @@ export const Home: React.FC<HomeProps> = ({
       </div>
 
       <div className="grid grid-cols-4 gap-2 md:gap-4 px-1 sm:px-0">
-        <QuickActionCircle icon={<Plus size={24} strokeWidth={3} />} label="Novo" color="bg-primary text-neutral-950" onClick={onOpenAddModal} />
-        <QuickActionCircle icon={<ShoppingCart size={22} />} label="Lista" color="bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800" onClick={() => onNavigate('shopping')} />
-        <QuickActionCircle icon={<Target size={22} />} label="Metas" color="bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800" onClick={() => onNavigate('goals')} />
-        <QuickActionCircle icon={<Zap size={22} />} label="Alexa" color="bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800" onClick={() => onNavigate('alexa')} />
+        <QuickActionCircle icon={<Plus className="w-6 h-6 md:w-8 md:h-8" strokeWidth={3} />} label="Novo" color="bg-primary text-neutral-950" onClick={onOpenAddModal} />
+        <QuickActionCircle icon={<ShoppingCart className="w-5 h-5 md:w-6 md:h-6" />} label="Lista" color="bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800" onClick={() => onNavigate('shopping')} />
+        <QuickActionCircle icon={<Target className="w-5 h-5 md:w-6 md:h-6" />} label="Metas" color="bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800" onClick={() => onNavigate('goals')} />
+        <QuickActionCircle icon={<Zap className="w-5 h-5 md:w-6 md:h-6" />} label="Alexa" color="bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800" onClick={() => onNavigate('alexa')} />
       </div>
     </div>
   );
@@ -164,9 +150,7 @@ export const Home: React.FC<HomeProps> = ({
 
 const QuickActionCircle = ({ icon, label, color, onClick }: any) => (
   <button onClick={onClick} className="flex flex-col items-center space-y-2 md:space-y-3 group w-full">
-    <div className={`w-14 h-14 xs:w-16 xs:h-16 rounded-2xl xs:rounded-[1.8rem] flex items-center justify-center shadow-lg active:scale-90 transition-all border border-transparent group-hover:border-primary/50 ${color}`}>
-      {icon}
-    </div>
+    <div className={`w-14 h-14 xs:w-16 xs:h-16 rounded-2xl xs:rounded-[1.8rem] flex items-center justify-center shadow-lg active:scale-90 transition-all border border-transparent group-hover:border-primary/50 ${color}`}>{icon}</div>
     <span className="text-[8px] md:text-[9px] font-black text-neutral-500 uppercase tracking-widest group-hover:text-primary transition-colors text-center">{label}</span>
   </button>
 );

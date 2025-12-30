@@ -1,9 +1,7 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { Transaction, User } from '../types';
-import { Card } from './ui/Card';
 import { 
-  ArrowUpRight, 
   Calendar, 
   CheckCircle2, 
   Circle, 
@@ -11,9 +9,7 @@ import {
   Trash2, 
   ChevronLeft, 
   ChevronRight,
-  Clock,
-  MoreVertical,
-  DollarSign
+  Clock
 } from 'lucide-react';
 
 interface DashboardProps {
@@ -77,11 +73,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
   return (
     <div className="space-y-6 md:space-y-8 animate-slide-up text-left max-w-2xl mx-auto px-1 sm:px-0">
-      {/* Header com Seletor de Mês Moderno */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center space-x-3 md:space-x-4">
           <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/10 rounded-xl md:rounded-[1.2rem] flex items-center justify-center text-primary border border-primary/20 shadow-glow shrink-0">
-            <Calendar size={22} />
+            <Calendar className="w-5 h-5 md:w-6 md:h-6" />
           </div>
           <div>
             <h2 className="text-[8px] md:text-[10px] font-black text-neutral-500 uppercase tracking-[0.2em] md:tracking-[0.3em]">Extrato Mensal</h2>
@@ -95,7 +90,6 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </div>
       </div>
       
-      {/* Dashboard de Saldo Real */}
       <div className="bg-neutral-950 border border-neutral-800 rounded-[2rem] md:rounded-[3rem] p-6 md:p-10 shadow-2xl relative overflow-hidden group mx-1 sm:mx-0">
         <div className="absolute top-0 right-0 w-48 h-48 md:w-64 md:h-64 bg-primary/10 blur-[80px] md:blur-[100px] rounded-full -mr-24 -mt-24 transition-opacity group-hover:opacity-60"></div>
         <div className="relative z-10 flex flex-col sm:flex-row sm:items-end justify-between gap-6">
@@ -121,67 +115,41 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </div>
       </div>
 
-      {/* Lista de Transações Redesenhada */}
       <div className="space-y-4">
         <div className="flex items-center justify-between px-2">
           <h3 className="text-[8px] md:text-[10px] font-black text-neutral-500 uppercase tracking-[0.3em] md:tracking-[0.4em]">Detalhamento</h3>
           <span className="text-[8px] md:text-[9px] font-bold text-neutral-400 uppercase tracking-widest">{filteredList.length} Lançamentos</span>
         </div>
-
         <div className="space-y-2 md:space-y-3">
           {filteredList.map((tx) => {
             const isActuallyPaid = tx.isFixed ? (tx.paidMonths?.includes(currentMonthKey) ?? false) : tx.isPaid;
             return (
-              <div 
-                key={tx.id} 
-                className={`group relative bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-2xl md:rounded-[2rem] p-4 md:p-6 transition-all duration-300 shadow-sm hover:shadow-md ${isActuallyPaid ? 'opacity-50 grayscale-[0.5]' : ''}`}
-              >
-                {/* Linha Lateral de Status */}
+              <div key={tx.id} className={`group relative bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-2xl md:rounded-[2rem] p-4 md:p-6 transition-all duration-300 shadow-sm hover:shadow-md ${isActuallyPaid ? 'opacity-50 grayscale-[0.5]' : ''}`}>
                 <div className={`absolute left-0 top-4 bottom-4 w-1 rounded-r-full transition-all ${isActuallyPaid ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]' : 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.2)]'}`} />
-
                 <div className="flex items-center justify-between gap-3 md:gap-4">
-                  {/* Info Lado Esquerdo */}
                   <div className="flex items-center space-x-3 md:space-x-4 min-w-0">
-                    <div className={`w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl flex items-center justify-center text-xl md:text-2xl shadow-inner transition-all shrink-0 ${isActuallyPaid ? 'bg-emerald-500/10 text-emerald-500' : 'bg-neutral-50 dark:bg-neutral-950 text-neutral-400 group-hover:text-primary'}`}>
-                      {tx.emoji}
-                    </div>
+                    <div className={`w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl flex items-center justify-center text-xl md:text-2xl shadow-inner transition-all shrink-0 ${isActuallyPaid ? 'bg-emerald-500/10 text-emerald-500' : 'bg-neutral-50 dark:bg-neutral-950 text-neutral-400 group-hover:text-primary'}`}>{tx.emoji}</div>
                     <div className="min-w-0">
-                      <h4 className={`text-sm md:text-lg font-black uppercase italic tracking-tighter leading-tight truncate ${isActuallyPaid ? 'text-neutral-400 line-through decoration-emerald-500/50 decoration-2' : 'text-neutral-900 dark:text-white'}`}>
-                        {tx.title}
-                      </h4>
+                      <h4 className={`text-sm md:text-lg font-black uppercase italic tracking-tighter leading-tight truncate ${isActuallyPaid ? 'text-neutral-400 line-through decoration-emerald-500/50 decoration-2' : 'text-neutral-900 dark:text-white'}`}>{tx.title}</h4>
                       <p className="text-[7px] md:text-[9px] font-black text-neutral-400 uppercase tracking-[0.1em] md:tracking-[0.2em] mt-0.5 md:mt-1 flex items-center truncate">
-                        {tx.category} <span className="mx-1 md:mx-2 opacity-30">|</span> {tx.isFixed ? <span className="flex items-center shrink-0"><Clock size={10} className="mr-1" /> FIXO</span> : tx.date}
+                        {tx.category} <span className="mx-1 md:mx-2 opacity-30">|</span> {tx.isFixed ? <span className="flex items-center shrink-0"><Clock className="w-2.5 h-2.5 md:w-3 md:h-3 mr-1" /> FIXO</span> : tx.date}
                       </p>
                     </div>
                   </div>
-
-                  {/* Info Lado Direito / Ações */}
                   <div className="flex flex-col items-end space-y-2 md:space-y-3 shrink-0">
                     <div className="text-right">
                       <p className={`text-base md:text-xl font-display font-black tracking-tighter italic tabular-nums leading-none ${tx.type === 'revenue' ? 'text-emerald-500' : 'text-neutral-900 dark:text-white'}`}>
-                        <span className="text-[8px] md:text-[10px] mr-0.5 opacity-40">R$</span>
-                        {tx.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        <span className="text-[8px] md:text-[10px] mr-0.5 opacity-40">R$</span>{tx.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                       </p>
                     </div>
-                    
                     <div className="flex items-center space-x-1 md:space-x-2">
-                       {/* Botão PAGO Moderno */}
-                       <button 
-                        onClick={() => onTogglePaid(tx.id, tx.isFixed ? currentMonthKey : undefined)}
-                        className={`flex items-center space-x-1 md:space-x-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full border-2 transition-all active:scale-95 ${
-                          isActuallyPaid 
-                            ? 'bg-emerald-500 border-emerald-500 text-neutral-950 font-black' 
-                            : 'bg-transparent border-neutral-100 dark:border-neutral-800 text-neutral-400 hover:border-amber-500 hover:text-amber-500'
-                        }`}
-                       >
-                         {isActuallyPaid ? <CheckCircle2 size={14} strokeWidth={3} /> : <Circle size={14} strokeWidth={2.5} />}
+                       <button onClick={() => onTogglePaid(tx.id, tx.isFixed ? currentMonthKey : undefined)} className={`flex items-center space-x-1 md:space-x-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full border-2 transition-all active:scale-95 ${isActuallyPaid ? 'bg-emerald-500 border-emerald-500 text-neutral-950 font-black' : 'bg-transparent border-neutral-100 dark:border-neutral-800 text-neutral-400 hover:border-amber-500 hover:text-amber-500'}`}>
+                         <CheckCircle2 className="w-3.5 h-3.5 md:w-4 md:h-4" strokeWidth={3} />
                          <span className="text-[7px] md:text-[9px] font-black uppercase tracking-widest">{isActuallyPaid ? 'PAGO' : 'PENDENTE'}</span>
                        </button>
-
-                       {/* Grupo de Ações secundárias */}
                        <div className="flex bg-neutral-50 dark:bg-neutral-950 rounded-full border border-neutral-100 dark:border-neutral-800 p-0.5">
-                          <button onClick={() => onEdit(tx)} className="p-1.5 md:p-2 text-neutral-300 hover:text-primary transition-colors"><Edit3 size={14} /></button>
-                          <button onClick={() => onDelete(tx.id)} className="p-1.5 md:p-2 text-neutral-300 hover:text-red-500 transition-colors"><Trash2 size={14} /></button>
+                          <button onClick={() => onEdit(tx)} className="p-1.5 md:p-2 text-neutral-300 hover:text-primary transition-colors"><Edit3 className="w-3.5 h-3.5 md:w-4 md:h-4" /></button>
+                          <button onClick={() => onDelete(tx.id)} className="p-1.5 md:p-2 text-neutral-300 hover:text-red-500 transition-colors"><Trash2 className="w-3.5 h-3.5 md:w-4 md:h-4" /></button>
                        </div>
                     </div>
                   </div>
@@ -189,12 +157,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
               </div>
             );
           })}
-          
-          {filteredList.length === 0 && (
-            <div className="py-16 md:py-20 text-center bg-neutral-50 dark:bg-neutral-900/30 rounded-[2rem] md:rounded-[3rem] border-2 border-dashed border-neutral-100 dark:border-neutral-800 mx-1">
-              <p className="text-[8px] md:text-[10px] font-black text-neutral-400 uppercase tracking-[0.4em] italic">Nenhum lançamento para este mês</p>
-            </div>
-          )}
+          {filteredList.length === 0 && <div className="py-16 md:py-20 text-center bg-neutral-50 dark:bg-neutral-900/30 rounded-[2rem] md:rounded-[3rem] border-2 border-dashed border-neutral-100 dark:border-neutral-800 mx-1"><p className="text-[8px] md:text-[10px] font-black text-neutral-400 uppercase tracking-[0.4em] italic">Nenhum lançamento para este mês</p></div>}
         </div>
       </div>
     </div>

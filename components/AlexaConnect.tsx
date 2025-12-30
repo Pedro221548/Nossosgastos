@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Card } from './ui/Card';
-import { Mic, Zap, Check, Copy, RefreshCw } from 'lucide-react';
+import { Mic, Zap, RefreshCw } from 'lucide-react';
 
 export const AlexaConnect: React.FC = () => {
   const [code, setCode] = useState<string | null>(null);

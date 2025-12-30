@@ -250,7 +250,6 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-200 flex flex-col md:flex-row transition-colors duration-300">
-      
       <div className="fixed top-[calc(env(safe-area-inset-top)+10px)] right-4 md:right-6 z-[100] flex items-center space-x-2 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-neutral-200 dark:border-neutral-800 shadow-xl">
         {isSyncing ? <><Loader2 size={10} className="text-primary animate-spin" /><span className="text-[7px] font-black text-neutral-500 uppercase tracking-widest">Sinc</span></> : <><div className="w-1.5 h-1.5 bg-emerald-500 rounded-full" /><span className="text-[7px] font-black text-neutral-400 uppercase tracking-widest">On</span></>}
       </div>
