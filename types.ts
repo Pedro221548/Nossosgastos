@@ -43,10 +43,12 @@ export interface ShoppingItem {
   id: string;
   text: string;
   completed: boolean;
+  price?: number;
+  quantity?: number;
   isDeleted?: boolean;
+  archivedAt?: string;
 }
 
-// Added ChatMessage interface to resolve "Module '../types' has no exported member 'ChatMessage'" error in AiMediator.tsx
 export interface ChatMessage {
   id: string;
   role: 'user' | 'model';
@@ -54,4 +56,4 @@ export interface ChatMessage {
   timestamp: Date;
 }
 
-export type AppTab = 'home' | 'dashboard' | 'analytics' | 'goals' | 'budget' | 'shopping';
+export type AppTab = 'home' | 'dashboard' | 'analytics' | 'goals' | 'budget' | 'shopping' | 'alexa';

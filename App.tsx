@@ -8,6 +8,7 @@ import { Goals } from './components/Goals';
 import { BudgetSettings } from './components/BudgetSettings'; 
 import { ShoppingList } from './components/ShoppingList';
 import { Analytics } from './components/Analytics';
+import { AlexaConnect } from './components/AlexaConnect';
 import { AddTransactionModal } from './components/AddTransactionModal';
 import { ConfirmationModal } from './components/ui/ConfirmationModal';
 import { Login } from './components/Login';
@@ -24,7 +25,8 @@ import {
   Loader2,
   TrendingUp,
   Home as HomeIcon,
-  ListOrdered
+  ListOrdered,
+  Mic
 } from 'lucide-react';
 
 type Theme = 'dark' | 'light';
@@ -111,12 +113,7 @@ const App: React.FC = () => {
   const handleSaveGoal = async (goal: Goal) => {
     setIsSyncing(true);
     const existing = goals.find(g => g.id === goal.id);
-    let updatedGoals;
-    if (existing) {
-      updatedGoals = goals.map(g => g.id === goal.id ? goal : g);
-    } else {
-      updatedGoals = [...goals, goal];
-    }
+    let updatedGoals = existing ? goals.map(g => g.id === goal.id ? goal : g) : [...goals, goal];
     setGoals(updatedGoals);
     await syncData('goals', updatedGoals);
     setIsSyncing(false);
@@ -124,12 +121,7 @@ const App: React.FC = () => {
 
   const handleUpdateGoalProgress = async (goalId: string, amountToAdd: number) => {
     setIsSyncing(true);
-    const updated = goals.map(g => {
-      if (g.id === goalId) {
-        return { ...g, currentAmount: g.currentAmount + amountToAdd };
-      }
-      return g;
-    });
+    const updated = goals.map(g => g.id === goalId ? { ...g, currentAmount: g.currentAmount + amountToAdd } : g);
     setGoals(updated);
     await syncData('goals', updated);
     setIsSyncing(false);
@@ -152,7 +144,6 @@ const App: React.FC = () => {
       const updatedMonths = currentPaidMonths.includes(targetMonth)
         ? currentPaidMonths.filter(m => m !== targetMonth)
         : [...currentPaidMonths, targetMonth];
-      
       await updateFirestoreTransaction(id, { paidMonths: updatedMonths });
     } else {
       await updateFirestoreTransaction(id, { pago: !tx.isPaid });
@@ -186,24 +177,52 @@ const App: React.FC = () => {
       }
       setIsAddModalOpen(false);
       setEditingTransaction(null);
-    } catch (e) {
-      console.error("Erro ao salvar transação:", e);
-    } finally {
-      setIsSyncing(false);
-    }
+    } catch (e) { console.error(e); } finally { setIsSyncing(false); }
   };
 
   const handleDeleteTransaction = (id: string) => {
     setConfirmModal({
       isOpen: true,
       title: 'Excluir Lançamento?',
-      message: 'Esta ação removerá o registro permanentemente do banco de dados.',
+      message: 'Esta ação removerá o registro permanentemente.',
       variant: 'danger',
       onConfirm: async () => {
         await deleteFirestoreTransaction(id);
         setConfirmModal(prev => ({ ...prev, isOpen: false }));
       }
     });
+  };
+
+  const handleAddShoppingItem = async (itemData: Partial<ShoppingItem>) => {
+    const newItem: ShoppingItem = {
+      id: `shop_${Date.now()}`,
+      text: itemData.text || '',
+      completed: false,
+      price: itemData.price,
+      quantity: itemData.quantity,
+    };
+    const updated = [...shoppingItems, newItem];
+    setShoppingItems(updated);
+    await syncData('shoppingItems', updated);
+  };
+
+  const handleToggleShopping = async (id: string) => {
+    const updated = shoppingItems.map(i => i.id === id ? { ...i, completed: !i.completed } : i);
+    setShoppingItems(updated);
+    await syncData('shoppingItems', updated);
+  };
+
+  const handleDeleteShopping = async (id: string) => {
+    const updated = shoppingItems.filter(i => i.id !== id);
+    setShoppingItems(updated);
+    await syncData('shoppingItems', updated);
+  };
+
+  const handleClearShoppingHistory = async () => {
+    const now = new Date().toLocaleDateString('pt-BR');
+    const updated = shoppingItems.map(i => i.completed && !i.archivedAt ? { ...i, archivedAt: now } : i);
+    setShoppingItems(updated);
+    await syncData('shoppingItems', updated);
   };
 
   const triggerSync = async (path: string, data: any) => {
@@ -222,9 +241,7 @@ const App: React.FC = () => {
         syncData('familyName', overrideFamilyName || familyName),
         syncData('alertThreshold', overrideThreshold || alertThreshold)
       ]);
-    } catch (e) {
-      console.error("[App] Erro na sincronização", e);
-    }
+    } catch (e) { console.error(e); }
     setTimeout(() => setIsSyncing(false), 1000);
   };
 
@@ -235,11 +252,7 @@ const App: React.FC = () => {
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-200 flex flex-col md:flex-row transition-colors duration-300">
       
       <div className="fixed top-[calc(env(safe-area-inset-top)+10px)] right-4 md:right-6 z-[100] flex items-center space-x-2 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-neutral-200 dark:border-neutral-800 shadow-xl">
-        {isSyncing ? (
-          <><Loader2 size={10} className="text-primary animate-spin" /><span className="text-[7px] font-black text-neutral-500 uppercase tracking-widest">Sinc</span></>
-        ) : (
-          <><div className="w-1.5 h-1.5 bg-emerald-500 rounded-full" /><span className="text-[7px] font-black text-neutral-400 uppercase tracking-widest">On</span></>
-        )}
+        {isSyncing ? <><Loader2 size={10} className="text-primary animate-spin" /><span className="text-[7px] font-black text-neutral-500 uppercase tracking-widest">Sinc</span></> : <><div className="w-1.5 h-1.5 bg-emerald-500 rounded-full" /><span className="text-[7px] font-black text-neutral-400 uppercase tracking-widest">On</span></>}
       </div>
 
       <aside className="hidden md:flex flex-col w-72 bg-white dark:bg-neutral-900/50 border-r border-neutral-200 dark:border-neutral-800 sticky top-0 h-screen p-8 z-50">
@@ -258,6 +271,7 @@ const App: React.FC = () => {
           <SidebarItem icon={<TrendingUp />} label="Análises" active={activeTab === 'analytics'} onClick={() => setActiveTab('analytics')} />
           <SidebarItem icon={<Target />} label="Metas" active={activeTab === 'goals'} onClick={() => setActiveTab('goals')} />
           <SidebarItem icon={<ShoppingCart />} label="Compras" active={activeTab === 'shopping'} onClick={() => setActiveTab('shopping')} />
+          <SidebarItem icon={<Mic />} label="Alexa" active={activeTab === 'alexa'} onClick={() => setActiveTab('alexa')} />
           <SidebarItem icon={<Settings />} label="Ajustes" active={activeTab === 'budget'} onClick={() => setActiveTab('budget')} />
         </nav>
         <div className="mt-auto pt-8 border-t border-neutral-200 dark:border-neutral-800">
@@ -268,100 +282,24 @@ const App: React.FC = () => {
       </aside>
 
       <main className="flex-1 max-w-5xl mx-auto w-full px-4 py-6 md:px-12 md:py-16 pb-36 md:pb-16 pt-[calc(1.5rem+env(safe-area-inset-top))]">
-        {activeTab === 'home' && (
-          <Home 
-            transactions={transactions}
-            goals={goals}
-            users={users}
-            familyName={familyName}
-            onNavigate={(tab: AppTab) => setActiveTab(tab)}
-            onOpenAddModal={() => setIsAddModalOpen(true)}
-          />
-        )}
-        {activeTab === 'dashboard' && (
-          <Dashboard 
-            transactions={transactions} 
-            totalIncome={users.A.income + users.B.income} 
-            currentDate={currentDate}
-            users={users}
-            alertThreshold={alertThreshold}
-            onMonthChange={(dir: 'prev' | 'next') => {
-              const nd = new Date(currentDate);
-              nd.setMonth(nd.getMonth() + (dir === 'next' ? 1 : -1));
-              setCurrentDate(nd);
-            }}
-            onDelete={handleDeleteTransaction}
-            onTogglePaid={handleTogglePaid}
-            onEdit={(tx: Transaction) => { setEditingTransaction(tx); setIsAddModalOpen(true); }}
-            onClearAll={() => {}}
-            onOpenShopping={() => setActiveTab('shopping')}
-            onOpenAddModal={() => { setEditingTransaction(null); setIsAddModalOpen(true); }}
-          />
-        )}
-        {activeTab === 'analytics' && (
-          <Analytics 
-            transactions={transactions}
-            baseIncome={users.A.income + users.B.income}
-            currentDate={currentDate}
-            onMonthChange={(dir: 'prev' | 'next') => {
-              const nd = new Date(currentDate);
-              nd.setMonth(nd.getMonth() + (dir === 'next' ? 1 : -1));
-              setCurrentDate(nd);
-            }}
-          />
-        )}
-        {activeTab === 'goals' && (
-          <Goals 
-            goals={goals} 
-            onUpdateGoal={handleUpdateGoalProgress} 
-            onSaveGoal={handleSaveGoal} 
-            onDeleteGoal={handleDeleteGoal} 
-          />
-        )}
-        {activeTab === 'shopping' && <ShoppingList items={shoppingItems} onAdd={() => {}} onToggle={() => {}} onDelete={() => {}} />}
-        {activeTab === 'budget' && (
-          <BudgetSettings 
-            users={users} familyName={familyName} alertThreshold={alertThreshold} 
-            onUpdateUser={(uid, data) => {
-              const key = uid === users.A.id ? 'A' : 'B';
-              const updated = { ...users, [key]: { ...users[key], ...data } };
-              setUsers(updated);
-              triggerSync('users', updated);
-            }} 
-            onUpdateFamilySettings={(name, threshold) => {
-              setFamilyName(name); setAlertThreshold(threshold);
-              triggerSync('familyName', name); triggerSync('alertThreshold', threshold);
-            }}
-            currentTheme={theme} onThemeToggle={setTheme} onLogout={() => signOut(auth)}
-            onForceSync={forceFullSync}
-            isSyncing={isSyncing}
-          />
-        )}
+        {activeTab === 'home' && <Home transactions={transactions} goals={goals} users={users} familyName={familyName} onNavigate={setActiveTab} onOpenAddModal={() => setIsAddModalOpen(true)} />}
+        {activeTab === 'dashboard' && <Dashboard transactions={transactions} totalIncome={users.A.income + users.B.income} currentDate={currentDate} users={users} alertThreshold={alertThreshold} onMonthChange={(dir) => { const nd = new Date(currentDate); nd.setMonth(nd.getMonth() + (dir === 'next' ? 1 : -1)); setCurrentDate(nd); }} onDelete={handleDeleteTransaction} onTogglePaid={handleTogglePaid} onEdit={(tx) => { setEditingTransaction(tx); setIsAddModalOpen(true); }} onClearAll={() => {}} onOpenShopping={() => setActiveTab('shopping')} onOpenAddModal={() => { setEditingTransaction(null); setIsAddModalOpen(true); }} />}
+        {activeTab === 'analytics' && <Analytics transactions={transactions} baseIncome={users.A.income + users.B.income} currentDate={currentDate} onMonthChange={(dir) => { const nd = new Date(currentDate); nd.setMonth(nd.getMonth() + (dir === 'next' ? 1 : -1)); setCurrentDate(nd); }} />}
+        {activeTab === 'goals' && <Goals goals={goals} onUpdateGoal={handleUpdateGoalProgress} onSaveGoal={handleSaveGoal} onDeleteGoal={handleDeleteGoal} />}
+        {activeTab === 'shopping' && <ShoppingList items={shoppingItems} onAdd={handleAddShoppingItem} onToggle={handleToggleShopping} onDelete={handleDeleteShopping} onClearHistory={handleClearShoppingHistory} />}
+        {activeTab === 'alexa' && <AlexaConnect />}
+        {activeTab === 'budget' && <BudgetSettings users={users} familyName={familyName} alertThreshold={alertThreshold} onUpdateUser={(uid, data) => { const key = uid === users.A.id ? 'A' : 'B'; const updated = { ...users, [key]: { ...users[key], ...data } }; setUsers(updated); triggerSync('users', updated); }} onUpdateFamilySettings={(name, threshold) => { setFamilyName(name); setAlertThreshold(threshold); triggerSync('familyName', name); triggerSync('alertThreshold', threshold); }} currentTheme={theme} onThemeToggle={setTheme} onLogout={() => signOut(auth)} onForceSync={forceFullSync} isSyncing={isSyncing} />}
       </main>
 
-      <nav className="md:hidden fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] left-4 right-4 h-16 bg-white/80 dark:bg-neutral-900/90 backdrop-blur-2xl border border-neutral-200 dark:border-neutral-800 rounded-[2.5rem] flex justify-around items-center z-[100] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.4)] px-2 transition-all">
+      <nav className="md:hidden fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] left-4 right-4 h-16 bg-white/80 dark:bg-neutral-900/90 backdrop-blur-2xl border border-neutral-200 dark:border-neutral-800 rounded-[2.5rem] flex justify-around items-center z-[100] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.4)] px-2">
          <MobileNavItem icon={<HomeIcon />} active={activeTab === 'home'} onClick={() => setActiveTab('home')} />
          <MobileNavItem icon={<ListOrdered />} active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} />
-         
-         <button 
-           onClick={() => { setEditingTransaction(null); setIsAddModalOpen(true); }}
-           className="w-14 h-14 bg-primary rounded-[1.8rem] flex items-center justify-center text-neutral-950 shadow-glow -translate-y-5 active:scale-90 transition-all border-[6px] border-neutral-50 dark:border-neutral-950"
-         >
-           <Plus size={28} strokeWidth={3} />
-         </button>
-
-         <MobileNavItem icon={<TrendingUp />} active={activeTab === 'analytics'} onClick={() => setActiveTab('analytics')} />
-         <MobileNavItem icon={<Settings />} active={activeTab === 'budget'} onClick={() => setActiveTab('budget')} />
+         <button onClick={() => { setEditingTransaction(null); setIsAddModalOpen(true); }} className="w-14 h-14 bg-primary rounded-[1.8rem] flex items-center justify-center text-neutral-950 shadow-glow -translate-y-5 active:scale-90 transition-all border-[6px] border-neutral-50 dark:border-neutral-950"><Plus size={28} strokeWidth={3} /></button>
+         <MobileNavItem icon={<ShoppingCart />} active={activeTab === 'shopping'} onClick={() => setActiveTab('shopping')} />
+         <MobileNavItem icon={<Mic />} active={activeTab === 'alexa'} onClick={() => setActiveTab('alexa')} />
       </nav>
 
-      <AddTransactionModal 
-        isOpen={isAddModalOpen} 
-        users={users} 
-        initialDate={currentDate} 
-        onClose={() => { setIsAddModalOpen(false); setEditingTransaction(null); }} 
-        onAdd={handleAddOrUpdateTransaction} 
-        editingTransaction={editingTransaction} 
-      />
+      <AddTransactionModal isOpen={isAddModalOpen} users={users} initialDate={currentDate} onClose={() => { setIsAddModalOpen(false); setEditingTransaction(null); }} onAdd={handleAddOrUpdateTransaction} editingTransaction={editingTransaction} />
       <ConfirmationModal isOpen={confirmModal.isOpen} title={confirmModal.title} message={confirmModal.message} variant={confirmModal.variant} onConfirm={confirmModal.onConfirm} onCancel={() => setConfirmModal(prev => ({ ...prev, isOpen: false }))} />
     </div>
   );
@@ -375,9 +313,7 @@ const SidebarItem = ({ icon, label, active, onClick }: { icon: any, label: strin
 );
 
 const MobileNavItem = ({ icon, active, onClick }: { icon: any, active: boolean, onClick: () => void }) => (
-  <button onClick={onClick} className={`p-4 rounded-2xl transition-all ${active ? 'text-primary' : 'text-neutral-400 opacity-60'}`}>
-    {React.cloneElement(icon, { size: 22, strokeWidth: active ? 3.5 : 2 })}
-  </button>
+  <button onClick={onClick} className={`p-4 rounded-2xl transition-all ${active ? 'text-primary' : 'text-neutral-400 opacity-60'}`}>{React.cloneElement(icon, { size: 22, strokeWidth: active ? 3.5 : 2 })}</button>
 );
 
 export default App;
