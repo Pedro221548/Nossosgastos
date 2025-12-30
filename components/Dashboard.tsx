@@ -4,12 +4,12 @@ import { Transaction, User } from '../types';
 import { 
   Calendar, 
   CheckCircle2, 
-  Circle, 
   Edit3, 
   Trash2, 
   ChevronLeft, 
   ChevronRight,
-  Clock
+  Clock,
+  CircleDashed
 } from 'lucide-react';
 
 interface DashboardProps {
@@ -120,36 +120,58 @@ export const Dashboard: React.FC<DashboardProps> = ({
           <h3 className="text-[8px] md:text-[10px] font-black text-neutral-500 uppercase tracking-[0.3em] md:tracking-[0.4em]">Detalhamento</h3>
           <span className="text-[8px] md:text-[9px] font-bold text-neutral-400 uppercase tracking-widest">{filteredList.length} Lançamentos</span>
         </div>
-        <div className="space-y-2 md:space-y-3">
+        <div className="space-y-3">
           {filteredList.map((tx) => {
             const isActuallyPaid = tx.isFixed ? (tx.paidMonths?.includes(currentMonthKey) ?? false) : tx.isPaid;
             return (
-              <div key={tx.id} className={`group relative bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-2xl md:rounded-[2rem] p-4 md:p-6 transition-all duration-300 shadow-sm hover:shadow-md ${isActuallyPaid ? 'opacity-50 grayscale-[0.5]' : ''}`}>
-                <div className={`absolute left-0 top-4 bottom-4 w-1 rounded-r-full transition-all ${isActuallyPaid ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]' : 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.2)]'}`} />
-                <div className="flex items-center justify-between gap-3 md:gap-4">
+              <div 
+                key={tx.id} 
+                className={`group relative bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-[1.5rem] md:rounded-[2rem] p-4 md:p-6 transition-all duration-300 shadow-sm hover:shadow-md overflow-hidden ${isActuallyPaid ? 'bg-neutral-50/50 dark:bg-neutral-900/40' : ''}`}
+              >
+                {/* Barra Lateral de Status - Referência da imagem do usuário */}
+                <div className={`absolute left-0 top-0 bottom-0 w-1.5 transition-all ${isActuallyPaid ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.4)]' : 'bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.3)]'}`} />
+                
+                <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center space-x-3 md:space-x-4 min-w-0">
-                    <div className={`w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl flex items-center justify-center text-xl md:text-2xl shadow-inner transition-all shrink-0 ${isActuallyPaid ? 'bg-emerald-500/10 text-emerald-500' : 'bg-neutral-50 dark:bg-neutral-950 text-neutral-400 group-hover:text-primary'}`}>{tx.emoji}</div>
-                    <div className="min-w-0">
-                      <h4 className={`text-sm md:text-lg font-black uppercase italic tracking-tighter leading-tight truncate ${isActuallyPaid ? 'text-neutral-400 line-through decoration-emerald-500/50 decoration-2' : 'text-neutral-900 dark:text-white'}`}>{tx.title}</h4>
-                      <p className="text-[7px] md:text-[9px] font-black text-neutral-400 uppercase tracking-[0.1em] md:tracking-[0.2em] mt-0.5 md:mt-1 flex items-center truncate">
-                        {tx.category} <span className="mx-1 md:mx-2 opacity-30">|</span> {tx.isFixed ? <span className="flex items-center shrink-0"><Clock className="w-2.5 h-2.5 md:w-3 md:h-3 mr-1" /> FIXO</span> : tx.date}
-                      </p>
+                    <div className={`w-12 h-12 md:w-16 md:h-16 rounded-2xl flex items-center justify-center text-xl md:text-2xl transition-all shrink-0 ${isActuallyPaid ? 'bg-emerald-500/5 text-emerald-500/50' : 'bg-neutral-100 dark:bg-neutral-950 text-neutral-400 group-hover:text-primary shadow-inner'}`}>
+                      {tx.emoji}
+                    </div>
+                    <div className="min-w-0 flex flex-col justify-center">
+                      <h4 className={`text-base md:text-lg font-display font-black uppercase italic tracking-tighter leading-none truncate mb-1 ${isActuallyPaid ? 'text-neutral-500 line-through decoration-emerald-500/30' : 'text-neutral-900 dark:text-white'}`}>
+                        {tx.title}
+                      </h4>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[7px] md:text-[9px] font-black text-neutral-400 uppercase tracking-widest truncate">{tx.category}</span>
+                        <span className="text-neutral-300 dark:text-neutral-800 opacity-30">|</span>
+                        <span className="text-[7px] md:text-[9px] font-black text-neutral-400 uppercase tracking-widest flex items-center">
+                          {tx.isFixed ? <><Clock className="w-2.5 h-2.5 mr-1" /> FIXO</> : tx.date}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                  <div className="flex flex-col items-end space-y-2 md:space-y-3 shrink-0">
+
+                  <div className="flex flex-col items-end space-y-3 shrink-0">
                     <div className="text-right">
-                      <p className={`text-base md:text-xl font-display font-black tracking-tighter italic tabular-nums leading-none ${tx.type === 'revenue' ? 'text-emerald-500' : 'text-neutral-900 dark:text-white'}`}>
-                        <span className="text-[8px] md:text-[10px] mr-0.5 opacity-40">R$</span>{tx.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                      <p className={`text-lg md:text-2xl font-display font-black tracking-tighter italic tabular-nums leading-none ${tx.type === 'revenue' ? 'text-emerald-500' : isActuallyPaid ? 'text-neutral-500' : 'text-neutral-900 dark:text-white'}`}>
+                        <span className="text-[8px] md:text-[10px] mr-0.5 opacity-40">R$</span>
+                        {tx.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                       </p>
                     </div>
-                    <div className="flex items-center space-x-1 md:space-x-2">
-                       <button onClick={() => onTogglePaid(tx.id, tx.isFixed ? currentMonthKey : undefined)} className={`flex items-center space-x-1 md:space-x-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full border-2 transition-all active:scale-95 ${isActuallyPaid ? 'bg-emerald-500 border-emerald-500 text-neutral-950 font-black' : 'bg-transparent border-neutral-100 dark:border-neutral-800 text-neutral-400 hover:border-amber-500 hover:text-amber-500'}`}>
-                         <CheckCircle2 className="w-3.5 h-3.5 md:w-4 md:h-4" strokeWidth={3} />
+                    <div className="flex items-center space-x-1.5">
+                       <button 
+                        onClick={() => onTogglePaid(tx.id, tx.isFixed ? currentMonthKey : undefined)} 
+                        className={`flex items-center space-x-1.5 px-3 py-2 md:px-4 md:py-2.5 rounded-full border transition-all active:scale-90 ${
+                          isActuallyPaid 
+                            ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-500 font-black' 
+                            : 'bg-neutral-950 border-neutral-800 text-neutral-500 hover:border-primary hover:text-primary'
+                        }`}
+                       >
+                         {isActuallyPaid ? <CheckCircle2 className="w-3 h-3 md:w-4 md:h-4" strokeWidth={3} /> : <CircleDashed className="w-3 h-3 md:w-4 md:h-4" />}
                          <span className="text-[7px] md:text-[9px] font-black uppercase tracking-widest">{isActuallyPaid ? 'PAGO' : 'PENDENTE'}</span>
                        </button>
-                       <div className="flex bg-neutral-50 dark:bg-neutral-950 rounded-full border border-neutral-100 dark:border-neutral-800 p-0.5">
-                          <button onClick={() => onEdit(tx)} className="p-1.5 md:p-2 text-neutral-300 hover:text-primary transition-colors"><Edit3 className="w-3.5 h-3.5 md:w-4 md:h-4" /></button>
-                          <button onClick={() => onDelete(tx.id)} className="p-1.5 md:p-2 text-neutral-300 hover:text-red-500 transition-colors"><Trash2 className="w-3.5 h-3.5 md:w-4 md:h-4" /></button>
+                       <div className="flex bg-neutral-950 rounded-full border border-neutral-800 p-0.5 shadow-inner">
+                          <button onClick={() => onEdit(tx)} className="p-2 text-neutral-500 hover:text-primary transition-colors active:scale-90"><Edit3 className="w-3.5 h-3.5 md:w-4 md:h-4" /></button>
+                          <button onClick={() => onDelete(tx.id)} className="p-2 text-neutral-500 hover:text-red-500 transition-colors active:scale-90"><Trash2 className="w-3.5 h-3.5 md:w-4 md:h-4" /></button>
                        </div>
                     </div>
                   </div>
@@ -157,7 +179,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
               </div>
             );
           })}
-          {filteredList.length === 0 && <div className="py-16 md:py-20 text-center bg-neutral-50 dark:bg-neutral-900/30 rounded-[2rem] md:rounded-[3rem] border-2 border-dashed border-neutral-100 dark:border-neutral-800 mx-1"><p className="text-[8px] md:text-[10px] font-black text-neutral-400 uppercase tracking-[0.4em] italic">Nenhum lançamento para este mês</p></div>}
+          {filteredList.length === 0 && (
+            <div className="py-20 text-center bg-neutral-950/20 rounded-[2rem] border-2 border-dashed border-neutral-800 mx-1">
+              <p className="text-[8px] md:text-[10px] font-black text-neutral-500 uppercase tracking-[0.4em] italic">Nenhum lançamento para este mês</p>
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -25,9 +25,9 @@ interface HomeProps {
 const PremiumLogo = ({ className = "" }: { className?: string }) => (
   <div className={`relative flex items-center justify-center ${className}`}>
     <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full animate-pulse"></div>
-    <div className="relative w-12 h-12 md:w-14 md:h-14 bg-neutral-900 border-2 border-primary/30 rounded-2xl md:rounded-[1.5rem] flex items-center justify-center shadow-glow overflow-hidden">
+    <div className="relative w-14 h-14 bg-neutral-900 border-2 border-primary/30 rounded-[1.5rem] flex items-center justify-center shadow-glow overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent"></div>
-      <Heart className="w-7 h-7 md:w-8 md:h-8 text-primary logo-glow" fill="currentColor" strokeWidth={0} />
+      <Heart size={28} className="text-primary logo-glow" fill="currentColor" strokeWidth={0} />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-5 bg-neutral-900/40 rounded-full blur-[1px]"></div>
     </div>
   </div>
@@ -120,17 +120,17 @@ export const Home: React.FC<HomeProps> = ({
             <div className="space-y-1">
               <p className="text-neutral-400 text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em]">Fluxo Disponível Hoje</p>
               <div className="flex items-baseline justify-center md:justify-start space-x-2">
-                <span className="text-lg md:text-xl font-black text-primary italic">R$</span>
+                <span className="text-xl md:text-2xl font-black text-primary italic">R$</span>
                 <h3 className="text-4xl xs:text-5xl md:text-7xl font-display font-black text-white tracking-tighter italic tabular-nums leading-none">{balance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</h3>
               </div>
             </div>
             <div className="flex flex-col sm:flex-row gap-3">
               <button onClick={() => onNavigate('dashboard')} className="flex-1 flex items-center justify-center space-x-3 bg-white/5 border border-white/10 px-5 py-3 md:px-6 md:py-4 rounded-2xl md:rounded-[1.5rem] transition-all active:scale-95 group/btn">
-                <TrendingUp className="w-4 h-4 md:w-5 md:h-5 text-primary group-hover/btn:translate-x-1 transition-transform" />
+                <TrendingUp size={16} className="text-primary group-hover/btn:translate-x-1 transition-transform" />
                 <span className="text-[9px] md:text-[10px] font-black text-white uppercase tracking-widest italic">Ver Extrato</span>
               </button>
               <button onClick={handleShareWhatsApp} className="flex-1 flex items-center justify-center space-x-3 bg-emerald-500/10 border border-emerald-500/20 px-5 py-3 md:px-6 md:py-4 rounded-2xl md:rounded-[1.5rem] transition-all active:scale-95 group/share">
-                <Share2 className="w-4 h-4 md:w-5 md:h-5 text-emerald-500 group-hover/share:scale-110 transition-transform" />
+                <Share2 size={16} className="text-emerald-500 group-hover/share:scale-110 transition-transform" />
                 <span className="text-[9px] md:text-[10px] font-black text-emerald-500 uppercase tracking-widest italic">Compartilhar</span>
               </button>
             </div>
@@ -139,10 +139,10 @@ export const Home: React.FC<HomeProps> = ({
       </div>
 
       <div className="grid grid-cols-4 gap-2 md:gap-4 px-1 sm:px-0">
-        <QuickActionCircle icon={<Plus className="w-6 h-6 md:w-8 md:h-8" strokeWidth={3} />} label="Novo" color="bg-primary text-neutral-950" onClick={onOpenAddModal} />
-        <QuickActionCircle icon={<ShoppingCart className="w-5 h-5 md:w-6 md:h-6" />} label="Lista" color="bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800" onClick={() => onNavigate('shopping')} />
-        <QuickActionCircle icon={<Target className="w-5 h-5 md:w-6 md:h-6" />} label="Metas" color="bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800" onClick={() => onNavigate('goals')} />
-        <QuickActionCircle icon={<Zap className="w-5 h-5 md:w-6 md:h-6" />} label="Alexa" color="bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800" onClick={() => onNavigate('alexa')} />
+        <QuickActionCircle icon={<Plus size={24} strokeWidth={3} />} label="Novo" color="bg-primary text-neutral-950" onClick={onOpenAddModal} />
+        <QuickActionCircle icon={<ShoppingCart size={22} />} label="Lista" color="bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800" onClick={() => onNavigate('shopping')} />
+        <QuickActionCircle icon={<Target size={22} />} label="Metas" color="bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800" onClick={() => onNavigate('goals')} />
+        <QuickActionCircle icon={<Zap size={22} />} label="Alexa" color="bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800" onClick={() => onNavigate('alexa')} />
       </div>
     </div>
   );
