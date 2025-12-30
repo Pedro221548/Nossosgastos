@@ -250,6 +250,7 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-200 flex flex-col md:flex-row transition-colors duration-300">
+      
       <div className="fixed top-[calc(env(safe-area-inset-top)+10px)] right-4 md:right-6 z-[100] flex items-center space-x-2 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-neutral-200 dark:border-neutral-800 shadow-xl">
         {isSyncing ? <><Loader2 size={10} className="text-primary animate-spin" /><span className="text-[7px] font-black text-neutral-500 uppercase tracking-widest">Sinc</span></> : <><div className="w-1.5 h-1.5 bg-emerald-500 rounded-full" /><span className="text-[7px] font-black text-neutral-400 uppercase tracking-widest">On</span></>}
       </div>
@@ -257,12 +258,7 @@ const App: React.FC = () => {
       <aside className="hidden md:flex flex-col w-72 bg-white dark:bg-neutral-900/50 border-r border-neutral-200 dark:border-neutral-800 sticky top-0 h-screen p-8 z-50">
         <div className="flex items-center justify-between mb-12">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-neutral-950 shadow-glow overflow-hidden">
-               <svg viewBox="0 0 512 512" className="w-full h-full p-1.5">
-                  <rect width="512" height="512" rx="128" fill="#FACC15"/>
-                  <path d="M256 450l-25-23C110 320 40 250 40 160 40 85 95 30 170 30c45 0 85 20 110 55 25-35 65-55 110-55 75 0 130 55 130 130 0 90-70 160-191 267l-25 23z" fill="#0F0F0F"/>
-               </svg>
-            </div>
+            <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-neutral-950 shadow-glow"><Heart size={20} strokeWidth={3} /></div>
             <div>
               <h1 className="text-lg font-display font-bold text-neutral-900 dark:text-white tracking-tight leading-none">Nossa Carteira</h1>
               <p className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest truncate mt-1">{familyName}</p>
@@ -295,12 +291,12 @@ const App: React.FC = () => {
         {activeTab === 'budget' && <BudgetSettings users={users} familyName={familyName} alertThreshold={alertThreshold} onUpdateUser={(uid: string, data: Partial<User>) => { const key = uid === users.A.id ? 'A' : 'B'; const updated = { ...users, [key]: { ...users[key], ...data } }; setUsers(updated); triggerSync('users', updated); }} onUpdateFamilySettings={(name: string, threshold: number) => { setFamilyName(name); setAlertThreshold(threshold); triggerSync('familyName', name); triggerSync('alertThreshold', threshold); }} currentTheme={theme} onThemeToggle={setTheme} onLogout={() => signOut(auth)} onForceSync={forceFullSync} isSyncing={isSyncing} />}
       </main>
 
-      <nav className="md:hidden fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] left-4 right-4 h-16 bg-white/80 dark:bg-neutral-900/90 backdrop-blur-2xl border border-neutral-200 dark:border-neutral-800 rounded-[2.5rem] flex justify-around items-center z-[100] shadow-[0_20px_50px_-15px_rgba(0,0,0,0.3)] px-2">
+      <nav className="md:hidden fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] left-4 right-4 h-16 bg-white/80 dark:bg-neutral-900/90 backdrop-blur-2xl border border-neutral-200 dark:border-neutral-800 rounded-[2.5rem] flex justify-around items-center z-[100] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.4)] px-2">
          <MobileNavItem icon={<HomeIcon />} active={activeTab === 'home'} onClick={() => setActiveTab('home')} />
          <MobileNavItem icon={<ListOrdered />} active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} />
          <button onClick={() => { setEditingTransaction(null); setIsAddModalOpen(true); }} className="w-14 h-14 bg-primary rounded-[1.8rem] flex items-center justify-center text-neutral-950 shadow-glow -translate-y-5 active:scale-90 transition-all border-[6px] border-neutral-50 dark:border-neutral-950"><Plus size={28} strokeWidth={3} /></button>
          <MobileNavItem icon={<ShoppingCart />} active={activeTab === 'shopping'} onClick={() => setActiveTab('shopping')} />
-         <MobileNavItem icon={<Settings />} active={activeTab === 'budget'} onClick={() => setActiveTab('budget')} />
+         <MobileNavItem icon={<Mic />} active={activeTab === 'alexa'} onClick={() => setActiveTab('alexa')} />
       </nav>
 
       <AddTransactionModal isOpen={isAddModalOpen} users={users} initialDate={currentDate} onClose={() => { setIsAddModalOpen(false); setEditingTransaction(null); }} onAdd={handleAddOrUpdateTransaction} editingTransaction={editingTransaction} />
