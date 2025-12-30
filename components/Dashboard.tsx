@@ -81,7 +81,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center space-x-3 md:space-x-4">
           <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/10 rounded-xl md:rounded-[1.2rem] flex items-center justify-center text-primary border border-primary/20 shadow-glow shrink-0">
-            <Calendar size={20} md:size={22} />
+            <Calendar size={22} />
           </div>
           <div>
             <h2 className="text-[8px] md:text-[10px] font-black text-neutral-500 uppercase tracking-[0.2em] md:tracking-[0.3em]">Extrato Mensal</h2>
@@ -150,7 +150,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                         {tx.title}
                       </h4>
                       <p className="text-[7px] md:text-[9px] font-black text-neutral-400 uppercase tracking-[0.1em] md:tracking-[0.2em] mt-0.5 md:mt-1 flex items-center truncate">
-                        {tx.category} <span className="mx-1 md:mx-2 opacity-30">|</span> {tx.isFixed ? <span className="flex items-center shrink-0"><Clock size={8} md:size={10} className="mr-0.5 md:mr-1" /> FIXO</span> : tx.date}
+                        {tx.category} <span className="mx-1 md:mx-2 opacity-30">|</span> {tx.isFixed ? <span className="flex items-center shrink-0"><Clock size={10} className="mr-1" /> FIXO</span> : tx.date}
                       </p>
                     </div>
                   </div>
@@ -174,14 +174,14 @@ export const Dashboard: React.FC<DashboardProps> = ({
                             : 'bg-transparent border-neutral-100 dark:border-neutral-800 text-neutral-400 hover:border-amber-500 hover:text-amber-500'
                         }`}
                        >
-                         {isActuallyPaid ? <CheckCircle2 size={10} md:size={14} strokeWidth={3} /> : <Circle size={10} md:size={14} strokeWidth={2.5} />}
+                         {isActuallyPaid ? <CheckCircle2 size={14} strokeWidth={3} /> : <Circle size={14} strokeWidth={2.5} />}
                          <span className="text-[7px] md:text-[9px] font-black uppercase tracking-widest">{isActuallyPaid ? 'PAGO' : 'PENDENTE'}</span>
                        </button>
 
                        {/* Grupo de Ações secundárias */}
                        <div className="flex bg-neutral-50 dark:bg-neutral-950 rounded-full border border-neutral-100 dark:border-neutral-800 p-0.5">
-                          <button onClick={() => onEdit(tx)} className="p-1.5 md:p-2 text-neutral-300 hover:text-primary transition-colors"><Edit3 size={12} md:size={14} /></button>
-                          <button onClick={() => onDelete(tx.id)} className="p-1.5 md:p-2 text-neutral-300 hover:text-red-500 transition-colors"><Trash2 size={12} md:size={14} /></button>
+                          <button onClick={() => onEdit(tx)} className="p-1.5 md:p-2 text-neutral-300 hover:text-primary transition-colors"><Edit3 size={14} /></button>
+                          <button onClick={() => onDelete(tx.id)} className="p-1.5 md:p-2 text-neutral-300 hover:text-red-500 transition-colors"><Trash2 size={14} /></button>
                        </div>
                     </div>
                   </div>

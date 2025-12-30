@@ -104,8 +104,8 @@ export const BudgetSettings: React.FC<BudgetSettingsProps> = ({
               <div className="w-24 h-24 md:w-32 md:h-32 rounded-2xl md:rounded-[2rem] border-4 border-primary/20 p-1 bg-neutral-100 dark:bg-neutral-800 shadow-xl md:shadow-2xl overflow-hidden transition-transform group-hover:scale-105">
                 <img src={avatarA} alt="User A" className="w-full h-full rounded-xl md:rounded-[1.5rem] object-cover" />
               </div>
-              <button onClick={() => fileInputRefA.current?.click()} className="absolute -bottom-1 -right-1 md:-bottom-2 md:-right-2 p-2.5 md:p-3 bg-primary text-neutral-950 rounded-xl md:rounded-2xl shadow-glow hover:scale-110 transition-transform active:scale-90">
-                <Camera size={16} md:size={18} strokeWidth={2.5} />
+              <button onClick={() => fileInputRefA.current?.click()} className="absolute -bottom-1 -right-1 md:-bottom-2 md:-right-2 p-3 bg-primary text-neutral-950 rounded-xl md:rounded-2xl shadow-glow hover:scale-110 transition-transform active:scale-90">
+                <Camera size={18} strokeWidth={2.5} />
               </button>
               <input type="file" ref={fileInputRefA} className="hidden" accept="image/*" onChange={(e) => {
                 const f = e.target.files?.[0];
@@ -148,8 +148,8 @@ export const BudgetSettings: React.FC<BudgetSettingsProps> = ({
               <div className="w-24 h-24 md:w-32 md:h-32 rounded-2xl md:rounded-[2rem] border-4 border-blue-500/20 p-1 bg-neutral-100 dark:bg-neutral-800 shadow-xl md:shadow-2xl overflow-hidden transition-transform group-hover:scale-105">
                 <img src={avatarB} alt="User B" className="w-full h-full rounded-xl md:rounded-[1.5rem] object-cover" />
               </div>
-              <button onClick={() => fileInputRefB.current?.click()} className="absolute -bottom-1 -right-1 md:-bottom-2 md:-right-2 p-2.5 md:p-3 bg-blue-500 text-white rounded-xl md:rounded-2xl shadow-[0_0_15px_rgba(59,130,246,0.4)] hover:scale-110 transition-transform active:scale-90">
-                <Camera size={16} md:size={18} strokeWidth={2.5} />
+              <button onClick={() => fileInputRefB.current?.click()} className="absolute -bottom-1 -right-1 md:-bottom-2 md:-right-2 p-3 bg-blue-500 text-white rounded-xl md:rounded-2xl shadow-[0_0_15px_rgba(59,130,246,0.4)] hover:scale-110 transition-transform active:scale-90">
+                <Camera size={18} strokeWidth={2.5} />
               </button>
               <input type="file" ref={fileInputRefB} className="hidden" accept="image/*" onChange={(e) => {
                 const f = e.target.files?.[0];
@@ -187,16 +187,16 @@ export const BudgetSettings: React.FC<BudgetSettingsProps> = ({
       {/* THEME SELECTOR */}
       <div className="p-6 md:p-8 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-[2rem] md:rounded-[2.5rem] shadow-sm">
         <div className="flex items-center space-x-4 mb-6 md:mb-8">
-          <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/10 rounded-xl md:rounded-2xl flex items-center justify-center text-primary border border-primary/20 shrink-0"><Sun size={20} md:size={24} /></div>
+          <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/10 rounded-xl md:rounded-2xl flex items-center justify-center text-primary border border-primary/20 shrink-0"><Sun size={24} /></div>
           <div><h3 className="text-xs md:text-sm font-bold text-neutral-900 dark:text-white uppercase tracking-widest leading-none">Tema Visual</h3><p className="text-[8px] md:text-[10px] text-neutral-500 font-medium mt-1">Adapte a interface ao seu estilo de uso.</p></div>
         </div>
         <div className="grid grid-cols-2 gap-3 md:gap-4">
           <button onClick={() => onThemeToggle('light')} className={`flex flex-col items-center justify-center space-y-2 md:space-y-3 p-6 md:p-8 rounded-[1.5rem] md:rounded-[2rem] border-2 transition-all ${currentTheme === 'light' ? 'border-primary bg-primary/5 shadow-glow' : 'border-neutral-100 dark:border-neutral-800 opacity-40 hover:opacity-70'}`}>
-            <Sun size={24} md:size={28} />
+            <Sun size={28} />
             <span className="text-[8px] md:text-[10px] font-black uppercase tracking-widest">Modo Claro</span>
           </button>
           <button onClick={() => onThemeToggle('dark')} className={`flex flex-col items-center justify-center space-y-2 md:space-y-3 p-6 md:p-8 rounded-[1.5rem] md:rounded-[2rem] border-2 transition-all ${currentTheme === 'dark' ? 'border-primary bg-primary/5 shadow-glow' : 'border-neutral-100 dark:border-neutral-800 opacity-40 hover:opacity-70'}`}>
-            <Moon size={24} md:size={28} />
+            <Moon size={28} />
             <span className="text-[8px] md:text-[10px] font-black uppercase tracking-widest">Modo Escuro</span>
           </button>
         </div>

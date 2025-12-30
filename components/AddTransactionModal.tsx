@@ -145,7 +145,7 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
             {editingTransaction ? 'Editar Dados' : 'Novo Lançamento'}
           </h2>
           <button onClick={handleAttemptClose} className="p-2 md:p-3 bg-neutral-900 rounded-full text-neutral-400 hover:text-white transition-all active:scale-90">
-            <X size={18} md:size={20} />
+            <X size={20} />
           </button>
         </div>
 
@@ -165,7 +165,7 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
             <label className="text-[9px] md:text-[10px] font-black text-neutral-500 uppercase tracking-widest px-1">Data do Lançamento</label>
             <div className="relative group">
               <div className="absolute left-6 md:left-8 top-1/2 -translate-y-1/2 text-neutral-500 transition-colors group-focus-within:text-primary z-20 pointer-events-none">
-                <CalendarIcon size={18} md:size={20} />
+                <CalendarIcon size={20} />
               </div>
               
               <input 
@@ -181,15 +181,15 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
              <label className="text-[9px] md:text-[10px] font-black text-neutral-500 uppercase tracking-widest px-1">Tipo e Status</label>
              <div className="grid grid-cols-3 gap-2 md:gap-3">
                 <button type="button" onClick={() => setIsPaid(!isPaid)} className={`flex flex-col items-center justify-center py-4 md:py-6 rounded-2xl md:rounded-3xl border transition-all ${isPaid ? 'bg-emerald-500/10 border-emerald-500 text-emerald-500' : 'bg-neutral-900/30 border-neutral-800 text-neutral-600'}`}>
-                  <Check size={20} md:size={24} strokeWidth={3} />
+                  <Check size={24} strokeWidth={3} />
                   <span className="text-[8px] md:text-[9px] font-black uppercase mt-1.5 md:mt-2">{isPaid ? 'Confirmado' : 'Pendente'}</span>
                 </button>
                 <button type="button" onClick={() => { setIsFixed(!isFixed); if(!isFixed) setIsInstallment(false); }} className={`flex flex-col items-center justify-center py-4 md:py-6 rounded-2xl md:rounded-3xl border transition-all ${isFixed ? 'bg-primary/10 border-primary text-primary' : 'bg-neutral-900/30 border-neutral-800 text-neutral-600'}`}>
-                  <Repeat size={20} md:size={24} />
+                  <Repeat size={24} />
                   <span className="text-[8px] md:text-[9px] font-black uppercase mt-1.5 md:mt-2">Fixo/Mês</span>
                 </button>
                 <button type="button" onClick={() => { setIsInstallment(!isInstallment); if(!isInstallment) setIsFixed(false); }} className={`flex flex-col items-center justify-center py-4 md:py-6 rounded-2xl md:rounded-3xl border transition-all ${isInstallment ? 'bg-blue-500/10 border-blue-500 text-blue-500' : 'bg-neutral-900/30 border-neutral-800 text-neutral-600'}`}>
-                  <CreditCard size={20} md:size={24} />
+                  <CreditCard size={24} />
                   <span className="text-[8px] md:text-[9px] font-black uppercase mt-1.5 md:mt-2">Parcelado</span>
                 </button>
              </div>
@@ -233,7 +233,7 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
                 disabled={!amount || !title} 
                 className="w-full py-6 md:py-8 rounded-2xl md:rounded-[2.5rem] bg-primary text-neutral-950 font-display font-black text-xs md:text-sm uppercase tracking-[0.2em] md:tracking-[0.25em] shadow-glow active:scale-95 flex items-center justify-center space-x-3 transition-all disabled:opacity-30"
               >
-                <Zap size={18} md:size={20} fill="currentColor" />
+                <Zap size={20} fill="currentColor" />
                 <span>CONFIRMAR AGENDAMENTO</span>
               </button>
           </div>
