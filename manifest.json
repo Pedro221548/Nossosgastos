@@ -4,12 +4,12 @@
   "description": "Gestão financeira unificada para casais.",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#FACC15",
+  "background_color": "#0F0F0F",
   "theme_color": "#FACC15",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='128' fill='%23FACC15'/%3E%3Cpath d='M256 420l-22-20C134 310 70 252 70 180c0-60 48-108 108-108 34 0 66 16 88 42 22-26 54-42 88-42 60 0 108 48 108 108 0 72-64 130-164 220l-22 20z' fill='%230F0F0F'/%3E%3C/svg%3E",
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='140' fill='%23FACC15'/%3E%3Cpath d='M256 440l-28-26C128 320 64 256 64 172c0-68 54-122 122-122 38 0 75 18 98 46 23-28 60-46 98-46 68 0 122 54 122 122 0 84-64 148-164 242l-28 26z' fill='%230F0F0F'/%3E%3C/svg%3E",
       "sizes": "192x192 512x512",
       "type": "image/svg+xml",
       "purpose": "any maskable"

@@ -23,8 +23,11 @@ interface HomeProps {
 
 const PremiumLogo = ({ className = "" }: { className?: string }) => (
   <div className={`relative flex items-center justify-center ${className}`}>
-    <div className="relative w-16 h-16 bg-primary rounded-[1.6rem] flex items-center justify-center shadow-glow overflow-hidden transform hover:scale-105 transition-transform duration-300">
-      <Heart size={32} className="text-neutral-900" fill="currentColor" strokeWidth={0} />
+    <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full animate-pulse"></div>
+    <div className="relative w-14 h-14 bg-neutral-900 border-2 border-primary/30 rounded-[1.5rem] flex items-center justify-center shadow-glow overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent"></div>
+      <Heart size={28} className="text-primary logo-glow" fill="currentColor" strokeWidth={0} />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-5 bg-neutral-900/40 rounded-full blur-[1px]"></div>
     </div>
   </div>
 );
