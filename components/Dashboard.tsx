@@ -76,46 +76,46 @@ export const Dashboard: React.FC<DashboardProps> = ({
   }, [filteredList, baseIncome, currentMonthKey]);
 
   return (
-    <div className="space-y-8 animate-slide-up text-left max-w-2xl mx-auto">
+    <div className="space-y-6 md:space-y-8 animate-slide-up text-left max-w-2xl mx-auto px-1 sm:px-0">
       {/* Header com Seletor de Mês Moderno */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-center space-x-4">
-          <div className="w-12 h-12 bg-primary/10 rounded-[1.2rem] flex items-center justify-center text-primary border border-primary/20 shadow-glow">
-            <Calendar size={22} />
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center space-x-3 md:space-x-4">
+          <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/10 rounded-xl md:rounded-[1.2rem] flex items-center justify-center text-primary border border-primary/20 shadow-glow shrink-0">
+            <Calendar size={20} md:size={22} />
           </div>
           <div>
-            <h2 className="text-[10px] font-black text-neutral-500 uppercase tracking-[0.3em]">Extrato Mensal</h2>
-            <span className="text-2xl font-display font-black text-neutral-900 dark:text-white uppercase italic tracking-tighter leading-none">{monthLabel}</span>
+            <h2 className="text-[8px] md:text-[10px] font-black text-neutral-500 uppercase tracking-[0.2em] md:tracking-[0.3em]">Extrato Mensal</h2>
+            <span className="text-xl md:text-2xl font-display font-black text-neutral-900 dark:text-white uppercase italic tracking-tighter leading-none">{monthLabel}</span>
           </div>
         </div>
-        <div className="flex items-center bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-2xl p-1.5 shadow-xl">
-          <button onClick={() => onMonthChange('prev')} className="p-3 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-xl transition-all active:scale-90"><ChevronLeft size={18} /></button>
-          <div className="w-px h-6 bg-neutral-100 dark:bg-neutral-800 mx-1" />
-          <button onClick={() => onMonthChange('next')} className="p-3 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-xl transition-all active:scale-90"><ChevronRight size={18} /></button>
+        <div className="flex items-center bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-xl md:rounded-2xl p-1 shadow-xl sm:w-auto w-full justify-between sm:justify-start">
+          <button onClick={() => onMonthChange('prev')} className="p-2 md:p-3 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg md:rounded-xl transition-all active:scale-90 flex-1 sm:flex-none flex justify-center"><ChevronLeft size={18} /></button>
+          <div className="w-px h-5 md:h-6 bg-neutral-100 dark:bg-neutral-800 mx-1" />
+          <button onClick={() => onMonthChange('next')} className="p-2 md:p-3 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg md:rounded-xl transition-all active:scale-90 flex-1 sm:flex-none flex justify-center"><ChevronRight size={18} /></button>
         </div>
       </div>
       
       {/* Dashboard de Saldo Real */}
-      <div className="bg-neutral-950 border border-neutral-800 rounded-[3rem] p-8 md:p-10 shadow-2xl relative overflow-hidden group">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 blur-[100px] rounded-full -mr-32 -mt-32 transition-opacity group-hover:opacity-60"></div>
-        <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+      <div className="bg-neutral-950 border border-neutral-800 rounded-[2rem] md:rounded-[3rem] p-6 md:p-10 shadow-2xl relative overflow-hidden group mx-1 sm:mx-0">
+        <div className="absolute top-0 right-0 w-48 h-48 md:w-64 md:h-64 bg-primary/10 blur-[80px] md:blur-[100px] rounded-full -mr-24 -mt-24 transition-opacity group-hover:opacity-60"></div>
+        <div className="relative z-10 flex flex-col sm:flex-row sm:items-end justify-between gap-6">
           <div className="space-y-2">
-            <p className="text-[10px] font-black text-neutral-500 uppercase tracking-[0.4em] mb-1">Saldo Líquido Disponível</p>
+            <p className="text-[8px] md:text-[10px] font-black text-neutral-500 uppercase tracking-[0.3em] md:tracking-[0.4em] mb-1">Saldo Líquido Disponível</p>
             <div className="flex items-baseline space-x-2">
-              <span className="text-2xl font-black text-primary italic">R$</span>
-              <h2 className={`text-6xl md:text-7xl font-display font-black tracking-tighter italic tabular-nums leading-none ${stats.balance < 0 ? 'text-red-500' : 'text-white'}`}>
+              <span className="text-xl md:text-2xl font-black text-primary italic">R$</span>
+              <h2 className={`text-4xl xs:text-5xl md:text-7xl font-display font-black tracking-tighter italic tabular-nums leading-none ${stats.balance < 0 ? 'text-red-500' : 'text-white'}`}>
                 {stats.balance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
               </h2>
             </div>
           </div>
-          <div className="grid grid-cols-1 gap-2 min-w-[160px]">
-            <div className="flex items-center justify-between bg-white/5 border border-white/10 px-4 py-3 rounded-2xl">
-               <span className="text-[9px] font-black text-neutral-500 uppercase tracking-widest">A Pagar</span>
-               <span className="text-sm font-black text-amber-500 tabular-nums">R$ {stats.pending.toLocaleString()}</span>
+          <div className="grid grid-cols-2 sm:grid-cols-1 gap-2 min-w-[140px] md:min-w-[160px]">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between bg-white/5 border border-white/10 px-3 py-2 md:px-4 md:py-3 rounded-xl md:rounded-2xl">
+               <span className="text-[7px] md:text-[9px] font-black text-neutral-500 uppercase tracking-widest sm:mb-0 mb-1">A Pagar</span>
+               <span className="text-xs md:text-sm font-black text-amber-500 tabular-nums">R$ {stats.pending.toLocaleString()}</span>
             </div>
-            <div className="flex items-center justify-between bg-emerald-500/10 border border-emerald-500/20 px-4 py-3 rounded-2xl">
-               <span className="text-[9px] font-black text-emerald-500/60 uppercase tracking-widest">Pagos</span>
-               <span className="text-sm font-black text-emerald-500 tabular-nums">R$ {stats.paid.toLocaleString()}</span>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between bg-emerald-500/10 border border-emerald-500/20 px-3 py-2 md:px-4 md:py-3 rounded-xl md:rounded-2xl">
+               <span className="text-[7px] md:text-[9px] font-black text-emerald-500/60 uppercase tracking-widest sm:mb-0 mb-1">Pagos</span>
+               <span className="text-xs md:text-sm font-black text-emerald-500 tabular-nums">R$ {stats.paid.toLocaleString()}</span>
             </div>
           </div>
         </div>
@@ -124,64 +124,64 @@ export const Dashboard: React.FC<DashboardProps> = ({
       {/* Lista de Transações Redesenhada */}
       <div className="space-y-4">
         <div className="flex items-center justify-between px-2">
-          <h3 className="text-[10px] font-black text-neutral-500 uppercase tracking-[0.4em]">Detalhamento</h3>
-          <span className="text-[9px] font-bold text-neutral-400 uppercase tracking-widest">{filteredList.length} Lançamentos</span>
+          <h3 className="text-[8px] md:text-[10px] font-black text-neutral-500 uppercase tracking-[0.3em] md:tracking-[0.4em]">Detalhamento</h3>
+          <span className="text-[8px] md:text-[9px] font-bold text-neutral-400 uppercase tracking-widest">{filteredList.length} Lançamentos</span>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-2 md:space-y-3">
           {filteredList.map((tx) => {
             const isActuallyPaid = tx.isFixed ? (tx.paidMonths?.includes(currentMonthKey) ?? false) : tx.isPaid;
             return (
               <div 
                 key={tx.id} 
-                className={`group relative bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-[2rem] p-5 md:p-6 transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5 ${isActuallyPaid ? 'opacity-60 dark:opacity-40' : ''}`}
+                className={`group relative bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-2xl md:rounded-[2rem] p-4 md:p-6 transition-all duration-300 shadow-sm hover:shadow-md ${isActuallyPaid ? 'opacity-50 grayscale-[0.5]' : ''}`}
               >
                 {/* Linha Lateral de Status */}
-                <div className={`absolute left-0 top-6 bottom-6 w-1 rounded-r-full transition-all ${isActuallyPaid ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]' : 'bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.3)]'}`} />
+                <div className={`absolute left-0 top-4 bottom-4 w-1 rounded-r-full transition-all ${isActuallyPaid ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]' : 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.2)]'}`} />
 
-                <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center justify-between gap-3 md:gap-4">
                   {/* Info Lado Esquerdo */}
-                  <div className="flex items-center space-x-4">
-                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl shadow-inner transition-all ${isActuallyPaid ? 'bg-emerald-500/10 text-emerald-500' : 'bg-neutral-50 dark:bg-neutral-950 text-neutral-400 group-hover:text-primary'}`}>
+                  <div className="flex items-center space-x-3 md:space-x-4 min-w-0">
+                    <div className={`w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl flex items-center justify-center text-xl md:text-2xl shadow-inner transition-all shrink-0 ${isActuallyPaid ? 'bg-emerald-500/10 text-emerald-500' : 'bg-neutral-50 dark:bg-neutral-950 text-neutral-400 group-hover:text-primary'}`}>
                       {tx.emoji}
                     </div>
-                    <div>
-                      <h4 className={`text-lg font-black uppercase italic tracking-tighter leading-tight ${isActuallyPaid ? 'text-neutral-400 line-through decoration-emerald-500/50 decoration-2' : 'text-neutral-900 dark:text-white'}`}>
+                    <div className="min-w-0">
+                      <h4 className={`text-sm md:text-lg font-black uppercase italic tracking-tighter leading-tight truncate ${isActuallyPaid ? 'text-neutral-400 line-through decoration-emerald-500/50 decoration-2' : 'text-neutral-900 dark:text-white'}`}>
                         {tx.title}
                       </h4>
-                      <p className="text-[9px] font-black text-neutral-400 uppercase tracking-[0.2em] mt-1 flex items-center">
-                        {tx.category} <span className="mx-2 opacity-30">|</span> {tx.isFixed ? <span className="flex items-center"><Clock size={10} className="mr-1" /> FIXO</span> : tx.date}
+                      <p className="text-[7px] md:text-[9px] font-black text-neutral-400 uppercase tracking-[0.1em] md:tracking-[0.2em] mt-0.5 md:mt-1 flex items-center truncate">
+                        {tx.category} <span className="mx-1 md:mx-2 opacity-30">|</span> {tx.isFixed ? <span className="flex items-center shrink-0"><Clock size={8} md:size={10} className="mr-0.5 md:mr-1" /> FIXO</span> : tx.date}
                       </p>
                     </div>
                   </div>
 
                   {/* Info Lado Direito / Ações */}
-                  <div className="flex flex-col items-end space-y-3">
+                  <div className="flex flex-col items-end space-y-2 md:space-y-3 shrink-0">
                     <div className="text-right">
-                      <p className={`text-xl font-display font-black tracking-tighter italic tabular-nums leading-none ${tx.type === 'revenue' ? 'text-emerald-500' : 'text-neutral-900 dark:text-white'}`}>
-                        <span className="text-[10px] mr-1 opacity-40">R$</span>
+                      <p className={`text-base md:text-xl font-display font-black tracking-tighter italic tabular-nums leading-none ${tx.type === 'revenue' ? 'text-emerald-500' : 'text-neutral-900 dark:text-white'}`}>
+                        <span className="text-[8px] md:text-[10px] mr-0.5 opacity-40">R$</span>
                         {tx.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                       </p>
                     </div>
                     
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-1 md:space-x-2">
                        {/* Botão PAGO Moderno */}
                        <button 
                         onClick={() => onTogglePaid(tx.id, tx.isFixed ? currentMonthKey : undefined)}
-                        className={`flex items-center space-x-2 px-4 py-2 rounded-full border-2 transition-all active:scale-95 ${
+                        className={`flex items-center space-x-1 md:space-x-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full border-2 transition-all active:scale-95 ${
                           isActuallyPaid 
                             ? 'bg-emerald-500 border-emerald-500 text-neutral-950 font-black' 
                             : 'bg-transparent border-neutral-100 dark:border-neutral-800 text-neutral-400 hover:border-amber-500 hover:text-amber-500'
                         }`}
                        >
-                         {isActuallyPaid ? <CheckCircle2 size={14} strokeWidth={3} /> : <Circle size={14} strokeWidth={2.5} />}
-                         <span className="text-[9px] font-black uppercase tracking-widest">{isActuallyPaid ? 'PAGO' : 'PENDENTE'}</span>
+                         {isActuallyPaid ? <CheckCircle2 size={10} md:size={14} strokeWidth={3} /> : <Circle size={10} md:size={14} strokeWidth={2.5} />}
+                         <span className="text-[7px] md:text-[9px] font-black uppercase tracking-widest">{isActuallyPaid ? 'PAGO' : 'PENDENTE'}</span>
                        </button>
 
                        {/* Grupo de Ações secundárias */}
                        <div className="flex bg-neutral-50 dark:bg-neutral-950 rounded-full border border-neutral-100 dark:border-neutral-800 p-0.5">
-                          <button onClick={() => onEdit(tx)} className="p-2 text-neutral-300 hover:text-primary transition-colors"><Edit3 size={14} /></button>
-                          <button onClick={() => onDelete(tx.id)} className="p-2 text-neutral-300 hover:text-red-500 transition-colors"><Trash2 size={14} /></button>
+                          <button onClick={() => onEdit(tx)} className="p-1.5 md:p-2 text-neutral-300 hover:text-primary transition-colors"><Edit3 size={12} md:size={14} /></button>
+                          <button onClick={() => onDelete(tx.id)} className="p-1.5 md:p-2 text-neutral-300 hover:text-red-500 transition-colors"><Trash2 size={12} md:size={14} /></button>
                        </div>
                     </div>
                   </div>
@@ -191,8 +191,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
           })}
           
           {filteredList.length === 0 && (
-            <div className="py-20 text-center bg-neutral-50 dark:bg-neutral-900/30 rounded-[3rem] border-2 border-dashed border-neutral-100 dark:border-neutral-800">
-              <p className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.4em] italic">Nenhum lançamento para este mês</p>
+            <div className="py-16 md:py-20 text-center bg-neutral-50 dark:bg-neutral-900/30 rounded-[2rem] md:rounded-[3rem] border-2 border-dashed border-neutral-100 dark:border-neutral-800 mx-1">
+              <p className="text-[8px] md:text-[10px] font-black text-neutral-400 uppercase tracking-[0.4em] italic">Nenhum lançamento para este mês</p>
             </div>
           )}
         </div>
