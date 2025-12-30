@@ -10,7 +10,8 @@ import {
   Heart,
   Clock,
   ShieldCheck,
-  ChevronRight
+  ChevronRight,
+  Share2
 } from 'lucide-react';
 
 interface HomeProps {
@@ -73,6 +74,19 @@ export const Home: React.FC<HomeProps> = ({
   const formattedDate = now.toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric', month: 'short' }).toUpperCase();
   const formattedTime = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 
+  const handleShareWhatsApp = () => {
+    const monthName = now.toLocaleString('pt-BR', { month: 'long' });
+    const message = `📊 *Resumo Financeiro - ${familyName}*\n` +
+      `📅 Mês: ${monthName.charAt(0).toUpperCase() + monthName.slice(1)}\n\n` +
+      `💰 *Saldo Real:* R$ ${balance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}\n` +
+      `📈 *Ganhos:* R$ ${totalIncome.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}\n` +
+      `💸 *Gastos Pagos:* R$ ${paidExpenses.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}\n\n` +
+      `Sincronizado via *Nossa Carteira* 🚀`;
+    
+    const encodedMessage = encodeURIComponent(message);
+    window.open(`https://api.whatsapp.com/send?text=${encodedMessage}`, '_blank');
+  };
+
   return (
     <div className="space-y-6 md:space-y-10 animate-slide-up pb-24 md:pb-0 px-2 sm:px-0">
       <div className="flex flex-col items-center justify-center text-center space-y-4 md:space-y-5 pt-2">
@@ -118,13 +132,22 @@ export const Home: React.FC<HomeProps> = ({
                 </h3>
               </div>
             </div>
-            <button 
-              onClick={() => onNavigate('dashboard')}
-              className="flex items-center justify-center space-x-3 bg-white/5 border border-white/10 px-5 py-3 md:px-6 md:py-4 rounded-2xl md:rounded-[1.5rem] transition-all active:scale-95 group/btn mx-auto md:mx-0 w-full md:w-auto"
-            >
-              <TrendingUp size={14} className="text-primary group-hover/btn:translate-x-1 transition-transform" />
-              <span className="text-[9px] md:text-[10px] font-black text-white uppercase tracking-widest italic">Ver Extrato</span>
-            </button>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button 
+                onClick={() => onNavigate('dashboard')}
+                className="flex-1 flex items-center justify-center space-x-3 bg-white/5 border border-white/10 px-5 py-3 md:px-6 md:py-4 rounded-2xl md:rounded-[1.5rem] transition-all active:scale-95 group/btn"
+              >
+                <TrendingUp size={14} className="text-primary group-hover/btn:translate-x-1 transition-transform" />
+                <span className="text-[9px] md:text-[10px] font-black text-white uppercase tracking-widest italic">Ver Extrato</span>
+              </button>
+              <button 
+                onClick={handleShareWhatsApp}
+                className="flex-1 flex items-center justify-center space-x-3 bg-emerald-500/10 border border-emerald-500/20 px-5 py-3 md:px-6 md:py-4 rounded-2xl md:rounded-[1.5rem] transition-all active:scale-95 group/share"
+              >
+                <Share2 size={14} className="text-emerald-500 group-hover/share:scale-110 transition-transform" />
+                <span className="text-[9px] md:text-[10px] font-black text-emerald-500 uppercase tracking-widest italic">Compartilhar</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
