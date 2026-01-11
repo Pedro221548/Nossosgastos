@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Transaction, Goal, User, AppTab } from '../types';
 import { 
@@ -9,7 +10,9 @@ import {
   Heart,
   Clock,
   ShieldCheck,
-  Share2
+  Share2,
+  AlertCircle,
+  ChevronRight
 } from 'lucide-react';
 
 interface HomeProps {
@@ -55,7 +58,10 @@ export const Home: React.FC<HomeProps> = ({
 
   const currentMonthTransactions = transactions.filter(t => {
     const [d, m, y] = t.date.split('/').map(Number);
-    return (m === currentMonth + 1 && y === currentYear) || (t.isFixed);
+    // Include if it's explicitly for this month OR it's a fixed transaction (relevant for any month)
+    const isExplicitlyThisMonth = m === currentMonth + 1 && y === currentYear;
+    const isFixedRelevant = t.isFixed && (y < currentYear || (y === currentYear && m <= currentMonth + 1));
+    return isExplicitlyThisMonth || isFixedRelevant;
   });
 
   const totalIncome = users.A.income + users.B.income + currentMonthTransactions
@@ -68,6 +74,11 @@ export const Home: React.FC<HomeProps> = ({
     .reduce((acc, t) => acc + t.amount, 0);
 
   const balance = totalIncome - paidExpenses;
+
+  // Reminders for fixed expenses not yet paid this month
+  const pendingFixedReminders = currentMonthTransactions.filter(t => 
+    t.isFixed && t.type === 'expense' && !t.paidMonths?.includes(monthKey)
+  );
 
   const formattedDate = now.toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric', month: 'short' }).toUpperCase();
   const formattedTime = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
@@ -134,6 +145,49 @@ export const Home: React.FC<HomeProps> = ({
               </button>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Payment Reminders Section */}
+      <div className="space-y-4 px-1 sm:px-0">
+        <div className="flex items-center justify-between px-2">
+          <h3 className="text-[8px] md:text-[10px] font-black text-neutral-500 uppercase tracking-[0.3em] italic">Lembretes de Pagamento</h3>
+          {pendingFixedReminders.length > 0 && (
+            <span className="flex items-center space-x-1.5 px-2 py-0.5 bg-red-500/10 text-red-500 rounded-full text-[7px] font-black uppercase tracking-widest">
+              <AlertCircle size={8} /> <span>{pendingFixedReminders.length} Pendentes</span>
+            </span>
+          )}
+        </div>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {pendingFixedReminders.length > 0 ? (
+            pendingFixedReminders.slice(0, 4).map(tx => (
+              <button 
+                key={tx.id} 
+                onClick={() => onNavigate('dashboard')}
+                className="flex items-center justify-between p-4 bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-2xl shadow-sm hover:shadow-md transition-all active:scale-[0.98] group"
+              >
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 rounded-xl bg-neutral-50 dark:bg-neutral-950 flex items-center justify-center text-lg grayscale group-hover:grayscale-0 transition-all border border-neutral-100 dark:border-neutral-800">
+                    {tx.emoji}
+                  </div>
+                  <div className="text-left">
+                    <p className="text-[10px] md:text-[11px] font-display font-black text-neutral-900 dark:text-white uppercase italic truncate max-w-[120px]">{tx.title}</p>
+                    <p className="text-[7px] md:text-[8px] font-black text-neutral-400 uppercase tracking-widest">Conta Fixa Mensal</p>
+                  </div>
+                </div>
+                <div className="text-right flex items-center space-x-2">
+                  <span className="text-xs md:text-sm font-black text-neutral-900 dark:text-white tabular-nums tracking-tighter">R$ {tx.amount.toLocaleString('pt-BR')}</span>
+                  <ChevronRight size={12} className="text-neutral-300 group-hover:text-primary transition-colors" />
+                </div>
+              </button>
+            ))
+          ) : (
+            <div className="col-span-full py-6 flex flex-col items-center justify-center bg-emerald-500/5 border border-dashed border-emerald-500/20 rounded-[2rem]">
+              <ShieldCheck className="text-emerald-500/40 mb-2" size={24} />
+              <p className="text-[8px] md:text-[9px] font-black text-emerald-500/60 uppercase tracking-[0.3em] italic">Tudo em dia para este mês! ✨</p>
+            </div>
+          )}
         </div>
       </div>
 
