@@ -154,26 +154,40 @@ const App: React.FC = () => {
     setIsSyncing(true);
     try {
       const [d, m, y] = tx.date.split('/');
-      const isoDate = `${y}-${m}-${d}`;
-
-      const payload = {
+      
+      const createPayload = (currentDate: string, currentInstallment?: number) => ({
         descricao: tx.title,
         valor: tx.amount,
         categoria: tx.category,
-        data: isoDate,
+        data: currentDate,
         userId: tx.spenderId,
         emoji: tx.emoji,
         tipo: tx.type === 'expense' ? 'despesa' : 'receita',
         pago: tx.isPaid,
         isFixed: tx.isFixed,
         paidMonths: tx.paidMonths || [],
-        installments: tx.installments || null
-      };
+        installments: currentInstallment ? { current: currentInstallment, total: tx.installments!.total } : null
+      });
 
       if (editingTransaction) {
-        await updateFirestoreTransaction(editingTransaction.id, payload);
+        const isoDate = `${y}-${m}-${d}`;
+        await updateFirestoreTransaction(editingTransaction.id, createPayload(isoDate, tx.installments?.current));
       } else {
-        await addDoc(collection(firestore, "transacoes"), payload);
+        if (tx.installments && tx.installments.total > 1) {
+          const promises = [];
+          const startDate = new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
+          
+          for (let i = 0; i < tx.installments.total; i++) {
+            const nextDate = new Date(startDate);
+            nextDate.setMonth(startDate.getMonth() + i);
+            const isoDateString = `${nextDate.getFullYear()}-${(nextDate.getMonth() + 1).toString().padStart(2, '0')}-${nextDate.getDate().toString().padStart(2, '0')}`;
+            promises.push(addDoc(collection(firestore, "transacoes"), createPayload(isoDateString, i + 1)));
+          }
+          await Promise.all(promises);
+        } else {
+          const isoDate = `${y}-${m}-${d}`;
+          await addDoc(collection(firestore, "transacoes"), createPayload(isoDate));
+        }
       }
       setIsAddModalOpen(false);
       setEditingTransaction(null);

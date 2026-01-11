@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { X, Check, Repeat, CreditCard, Zap, Calendar as CalendarIcon } from 'lucide-react';
+import { X, Check, Repeat, CreditCard, Zap, Calendar as CalendarIcon, Hash } from 'lucide-react';
 import { CATEGORIES } from '../constants';
 import { Transaction, User, TransactionType } from '../types';
 
@@ -123,7 +123,7 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
       isFixed: isFixed,
       paidMonths: editingTransaction?.paidMonths || [],
       installments: (isInstallment && installmentsCount > 1) ? {
-        current: 1,
+        current: editingTransaction?.installments?.current || 1,
         total: installmentsCount
       } : undefined
     };
@@ -195,6 +195,24 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
              </div>
           </div>
 
+          {isInstallment && (
+            <div className="space-y-4 animate-in slide-in-from-top duration-300">
+              <label className="text-[9px] md:text-[10px] font-black text-neutral-500 uppercase tracking-widest px-1">Número de Parcelas</label>
+              <div className="relative group">
+                <Hash className="absolute left-6 md:left-8 top-1/2 -translate-y-1/2 text-neutral-500 group-focus-within:text-blue-500 transition-colors z-20 pointer-events-none" size={20} />
+                <input 
+                  type="number" 
+                  min="2"
+                  max="120"
+                  value={totalInstallments} 
+                  onChange={e => setTotalInstallments(e.target.value)} 
+                  className="w-full pl-16 md:pl-20 pr-8 py-5 md:py-7 bg-neutral-950/50 border border-neutral-800 rounded-2xl md:rounded-[2.5rem] font-display font-black text-white text-lg md:text-2xl outline-none focus:border-blue-500/50 transition-all shadow-xl tracking-tighter"
+                  placeholder="2"
+                />
+              </div>
+            </div>
+          )}
+
           <div className="space-y-4">
             <label className="text-[9px] md:text-[10px] font-black text-neutral-500 uppercase tracking-widest px-1">Responsável</label>
             <div className="grid grid-cols-2 gap-3 md:gap-4">
@@ -213,7 +231,7 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
           </div>
 
           <div className="space-y-4">
-             <label className="text-[9px] md:text-[10px] font-black text-neutral-500 uppercase tracking-widest px-1">Valor Final</label>
+             <label className="text-[9px] md:text-[10px] font-black text-neutral-500 uppercase tracking-widest px-1">Valor Final {isInstallment ? '(por parcela)' : ''}</label>
              <div className="relative group">
                <span className="absolute left-6 md:left-10 top-1/2 -translate-y-1/2 text-xl md:text-2xl font-black text-neutral-700 transition-colors group-focus-within:text-white">R$</span>
                <input 
