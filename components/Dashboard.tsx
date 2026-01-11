@@ -46,11 +46,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
       const isCurrentMonth = tDate.getMonth() === currentDate.getMonth() && tDate.getFullYear() === currentDate.getFullYear();
       const isFixedAndRelevant = t.isFixed && (tDate.getFullYear() < currentDate.getFullYear() || (tDate.getFullYear() === currentDate.getFullYear() && tDate.getMonth() <= currentDate.getMonth()));
       return isCurrentMonth || isFixedAndRelevant;
-    }).sort((a, b) => {
-      const [da, ma, ya] = a.date.split('/').map(Number);
-      const [db, mb, yb] = b.date.split('/').map(Number);
-      return new Date(yb, mb - 1, db).getTime() - new Date(ya, ma - 1, da).getTime();
-    });
+    }).sort((a, b) => a.amount - b.amount); // Ordenado do menor para o maior valor
   }, [transactions, currentDate]);
 
   const stats = useMemo(() => {

@@ -75,10 +75,10 @@ export const Home: React.FC<HomeProps> = ({
 
   const balance = totalIncome - paidExpenses;
 
-  // Reminders for fixed expenses not yet paid this month
-  const pendingFixedReminders = currentMonthTransactions.filter(t => 
-    t.isFixed && t.type === 'expense' && !t.paidMonths?.includes(monthKey)
-  );
+  // Reminders for fixed expenses not yet paid this month, sorted from smallest to largest value
+  const pendingFixedReminders = currentMonthTransactions
+    .filter(t => t.isFixed && t.type === 'expense' && !t.paidMonths?.includes(monthKey))
+    .sort((a, b) => a.amount - b.amount);
 
   const formattedDate = now.toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric', month: 'short' }).toUpperCase();
   const formattedTime = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
