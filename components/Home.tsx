@@ -27,7 +27,7 @@ interface HomeProps {
 const PremiumLogo = ({ className = "" }: { className?: string }) => (
   <div className={`relative flex items-center justify-center ${className}`}>
     <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full animate-pulse"></div>
-    <div className="relative w-14 h-14 bg-neutral-900 border-2 border-primary/30 rounded-[1.5rem] flex items-center justify-center shadow-glow overflow-hidden">
+    <div className="relative w-14 h-14 bg-neutral-950 border-2 border-primary/30 rounded-[1.5rem] flex items-center justify-center shadow-glow overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent"></div>
       <Heart size={28} className="text-primary logo-glow" fill="currentColor" strokeWidth={0} />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-5 bg-neutral-900/40 rounded-full blur-[1px]"></div>
@@ -90,7 +90,7 @@ export const Home: React.FC<HomeProps> = ({
       `💰 *Saldo Real:* R$ ${balance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}\n` +
       `📈 *Ganhos:* R$ ${totalIncome.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}\n` +
       `💸 *Gastos Pagos:* R$ ${paidExpenses.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}\n\n` +
-      `Sincronizado via *Nossa Carteira* 🚀`;
+      `Sincronizado via *NOSSA CARTEIRA* 🚀`;
     const encodedMessage = encodeURIComponent(message);
     window.open(`https://api.whatsapp.com/send?text=${encodedMessage}`, '_blank');
   };
@@ -105,7 +105,7 @@ export const Home: React.FC<HomeProps> = ({
             <p className="text-[9px] md:text-[10px] font-black text-neutral-400 uppercase tracking-[0.4em] italic">{now.getHours() < 12 ? 'BOM DIA' : now.getHours() < 18 ? 'BOA TARDE' : 'BOA NOITE'}</p>
             <span className="h-px w-4 sm:w-6 bg-neutral-200 dark:bg-neutral-800"></span>
           </div>
-          <h2 className="text-3xl md:text-5xl font-display font-black text-neutral-900 dark:text-white uppercase tracking-tighter italic leading-tight">{familyName.split(' ')[0]} <span className="text-primary italic">Sinc</span></h2>
+          <h2 className="text-3xl md:text-5xl font-display font-black text-neutral-900 dark:text-white uppercase tracking-tighter italic leading-tight">NOSSA <span className="text-primary italic">CARTEIRA</span></h2>
           <div className="flex items-center justify-center space-x-2 mt-1">
             <p className="text-[8px] md:text-[9px] font-black text-neutral-500 uppercase tracking-[0.2em]">{formattedDate}</p>
             <span className="text-neutral-300 dark:text-neutral-800 opacity-30">|</span>

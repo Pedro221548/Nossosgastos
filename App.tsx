@@ -272,9 +272,9 @@ const App: React.FC = () => {
       <aside className="hidden md:flex flex-col w-72 bg-white dark:bg-neutral-900/50 border-r border-neutral-200 dark:border-neutral-800 sticky top-0 h-screen p-8 z-50">
         <div className="flex items-center justify-between mb-12">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-neutral-950 shadow-glow"><Heart size={20} strokeWidth={3} /></div>
+            <div className="w-10 h-10 bg-neutral-950 rounded-xl flex items-center justify-center text-primary shadow-glow border border-primary/20"><Heart size={20} strokeWidth={3} fill="currentColor" /></div>
             <div>
-              <h1 className="text-lg font-display font-bold text-neutral-900 dark:text-white tracking-tight leading-none">Nossa Carteira</h1>
+              <h1 className="text-lg font-display font-black text-neutral-900 dark:text-white tracking-tight leading-none uppercase italic">NOSSA CARTEIRA</h1>
               <p className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest truncate mt-1">{familyName}</p>
             </div>
           </div>

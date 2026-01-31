@@ -1,6 +1,7 @@
+
 {
-  "name": "Nossa Carteira",
-  "short_name": "Carteira",
+  "name": "NOSSA CARTEIRA",
+  "short_name": "CARTEIRA",
   "description": "Gestão financeira unificada para casais.",
   "start_url": "./index.html",
   "display": "standalone",
@@ -9,7 +10,7 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='140' fill='%23FACC15'/%3E%3Cpath d='M256 440l-28-26C128 320 64 256 64 172c0-68 54-122 122-122 38 0 75 18 98 46 23-28 60-46 98-46 68 0 122 54 122 122 0 84-64 148-164 242l-28 26z' fill='%230F0F0F'/%3E%3C/svg%3E",
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='140' fill='%230F0F0F'/%3E%3Cpath d='M256 440l-28-26C128 320 64 256 64 172c0-68 54-122 122-122 38 0 75 18 98 46 23-28 60-46 98-46 68 0 122 54 122 122 0 84-64 148-164 242l-28 26z' fill='%23FACC15'/%3E%3C/svg%3E",
       "sizes": "192x192 512x512",
       "type": "image/svg+xml",
       "purpose": "any maskable"
