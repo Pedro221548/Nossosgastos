@@ -4,22 +4,17 @@ import { auth } from '../services/firebase';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 import { Heart, Mail, Lock, Loader2, ArrowRight, Sparkles, Eye, EyeOff } from 'lucide-react';
 
-interface LoginProps {
-  onLoginSuccess: () => void;
-}
-
 const PremiumLogo = () => (
   <div className="relative flex items-center justify-center mb-6">
     <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full animate-pulse"></div>
-    <div className="relative w-20 h-20 bg-neutral-900 border-2 border-primary/40 rounded-[2rem] flex items-center justify-center shadow-glow overflow-hidden">
+    <div className="relative w-20 h-20 bg-neutral-900 border-2 border-primary rounded-[2.2rem] flex items-center justify-center shadow-glow overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent"></div>
-      <Heart size={40} className="text-primary logo-glow" fill="currentColor" strokeWidth={0} />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-8 bg-neutral-900/50 rounded-full blur-[1px]"></div>
+      <Heart size={44} className="text-primary logo-glow" fill="currentColor" strokeWidth={0} />
     </div>
   </div>
 );
 
-export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
+export const Login: React.FC<{ onLoginSuccess: () => void }> = ({ onLoginSuccess }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -72,9 +67,9 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
           <PremiumLogo />
           <div className="space-y-1">
             <h1 className="text-4xl font-display font-black text-white uppercase tracking-tighter italic leading-none">
-              Nossa <span className="text-primary">Carteira</span>
+              NOSSA <span className="text-primary">CARTEIRA</span>
             </h1>
-            <p className="text-neutral-500 text-[10px] font-bold uppercase tracking-[0.4em]">Sincronização do Casal</p>
+            <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.4em] italic">Sincronização do Casal</p>
           </div>
         </div>
 
@@ -112,7 +107,6 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-600 hover:text-neutral-400 transition-colors focus:outline-none"
-                    title={showPassword ? "Ocultar senha" : "Mostrar senha"}
                   >
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>

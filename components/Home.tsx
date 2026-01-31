@@ -27,10 +27,9 @@ interface HomeProps {
 const PremiumLogo = ({ className = "" }: { className?: string }) => (
   <div className={`relative flex items-center justify-center ${className}`}>
     <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full animate-pulse"></div>
-    <div className="relative w-14 h-14 bg-neutral-950 border-2 border-primary/30 rounded-[1.5rem] flex items-center justify-center shadow-glow overflow-hidden">
+    <div className="relative w-16 h-16 bg-neutral-900 border-2 border-primary rounded-[1.8rem] flex items-center justify-center shadow-glow overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent"></div>
-      <Heart size={28} className="text-primary logo-glow" fill="currentColor" strokeWidth={0} />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-5 bg-neutral-900/40 rounded-full blur-[1px]"></div>
+      <Heart size={32} className="text-primary logo-glow" fill="currentColor" strokeWidth={0} />
     </div>
   </div>
 );
@@ -58,7 +57,6 @@ export const Home: React.FC<HomeProps> = ({
 
   const currentMonthTransactions = transactions.filter(t => {
     const [d, m, y] = t.date.split('/').map(Number);
-    // Include if it's explicitly for this month OR it's a fixed transaction (relevant for any month)
     const isExplicitlyThisMonth = m === currentMonth + 1 && y === currentYear;
     const isFixedRelevant = t.isFixed && (y < currentYear || (y === currentYear && m <= currentMonth + 1));
     return isExplicitlyThisMonth || isFixedRelevant;
@@ -75,7 +73,6 @@ export const Home: React.FC<HomeProps> = ({
 
   const balance = totalIncome - paidExpenses;
 
-  // Reminders for fixed expenses not yet paid this month, sorted from smallest to largest value
   const pendingFixedReminders = currentMonthTransactions
     .filter(t => t.isFixed && t.type === 'expense' && !t.paidMonths?.includes(monthKey))
     .sort((a, b) => a.amount - b.amount);
@@ -100,13 +97,13 @@ export const Home: React.FC<HomeProps> = ({
       <div className="flex flex-col items-center justify-center text-center space-y-4 md:space-y-5 pt-2">
         <PremiumLogo />
         <div className="space-y-1 px-4">
-          <div className="flex items-center justify-center space-x-2">
-            <span className="h-px w-4 sm:w-6 bg-neutral-200 dark:bg-neutral-800"></span>
-            <p className="text-[9px] md:text-[10px] font-black text-neutral-400 uppercase tracking-[0.4em] italic">{now.getHours() < 12 ? 'BOM DIA' : now.getHours() < 18 ? 'BOA TARDE' : 'BOA NOITE'}</p>
-            <span className="h-px w-4 sm:w-6 bg-neutral-200 dark:bg-neutral-800"></span>
-          </div>
-          <h2 className="text-3xl md:text-5xl font-display font-black text-neutral-900 dark:text-white uppercase tracking-tighter italic leading-tight">NOSSA <span className="text-primary italic">CARTEIRA</span></h2>
-          <div className="flex items-center justify-center space-x-2 mt-1">
+          <h2 className="text-3xl md:text-5xl font-display font-black text-white uppercase tracking-tighter italic leading-none">
+            NOSSA <span className="text-primary">CARTEIRA</span>
+          </h2>
+          <p className="text-[9px] md:text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.4em] italic mt-1">
+            SINCRONIZAÇÃO DO CASAL
+          </p>
+          <div className="flex items-center justify-center space-x-2 mt-4">
             <p className="text-[8px] md:text-[9px] font-black text-neutral-500 uppercase tracking-[0.2em]">{formattedDate}</p>
             <span className="text-neutral-300 dark:text-neutral-800 opacity-30">|</span>
             <div className="flex items-center space-x-1.5">
@@ -148,7 +145,6 @@ export const Home: React.FC<HomeProps> = ({
         </div>
       </div>
 
-      {/* Payment Reminders Section */}
       <div className="space-y-4 px-1 sm:px-0">
         <div className="flex items-center justify-between px-2">
           <h3 className="text-[8px] md:text-[10px] font-black text-neutral-500 uppercase tracking-[0.3em] italic">Lembretes de Pagamento</h3>
