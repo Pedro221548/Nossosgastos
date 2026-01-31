@@ -160,7 +160,7 @@ const App: React.FC = () => {
       const createPayload = (currentDate: string, currentInstallment?: number) => ({
         descricao: tx.title,
         valor: tx.amount,
-        categoria: tx.category,
+        category: tx.category,
         data: currentDate,
         userId: tx.spenderId,
         emoji: tx.emoji,
@@ -274,7 +274,7 @@ const App: React.FC = () => {
       <aside className="hidden md:flex flex-col w-72 bg-white dark:bg-neutral-900/50 border-r border-neutral-200 dark:border-neutral-800 sticky top-0 h-screen p-8 z-50">
         <div className="flex items-center justify-between mb-12">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-neutral-950 rounded-xl flex items-center justify-center text-primary shadow-glow border border-primary"><Heart size={20} strokeWidth={3} fill="currentColor" /></div>
+            <div className="w-10 h-10 bg-neutral-950 rounded-xl flex items-center justify-center text-primary shadow-glow border border-primary/50"><Heart size={20} strokeWidth={3} fill="currentColor" /></div>
             <div>
               <h1 className="text-lg font-display font-black text-neutral-900 dark:text-white tracking-tight leading-none uppercase italic">NOSSA <span className="text-primary">CARTEIRA</span></h1>
               <p className="text-[8px] font-bold text-slate-500 uppercase tracking-widest truncate mt-1">{familyName}</p>
@@ -284,9 +284,9 @@ const App: React.FC = () => {
         <nav className="flex-1 space-y-2">
           <SidebarItem icon={<HomeIcon />} label="Home" active={activeTab === 'home'} onClick={() => setActiveTab('home')} />
           <SidebarItem icon={<ListOrdered />} label="Extrato" active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} />
-          <SidebarItem icon={<TrendingUp />} label="Análises" active={activeTab === 'analytics'} onClick={() => setActiveTab('analytics')} />
+          <SidebarItem icon={<TrendingUp />} label="Saúde" active={activeTab === 'analytics'} onClick={() => setActiveTab('analytics')} />
           <SidebarItem icon={<Target />} label="Metas" active={activeTab === 'goals'} onClick={() => setActiveTab('goals')} />
-          <SidebarItem icon={<Sparkles />} label="Mediador AI" active={activeTab === 'mediator'} onClick={() => setActiveTab('mediator')} />
+          <SidebarItem icon={<Sparkles />} label="IA Sinc" active={activeTab === 'mediator'} onClick={() => setActiveTab('mediator')} />
           <SidebarItem icon={<ShoppingCart />} label="Compras" active={activeTab === 'shopping'} onClick={() => setActiveTab('shopping')} />
           <SidebarItem icon={<Mic />} label="Alexa" active={activeTab === 'alexa'} onClick={() => setActiveTab('alexa')} />
           <SidebarItem icon={<Settings />} label="Ajustes" active={activeTab === 'budget'} onClick={() => setActiveTab('budget')} />
