@@ -122,12 +122,12 @@ export const Home: React.FC<HomeProps> = ({
         </div>
       </div>
 
-      {/* Responsive Grid for Quick Actions */}
+      {/* Grid corrigida sem props inválidas */}
       <div className="grid grid-cols-4 gap-2 xs:gap-3 px-1 sm:px-2">
-        <QuickActionCircle icon={<Plus size={20} xs:size={24} strokeWidth={3} />} label="NOVO" color="bg-primary text-neutral-950" onClick={onOpenAddModal} />
-        <QuickActionCircle icon={<ShoppingCart size={18} xs:size={22} />} label="COMPRA" color="bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800" onClick={() => onNavigate('shopping')} />
-        <QuickActionCircle icon={<Target size={18} xs:size={22} />} label="METAS" color="bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800" onClick={() => onNavigate('goals')} />
-        <QuickActionCircle icon={<Zap size={18} xs:size={22} />} label="SINC" color="bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800" onClick={() => onNavigate('mediator')} />
+        <QuickActionCircle icon={<Plus size={24} strokeWidth={3} />} label="NOVO" color="bg-primary text-neutral-950" onClick={onOpenAddModal} />
+        <QuickActionCircle icon={<ShoppingCart size={20} />} label="COMPRA" color="bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800" onClick={() => onNavigate('shopping')} />
+        <QuickActionCircle icon={<Target size={20} />} label="METAS" color="bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800" onClick={() => onNavigate('goals')} />
+        <QuickActionCircle icon={<Zap size={20} />} label="SINC" color="bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800" onClick={() => onNavigate('mediator')} />
       </div>
     </div>
   );
