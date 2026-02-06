@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { USERS } from './constants';
-import { Transaction, User, Goal, ShoppingItem, AppTab } from './types';
+import { Transaction, User, Goal, ShoppingItem, AppTab, Invoice } from './types';
 import { Home } from './components/Home';
 import { Dashboard } from './components/Dashboard';
 import { Goals } from './components/Goals';
@@ -10,6 +10,7 @@ import { ShoppingList } from './components/ShoppingList';
 import { Analytics } from './components/Analytics';
 import { AlexaConnect } from './components/AlexaConnect';
 import { AiMediator } from './components/AiMediator';
+import { InvoiceManager } from './components/InvoiceManager';
 import { AddTransactionModal } from './components/AddTransactionModal';
 import { ConfirmationModal } from './components/ui/ConfirmationModal';
 import { Login } from './components/Login';
@@ -28,7 +29,8 @@ import {
   Home as HomeIcon,
   ListOrdered,
   Mic,
-  Sparkles
+  Sparkles,
+  FileText
 } from 'lucide-react';
 
 type Theme = 'dark' | 'light';
@@ -43,6 +45,7 @@ const App: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [goals, setGoals] = useState<Goal[]>([]);
   const [shoppingItems, setShoppingItems] = useState<ShoppingItem[]>([]);
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [users, setUsers] = useState<{ A: User; B: User }>(USERS);
   const [familyName, setFamilyName] = useState('Nossa Família');
   const [alertThreshold, setAlertThreshold] = useState(15);
@@ -71,6 +74,7 @@ const App: React.FC = () => {
     
     const unsubGoals = listenToData('goals', (data: Goal[]) => data && setGoals(data));
     const unsubShopping = listenToData('shoppingItems', (data: ShoppingItem[]) => data && setShoppingItems(data));
+    const unsubInvoices = listenToData('invoices', (data: Invoice[]) => data && setInvoices(data));
     const unsubUsers = listenToData('users', (data: { A: User; B: User }) => data && setUsers(data));
     const unsubFamily = listenToData('familyName', (data: string) => data && setFamilyName(data));
     const unsubThreshold = listenToData('alertThreshold', (data: number) => data && setAlertThreshold(data));
@@ -102,7 +106,7 @@ const App: React.FC = () => {
     });
 
     return () => {
-      unsubGoals?.(); unsubShopping?.(); unsubUsers?.(); unsubFamily?.(); 
+      unsubGoals?.(); unsubShopping?.(); unsubInvoices?.(); unsubUsers?.(); unsubFamily?.(); 
       unsubThreshold?.(); unsubFirestore?.();
     };
   }, [user]);
@@ -111,6 +115,22 @@ const App: React.FC = () => {
     localStorage.setItem('nc_theme', theme);
     document.documentElement.classList.toggle('dark', theme === 'dark');
   }, [theme]);
+
+  const handleSaveInvoice = async (invoice: Invoice) => {
+    setIsSyncing(true);
+    const updated = [...invoices, invoice];
+    setInvoices(updated);
+    await syncData('invoices', updated);
+    setIsSyncing(false);
+  };
+
+  const handleDeleteInvoice = async (id: string) => {
+    setIsSyncing(true);
+    const updated = invoices.filter(i => i.id !== id);
+    setInvoices(updated);
+    await syncData('invoices', updated);
+    setIsSyncing(false);
+  };
 
   const handleSaveGoal = async (goal: Goal) => {
     setIsSyncing(true);
@@ -253,6 +273,7 @@ const App: React.FC = () => {
       await Promise.all([
         syncData('goals', goals),
         syncData('shoppingItems', shoppingItems),
+        syncData('invoices', invoices),
         syncData('users', overrideUsers || users),
         syncData('familyName', overrideFamilyName || familyName),
         syncData('alertThreshold', overrideThreshold || alertThreshold)
@@ -284,6 +305,7 @@ const App: React.FC = () => {
         <nav className="flex-1 space-y-2">
           <SidebarItem icon={<HomeIcon />} label="Home" active={activeTab === 'home'} onClick={() => setActiveTab('home')} />
           <SidebarItem icon={<ListOrdered />} label="Extrato" active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} />
+          <SidebarItem icon={<FileText />} label="Faturas" active={activeTab === 'invoices'} onClick={() => setActiveTab('invoices')} />
           <SidebarItem icon={<TrendingUp />} label="Saúde" active={activeTab === 'analytics'} onClick={() => setActiveTab('analytics')} />
           <SidebarItem icon={<Target />} label="Metas" active={activeTab === 'goals'} onClick={() => setActiveTab('goals')} />
           <SidebarItem icon={<Sparkles />} label="IA Sinc" active={activeTab === 'mediator'} onClick={() => setActiveTab('mediator')} />
@@ -301,6 +323,7 @@ const App: React.FC = () => {
       <main className="flex-1 max-w-5xl mx-auto w-full px-4 py-6 md:px-12 md:py-16 pb-36 md:pb-16 pt-[calc(1.5rem+env(safe-area-inset-top))]">
         {activeTab === 'home' && <Home transactions={transactions} goals={goals} users={users} familyName={familyName} onNavigate={setActiveTab} onOpenAddModal={() => setIsAddModalOpen(true)} />}
         {activeTab === 'dashboard' && <Dashboard transactions={transactions} totalIncome={users.A.income + users.B.income} currentDate={currentDate} users={users} alertThreshold={alertThreshold} onMonthChange={(dir: 'prev' | 'next') => { const nd = new Date(currentDate); nd.setMonth(nd.getMonth() + (dir === 'next' ? 1 : -1)); setCurrentDate(nd); }} onDelete={handleDeleteTransaction} onTogglePaid={handleTogglePaid} onEdit={(tx: Transaction) => { setEditingTransaction(tx); setIsAddModalOpen(true); }} onClearAll={() => {}} onOpenShopping={() => setActiveTab('shopping')} onOpenAddModal={() => { setEditingTransaction(null); setIsAddModalOpen(true); }} />}
+        {activeTab === 'invoices' && <InvoiceManager invoices={invoices} onSaveInvoice={handleSaveInvoice} onDeleteInvoice={handleDeleteInvoice} />}
         {activeTab === 'analytics' && <Analytics transactions={transactions} baseIncome={users.A.income + users.B.income} currentDate={currentDate} onMonthChange={(dir: 'prev' | 'next') => { const nd = new Date(currentDate); nd.setMonth(nd.getMonth() + (dir === 'next' ? 1 : -1)); setCurrentDate(nd); }} />}
         {activeTab === 'goals' && <Goals goals={goals} onUpdateGoal={handleUpdateGoalProgress} onSaveGoal={handleSaveGoal} onDeleteGoal={handleDeleteGoal} />}
         {activeTab === 'mediator' && <AiMediator transactions={transactions} users={users} goals={goals} />}
@@ -313,8 +336,8 @@ const App: React.FC = () => {
          <MobileNavItem icon={<HomeIcon />} active={activeTab === 'home'} onClick={() => setActiveTab('home')} />
          <MobileNavItem icon={<ListOrdered />} active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} />
          <button onClick={() => { setEditingTransaction(null); setIsAddModalOpen(true); }} className="w-14 h-14 bg-primary rounded-[1.8rem] flex items-center justify-center text-neutral-950 shadow-glow -translate-y-5 active:scale-90 transition-all border-[6px] border-neutral-50 dark:border-neutral-950"><Plus size={28} strokeWidth={3} /></button>
+         <MobileNavItem icon={<FileText />} active={activeTab === 'invoices'} onClick={() => setActiveTab('invoices')} />
          <MobileNavItem icon={<Sparkles />} active={activeTab === 'mediator'} onClick={() => setActiveTab('mediator')} />
-         <MobileNavItem icon={<ShoppingCart />} active={activeTab === 'shopping'} onClick={() => setActiveTab('shopping')} />
       </nav>
 
       <AddTransactionModal isOpen={isAddModalOpen} users={users} initialDate={currentDate} onClose={() => { setIsAddModalOpen(false); setEditingTransaction(null); }} onAdd={handleAddOrUpdateTransaction} editingTransaction={editingTransaction} />

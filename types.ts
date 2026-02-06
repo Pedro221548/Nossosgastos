@@ -28,6 +28,25 @@ export interface Transaction {
   };
 }
 
+export interface InvoiceItem {
+  description: string;
+  amount: number;
+  date: string;
+  installments?: {
+    current: number;
+    total: number;
+  };
+}
+
+export interface Invoice {
+  id: string;
+  bankName: string;
+  month: string;
+  totalAmount: number;
+  processedAt: string;
+  items: InvoiceItem[];
+}
+
 export interface Goal {
   id: string;
   title: string;
@@ -56,4 +75,4 @@ export interface ChatMessage {
   timestamp: Date;
 }
 
-export type AppTab = 'home' | 'dashboard' | 'analytics' | 'goals' | 'budget' | 'shopping' | 'alexa' | 'mediator';
+export type AppTab = 'home' | 'dashboard' | 'analytics' | 'goals' | 'budget' | 'shopping' | 'alexa' | 'mediator' | 'invoices';
