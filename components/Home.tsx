@@ -2,17 +2,15 @@
 import React, { useState, useEffect } from 'react';
 import { Transaction, Goal, User, AppTab } from '../types';
 import { 
-  Zap, 
-  ShoppingCart, 
+  Plus, 
   Target, 
   TrendingUp, 
-  Plus, 
   Heart,
   Clock,
   ShieldCheck,
-  Share2,
-  AlertCircle,
-  ChevronRight
+  ChevronRight,
+  ShoppingCart,
+  Zap
 } from 'lucide-react';
 
 interface HomeProps {
@@ -27,9 +25,9 @@ interface HomeProps {
 const PremiumLogo = ({ className = "" }: { className?: string }) => (
   <div className={`relative flex items-center justify-center ${className}`}>
     <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full animate-pulse"></div>
-    <div className="relative w-16 h-16 bg-neutral-900 border-2 border-primary rounded-[1.8rem] flex items-center justify-center shadow-glow overflow-hidden">
+    <div className="relative w-12 h-12 xs:w-14 xs:h-14 bg-neutral-900 border-2 border-primary/30 rounded-[1.2rem] xs:rounded-[1.5rem] flex items-center justify-center shadow-glow overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent"></div>
-      <Heart size={32} className="text-primary logo-glow" fill="currentColor" strokeWidth={0} />
+      <Heart size={24} className="text-primary logo-glow" fill="currentColor" strokeWidth={0} />
     </div>
   </div>
 );
@@ -57,9 +55,7 @@ export const Home: React.FC<HomeProps> = ({
 
   const currentMonthTransactions = transactions.filter(t => {
     const [d, m, y] = t.date.split('/').map(Number);
-    const isExplicitlyThisMonth = m === currentMonth + 1 && y === currentYear;
-    const isFixedRelevant = t.isFixed && (y < currentYear || (y === currentYear && m <= currentMonth + 1));
-    return isExplicitlyThisMonth || isFixedRelevant;
+    return m === currentMonth + 1 && y === currentYear || (t.isFixed);
   });
 
   const totalIncome = users.A.income + users.B.income + currentMonthTransactions
@@ -73,133 +69,75 @@ export const Home: React.FC<HomeProps> = ({
 
   const balance = totalIncome - paidExpenses;
 
-  const pendingFixedReminders = currentMonthTransactions
-    .filter(t => t.isFixed && t.type === 'expense' && !t.paidMonths?.includes(monthKey))
-    .sort((a, b) => a.amount - b.amount);
-
   const formattedDate = now.toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric', month: 'short' }).toUpperCase();
   const formattedTime = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 
-  const handleShareWhatsApp = () => {
-    const monthName = now.toLocaleString('pt-BR', { month: 'long' });
-    const message = `📊 *Resumo Financeiro - ${familyName}*\n` +
-      `📅 Mês: ${monthName.charAt(0).toUpperCase() + monthName.slice(1)}\n\n` +
-      `💰 *Saldo Real:* R$ ${balance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}\n` +
-      `📈 *Ganhos:* R$ ${totalIncome.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}\n` +
-      `💸 *Gastos Pagos:* R$ ${paidExpenses.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}\n\n` +
-      `Sincronizado via *NOSSA CARTEIRA* 🚀`;
-    const encodedMessage = encodeURIComponent(message);
-    window.open(`https://api.whatsapp.com/send?text=${encodedMessage}`, '_blank');
-  };
-
   return (
-    <div className="space-y-6 md:space-y-10 animate-slide-up pb-24 md:pb-0 px-2 sm:px-0">
-      <div className="flex flex-col items-center justify-center text-center space-y-4 md:space-y-5 pt-2">
+    <div className="space-y-6 xs:space-y-8 animate-slide-up pb-24 px-1 sm:px-0">
+      <div className="flex flex-col items-center justify-center text-center space-y-3 xs:space-y-4 px-1 pt-2">
         <PremiumLogo />
-        <div className="space-y-1 px-4">
-          <h2 className="text-3xl md:text-5xl font-display font-black text-white uppercase tracking-tighter italic leading-none">
-            NOSSA <span className="text-primary">CARTEIRA</span>
-          </h2>
-          <p className="text-[9px] md:text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.4em] italic mt-1">
-            SINCRONIZAÇÃO DO CASAL
+        <div className="space-y-1">
+          <p className="text-[8px] xs:text-[9px] font-black text-neutral-400 uppercase tracking-[0.4em] italic">
+            SINCRONIZAÇÃO EM TEMPO REAL
           </p>
-          <div className="flex items-center justify-center space-x-2 mt-4">
-            <p className="text-[8px] md:text-[9px] font-black text-neutral-500 uppercase tracking-[0.2em]">{formattedDate}</p>
+          <h2 className="text-2xl xs:text-3xl md:text-4xl font-display font-black text-neutral-900 dark:text-white uppercase tracking-tighter italic leading-none truncate max-w-[280px]">
+            {familyName.split(' ')[0]} <span className="text-primary">SINC</span>
+          </h2>
+          <div className="flex items-center justify-center space-x-2 mt-2">
+            <p className="text-[8px] font-black text-neutral-500 uppercase tracking-[0.2em]">{formattedDate}</p>
             <span className="text-neutral-300 dark:text-neutral-800 opacity-30">|</span>
             <div className="flex items-center space-x-1.5">
               <Clock size={10} className="text-primary animate-pulse" />
-              <p className="text-[8px] md:text-[9px] font-black text-neutral-600 dark:text-neutral-400 uppercase tracking-widest tabular-nums">{formattedTime}</p>
+              <p className="text-[8px] font-black text-neutral-600 dark:text-neutral-400 uppercase tracking-widest tabular-nums">{formattedTime}</p>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="relative group overflow-hidden bg-neutral-950 rounded-[2.5rem] md:rounded-[3rem] p-6 sm:p-8 md:p-12 shadow-2xl transition-all border border-neutral-800 mx-1 sm:mx-0">
-        <div className="absolute top-0 right-0 w-48 h-48 md:w-64 md:h-64 bg-primary/5 blur-[80px] md:blur-[100px] rounded-full -mr-24 -mt-24"></div>
-        <div className="relative z-10 space-y-4 md:space-y-8 text-center md:text-left">
-          <div className="flex items-center justify-center md:justify-between">
-            <div className="flex items-center space-x-2 bg-white/5 md:bg-transparent px-3 py-1 md:p-0 rounded-full">
-               <ShieldCheck size={12} className="text-primary" />
-               <span className="text-[8px] md:text-[9px] font-black text-neutral-500 uppercase tracking-[0.3em]">Saldo Real (Líquido)</span>
-            </div>
+      <div className="relative group overflow-hidden bg-neutral-950 rounded-[2.2rem] xs:rounded-[2.5rem] p-6 xs:p-8 md:p-12 shadow-2xl transition-all border border-neutral-800 mx-1">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[100px] rounded-full -mr-32 -mt-32"></div>
+        <div className="relative z-10 space-y-4 xs:space-y-6 text-center md:text-left">
+          <div className="flex items-center justify-center md:justify-start space-x-2">
+             <ShieldCheck size={10} className="text-primary" />
+             <span className="text-[8px] font-black text-neutral-500 uppercase tracking-[0.3em]">Fluxo de Caixa Real</span>
           </div>
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-5">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 xs:gap-5">
             <div className="space-y-1">
-              <p className="text-neutral-400 text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em]">Fluxo Disponível Hoje</p>
-              <div className="flex items-baseline justify-center md:justify-start space-x-2">
-                <span className="text-xl md:text-2xl font-black text-primary italic">R$</span>
-                <h3 className="text-4xl xs:text-5xl md:text-7xl font-display font-black text-white tracking-tighter italic tabular-nums leading-none">{balance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</h3>
+              <p className="text-neutral-400 text-[9px] xs:text-[10px] font-black uppercase tracking-[0.2em]">Disponível Líquido</p>
+              <div className="flex items-baseline justify-center md:justify-start space-x-1.5 xs:space-x-2">
+                <span className="text-base xs:text-lg font-black text-primary italic shrink-0">R$</span>
+                <h3 className="text-3xl xs:text-4xl sm:text-5xl md:text-7xl font-display font-black text-white tracking-tighter italic tabular-nums leading-none truncate">
+                  {balance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                </h3>
               </div>
             </div>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <button onClick={() => onNavigate('dashboard')} className="flex-1 flex items-center justify-center space-x-3 bg-white/5 border border-white/10 px-5 py-3 md:px-6 md:py-4 rounded-2xl md:rounded-[1.5rem] transition-all active:scale-95 group/btn">
-                <TrendingUp size={16} className="text-primary group-hover/btn:translate-x-1 transition-transform" />
-                <span className="text-[9px] md:text-[10px] font-black text-white uppercase tracking-widest italic">Ver Extrato</span>
-              </button>
-              <button onClick={handleShareWhatsApp} className="flex-1 flex items-center justify-center space-x-3 bg-emerald-500/10 border border-emerald-500/20 px-5 py-3 md:px-6 md:py-4 rounded-2xl md:rounded-[1.5rem] transition-all active:scale-95 group/share">
-                <Share2 size={16} className="text-emerald-500 group-hover/share:scale-110 transition-transform" />
-                <span className="text-[9px] md:text-[10px] font-black text-emerald-500 uppercase tracking-widest italic">Compartilhar</span>
-              </button>
-            </div>
+            <button 
+              onClick={() => onNavigate('dashboard')}
+              className="flex items-center justify-center space-x-2.5 bg-white/5 border border-white/10 px-5 py-3.5 rounded-2xl transition-all active:scale-95 group/btn"
+            >
+              <TrendingUp size={14} className="text-primary group-hover/btn:translate-x-1 transition-transform" />
+              <span className="text-[9px] font-black text-white uppercase tracking-widest italic">EXTRATO</span>
+            </button>
           </div>
         </div>
       </div>
 
-      <div className="space-y-4 px-1 sm:px-0">
-        <div className="flex items-center justify-between px-2">
-          <h3 className="text-[8px] md:text-[10px] font-black text-neutral-500 uppercase tracking-[0.3em] italic">Lembretes de Pagamento</h3>
-          {pendingFixedReminders.length > 0 && (
-            <span className="flex items-center space-x-1.5 px-2 py-0.5 bg-red-500/10 text-red-500 rounded-full text-[7px] font-black uppercase tracking-widest">
-              <AlertCircle size={8} /> <span>{pendingFixedReminders.length} Pendentes</span>
-            </span>
-          )}
-        </div>
-        
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {pendingFixedReminders.length > 0 ? (
-            pendingFixedReminders.slice(0, 4).map(tx => (
-              <button 
-                key={tx.id} 
-                onClick={() => onNavigate('dashboard')}
-                className="flex items-center justify-between p-4 bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-2xl shadow-sm hover:shadow-md transition-all active:scale-[0.98] group"
-              >
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 rounded-xl bg-neutral-50 dark:bg-neutral-950 flex items-center justify-center text-lg grayscale group-hover:grayscale-0 transition-all border border-neutral-100 dark:border-neutral-800">
-                    {tx.emoji}
-                  </div>
-                  <div className="text-left">
-                    <p className="text-[10px] md:text-[11px] font-display font-black text-neutral-900 dark:text-white uppercase italic truncate max-w-[120px]">{tx.title}</p>
-                    <p className="text-[7px] md:text-[8px] font-black text-neutral-400 uppercase tracking-widest">Conta Fixa Mensal</p>
-                  </div>
-                </div>
-                <div className="text-right flex items-center space-x-2">
-                  <span className="text-xs md:text-sm font-black text-neutral-900 dark:text-white tabular-nums tracking-tighter">R$ {tx.amount.toLocaleString('pt-BR')}</span>
-                  <ChevronRight size={12} className="text-neutral-300 group-hover:text-primary transition-colors" />
-                </div>
-              </button>
-            ))
-          ) : (
-            <div className="col-span-full py-6 flex flex-col items-center justify-center bg-emerald-500/5 border border-dashed border-emerald-500/20 rounded-[2rem]">
-              <ShieldCheck className="text-emerald-500/40 mb-2" size={24} />
-              <p className="text-[8px] md:text-[9px] font-black text-emerald-500/60 uppercase tracking-[0.3em] italic">Tudo em dia para este mês! ✨</p>
-            </div>
-          )}
-        </div>
-      </div>
-
-      <div className="grid grid-cols-4 gap-2 md:gap-4 px-1 sm:px-0">
-        <QuickActionCircle icon={<Plus size={24} strokeWidth={3} />} label="Novo" color="bg-primary text-neutral-950" onClick={onOpenAddModal} />
-        <QuickActionCircle icon={<ShoppingCart size={22} />} label="Lista" color="bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800" onClick={() => onNavigate('shopping')} />
-        <QuickActionCircle icon={<Target size={22} />} label="Metas" color="bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800" onClick={() => onNavigate('goals')} />
-        <QuickActionCircle icon={<Zap size={22} />} label="Alexa" color="bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800" onClick={() => onNavigate('alexa')} />
+      {/* Responsive Grid for Quick Actions */}
+      <div className="grid grid-cols-4 gap-2 xs:gap-3 px-1 sm:px-2">
+        <QuickActionCircle icon={<Plus size={20} xs:size={24} strokeWidth={3} />} label="NOVO" color="bg-primary text-neutral-950" onClick={onOpenAddModal} />
+        <QuickActionCircle icon={<ShoppingCart size={18} xs:size={22} />} label="COMPRA" color="bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800" onClick={() => onNavigate('shopping')} />
+        <QuickActionCircle icon={<Target size={18} xs:size={22} />} label="METAS" color="bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800" onClick={() => onNavigate('goals')} />
+        <QuickActionCircle icon={<Zap size={18} xs:size={22} />} label="SINC" color="bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800" onClick={() => onNavigate('mediator')} />
       </div>
     </div>
   );
 };
 
 const QuickActionCircle = ({ icon, label, color, onClick }: any) => (
-  <button onClick={onClick} className="flex flex-col items-center space-y-2 md:space-y-3 group w-full">
-    <div className={`w-14 h-14 xs:w-16 xs:h-16 rounded-2xl xs:rounded-[1.8rem] flex items-center justify-center shadow-lg active:scale-90 transition-all border border-transparent group-hover:border-primary/50 ${color}`}>{icon}</div>
-    <span className="text-[8px] md:text-[9px] font-black text-neutral-500 uppercase tracking-widest group-hover:text-primary transition-colors text-center">{label}</span>
+  <button onClick={onClick} className="flex flex-col items-center space-y-2 xs:space-y-3 group w-full">
+    <div className={`w-full aspect-square rounded-[1.2rem] xs:rounded-[1.8rem] flex items-center justify-center shadow-lg active:scale-90 transition-all border border-transparent group-hover:border-primary/30 ${color}`}>
+      {icon}
+    </div>
+    <span className="text-[7px] xs:text-[8px] font-black text-neutral-500 uppercase tracking-widest group-hover:text-primary transition-colors text-center truncate w-full">{label}</span>
   </button>
 );
