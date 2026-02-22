@@ -62,12 +62,11 @@ export const Home: React.FC<HomeProps> = ({
     .filter(t => t.type === 'revenue')
     .reduce((acc, t) => acc + t.amount, 0);
 
-  const paidExpenses = currentMonthTransactions
+  const totalExpenses = currentMonthTransactions
     .filter(t => t.type === 'expense')
-    .filter(t => t.isFixed ? t.paidMonths?.includes(monthKey) : t.isPaid)
     .reduce((acc, t) => acc + t.amount, 0);
 
-  const balance = totalIncome - paidExpenses;
+  const balance = totalIncome - totalExpenses;
 
   const formattedDate = now.toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric', month: 'short' }).toUpperCase();
   const formattedTime = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
@@ -103,7 +102,7 @@ export const Home: React.FC<HomeProps> = ({
           </div>
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 xs:gap-8">
             <div className="space-y-2">
-              <p className="text-neutral-400 text-xs xs:text-sm font-black uppercase tracking-[0.2em]">Disponível Líquido</p>
+              <p className="text-neutral-400 text-xs xs:text-sm font-black uppercase tracking-[0.2em]">Saldo Livre (Estimado)</p>
               <div className="flex items-baseline justify-center md:justify-start space-x-2 xs:space-x-3">
                 <span className="text-xl xs:text-2xl font-black text-primary italic shrink-0">R$</span>
                 <h3 className="text-4xl xs:text-5xl sm:text-6xl md:text-8xl font-display font-black text-white tracking-tighter italic tabular-nums leading-none truncate">

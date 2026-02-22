@@ -73,13 +73,13 @@ export const Dashboard: React.FC<DashboardProps> = ({
   return (
     <div className="space-y-6 md:space-y-8 animate-slide-up text-left max-w-2xl mx-auto px-1 sm:px-0 pb-24">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 px-2 sm:px-0">
-        <div className="flex items-center space-x-5">
-          <div className="w-14 h-14 md:w-16 md:h-16 bg-neutral-900 border border-neutral-800 rounded-[1.8rem] md:rounded-3xl flex items-center justify-center text-primary shadow-inner transform -rotate-3 shrink-0">
-            <Calendar className="w-7 h-7 md:w-8 md:h-8" />
+        <div className="flex items-center space-x-3 md:space-x-5">
+          <div className="w-12 h-12 md:w-16 md:h-16 bg-neutral-900 border border-neutral-800 rounded-2xl md:rounded-3xl flex items-center justify-center text-primary shadow-inner transform -rotate-3 shrink-0">
+            <Calendar className="w-6 h-6 md:w-8 md:h-8" />
           </div>
           <div className="min-w-0">
-            <h2 className="text-[10px] md:text-xs font-black text-neutral-500 uppercase tracking-[0.3em] mb-1 truncate">{familyName}</h2>
-            <span className="text-xl xs:text-2xl md:text-4xl font-display font-black text-neutral-900 dark:text-white italic tracking-tighter leading-none block truncate">{monthLabel}</span>
+            <h2 className="text-[9px] md:text-xs font-black text-neutral-500 uppercase tracking-[0.2em] mb-1 truncate">{familyName}</h2>
+            <span className="text-lg xs:text-xl md:text-4xl font-display font-black text-neutral-900 dark:text-white italic tracking-tighter leading-none block">{monthLabel}</span>
           </div>
         </div>
         <div className="flex items-center bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-[1.5rem] md:rounded-2xl p-1.5 shadow-xl sm:w-auto w-full justify-between sm:justify-start">
@@ -93,12 +93,16 @@ export const Dashboard: React.FC<DashboardProps> = ({
         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 blur-[80px] rounded-full -mr-24 -mt-24"></div>
         <div className="relative z-10 flex flex-col sm:flex-row sm:items-end justify-between gap-8">
           <div className="space-y-3">
-            <p className="text-[10px] font-black text-neutral-500 uppercase tracking-[0.3em] mb-1">Saldo Projetado</p>
+            <p className="text-[10px] font-black text-neutral-500 uppercase tracking-[0.3em] mb-1">Saldo Livre (Estimado)</p>
             <div className="flex items-baseline space-x-2 xs:space-x-3">
               <span className="text-xl xs:text-2xl font-black text-primary italic shrink-0">R$</span>
               <h2 className={`text-3xl xs:text-4xl sm:text-5xl md:text-7xl font-display font-black tracking-tighter italic tabular-nums leading-none ${stats.balance < 0 ? 'text-red-500' : 'text-white'}`}>
                 {stats.balance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
               </h2>
+            </div>
+            <div className="flex items-center space-x-2 opacity-40">
+              <p className="text-[8px] font-black text-neutral-400 uppercase tracking-widest">Saldo Atual em Conta:</p>
+              <p className="text-[10px] font-black text-white italic tabular-nums">R$ {(stats.balance + stats.pending).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
             </div>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-1 gap-3 min-w-[160px]">
