@@ -39,7 +39,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
   onEdit
 }) => {
   const currentMonthKey = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}`;
-  const monthLabel = currentDate.toLocaleString('pt-BR', { month: 'long', year: 'numeric' });
+  const month = currentDate.toLocaleString('pt-BR', { month: 'long' });
+  const monthLabel = `${month.charAt(0).toUpperCase() + month.slice(1)} ${currentDate.getFullYear()}`;
 
   const filteredList = useMemo(() => {
     return transactions.filter(t => {
@@ -78,7 +79,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
           </div>
           <div className="min-w-0">
             <h2 className="text-[10px] md:text-xs font-black text-neutral-500 uppercase tracking-[0.3em] mb-1 truncate">{familyName}</h2>
-            <span className="text-2xl xs:text-3xl md:text-5xl font-display font-black text-neutral-900 dark:text-white uppercase italic tracking-tighter leading-none block truncate">{monthLabel}</span>
+            <span className="text-xl xs:text-2xl md:text-4xl font-display font-black text-neutral-900 dark:text-white italic tracking-tighter leading-none block truncate">{monthLabel}</span>
           </div>
         </div>
         <div className="flex items-center bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-[1.5rem] md:rounded-2xl p-1.5 shadow-xl sm:w-auto w-full justify-between sm:justify-start">
