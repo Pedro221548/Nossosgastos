@@ -1,7 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { User } from '../types';
-import { Wallet, Camera, Sun, Moon, LogOut, Loader2, Check } from 'lucide-react';
+import { Wallet, Camera, Sun, Moon, LogOut, Loader2, Check, Heart } from 'lucide-react';
 
 interface BudgetSettingsProps {
   users: { A: User; B: User };
@@ -81,20 +81,20 @@ export const BudgetSettings: React.FC<BudgetSettingsProps> = ({
     <div className="space-y-6 md:space-y-8 animate-slide-up max-w-4xl mx-auto pb-32 px-1 sm:px-0">
       
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 px-2">
-        <div className="space-y-1 text-center sm:text-left">
-          <h2 className="text-2xl md:text-3xl font-display font-black text-neutral-900 dark:text-white uppercase tracking-tighter italic leading-none">Configurações</h2>
-          <p className="text-neutral-500 text-[8px] md:text-[10px] font-bold uppercase tracking-[0.2em]">Personalize seu ecossistema financeiro</p>
+        <div className="space-y-2 text-center sm:text-left">
+          <h2 className="text-3xl md:text-5xl font-display font-black text-neutral-900 dark:text-white uppercase tracking-tighter italic leading-none">Configurações</h2>
+          <p className="text-neutral-500 text-[10px] md:text-xs font-bold uppercase tracking-[0.2em]">Personalize seu ecossistema financeiro</p>
         </div>
         {showSuccess && (
-          <div className="bg-emerald-500 text-white px-5 py-2 rounded-full font-black uppercase text-[8px] md:text-[10px] tracking-widest flex items-center justify-center space-x-2 animate-bounce mx-auto sm:mx-0">
-            <Check className="w-3 h-3 md:w-4 md:h-4" /> <span>Sincronizado!</span>
+          <div className="bg-emerald-500 text-white px-6 py-3 rounded-full font-black uppercase text-[10px] md:text-xs tracking-widest flex items-center justify-center space-x-3 animate-bounce mx-auto sm:mx-0 shadow-glow">
+            <Check className="w-4 h-4 md:w-5 md:h-5" /> <span>Sincronizado!</span>
           </div>
         )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-        <div className="group relative p-6 md:p-8 bg-white dark:bg-neutral-900 border-2 border-primary/40 rounded-[2rem] md:rounded-[2.5rem] space-y-6 md:space-y-8 shadow-xl transition-all hover:border-primary">
-          <div className="absolute top-4 right-6 text-[8px] md:text-[10px] font-black text-primary uppercase tracking-[0.2em] md:tracking-[0.3em]">Perfil Principal</div>
+        <div className="group relative p-8 md:p-10 bg-white dark:bg-neutral-900 border-2 border-primary/40 rounded-[2.5rem] md:rounded-[3rem] space-y-8 md:space-y-10 shadow-xl transition-all hover:border-primary">
+          <div className="absolute top-6 right-8 text-[10px] md:text-xs font-black text-primary uppercase tracking-[0.2em] md:tracking-[0.3em]">Perfil Principal</div>
           <div className="flex flex-col items-center pt-2">
             <div className="relative">
               <div className="w-24 h-24 md:w-32 md:h-32 rounded-2xl md:rounded-[2rem] border-4 border-primary/20 p-1 bg-neutral-100 dark:bg-neutral-800 shadow-xl md:shadow-2xl overflow-hidden transition-transform group-hover:scale-105">
@@ -124,8 +124,8 @@ export const BudgetSettings: React.FC<BudgetSettingsProps> = ({
           </div>
         </div>
 
-        <div className="group relative p-6 md:p-8 bg-white dark:bg-neutral-900 border-2 border-blue-500/40 rounded-[2rem] md:rounded-[2.5rem] space-y-6 md:space-y-8 shadow-xl transition-all hover:border-blue-500">
-          <div className="absolute top-4 right-6 text-[8px] md:text-[10px] font-black text-blue-500 uppercase tracking-[0.2em] md:tracking-[0.3em]">Co-Responsável</div>
+        <div className="group relative p-8 md:p-10 bg-white dark:bg-neutral-900 border-2 border-blue-500/40 rounded-[2.5rem] md:rounded-[3rem] space-y-8 md:space-y-10 shadow-xl transition-all hover:border-blue-500">
+          <div className="absolute top-6 right-8 text-[10px] md:text-xs font-black text-blue-500 uppercase tracking-[0.2em] md:tracking-[0.3em]">Co-Responsável</div>
           <div className="flex flex-col items-center pt-2">
             <div className="relative">
               <div className="w-24 h-24 md:w-32 md:h-32 rounded-2xl md:rounded-[2rem] border-4 border-blue-500/20 p-1 bg-neutral-100 dark:bg-neutral-800 shadow-xl md:shadow-2xl overflow-hidden transition-transform group-hover:scale-105">
@@ -153,6 +153,17 @@ export const BudgetSettings: React.FC<BudgetSettingsProps> = ({
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      <div className="p-6 md:p-8 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-[2rem] md:rounded-[2.5rem] shadow-sm">
+        <div className="flex items-center space-x-4 mb-6 md:mb-8">
+          <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/10 rounded-xl md:rounded-2xl flex items-center justify-center text-primary border border-primary/20 shrink-0"><Heart className="w-5 h-5 md:w-6 md:h-6" /></div>
+          <div><h3 className="text-xs md:text-sm font-bold text-neutral-900 dark:text-white uppercase tracking-widest leading-none">Identidade do Casal</h3><p className="text-[8px] md:text-[10px] text-neutral-500 font-medium mt-1">Como vocês querem ser chamados no app.</p></div>
+        </div>
+        <div className="space-y-1.5 md:space-y-2">
+          <label className="text-[8px] md:text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">Nome da Família / Conta</label>
+          <input type="text" value={familyName} onChange={e => setFamilyName(e.target.value)} className="w-full bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl md:rounded-2xl px-5 py-3 md:px-6 md:py-4 text-base md:text-lg font-bold text-neutral-900 dark:text-white outline-none focus:border-primary transition-all" placeholder="Ex: Família Silva" />
         </div>
       </div>
 

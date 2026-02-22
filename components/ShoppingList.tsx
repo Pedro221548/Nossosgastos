@@ -44,56 +44,56 @@ export const ShoppingList: React.FC<ShoppingListProps> = ({ items, onAdd, onTogg
   return (
     <div className="space-y-8 animate-slide-up pb-24">
       <div className="flex items-center justify-between px-2">
-        <div className="flex items-center space-x-4">
-          <div className="w-12 h-12 bg-neutral-100 dark:bg-neutral-900 rounded-2xl flex items-center justify-center text-2xl shadow-inner">🛒</div>
+        <div className="flex items-center space-x-5">
+          <div className="w-14 h-14 bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-[1.5rem] flex items-center justify-center text-2xl shadow-inner transform rotate-3">🛒</div>
           <div>
-            <h2 className="text-3xl font-display font-bold text-neutral-900 dark:text-white uppercase italic tracking-tighter">Carrinho</h2>
-            <p className="text-[10px] text-neutral-500 font-bold uppercase tracking-widest">Sincronizado e Compartilhado</p>
+            <h2 className="text-3xl md:text-5xl font-display font-black text-neutral-900 dark:text-white uppercase italic tracking-tighter leading-none">Carrinho</h2>
+            <p className="text-[10px] md:text-xs text-neutral-500 font-bold uppercase tracking-[0.2em] mt-1">Sincronizado e Compartilhado</p>
           </div>
         </div>
         <button 
           onClick={() => setShowHistory(!showHistory)}
-          className={`p-3 rounded-2xl transition-all ${showHistory ? 'bg-primary text-neutral-950' : 'bg-neutral-100 dark:bg-neutral-900 text-neutral-500'}`}
+          className={`p-4 rounded-[1.2rem] transition-all shadow-lg active:scale-90 ${showHistory ? 'bg-primary text-neutral-950' : 'bg-neutral-100 dark:bg-neutral-900 text-neutral-500 border border-neutral-200 dark:border-neutral-800'}`}
           title="Ver Histórico"
         >
-          <History size={20} />
+          <History size={24} />
         </button>
       </div>
 
       {!showHistory ? (
         <>
-          <form onSubmit={handleSubmit} className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-6 rounded-[2.5rem] shadow-sm space-y-4">
+          <form onSubmit={handleSubmit} className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-8 md:p-10 rounded-[2.5rem] md:rounded-[3.5rem] shadow-xl space-y-6">
             <input 
               type="text" 
               value={text} 
               onChange={e => setText(e.target.value)} 
               placeholder="O que vamos comprar?" 
-              className="w-full p-4 bg-neutral-50 dark:bg-neutral-950 border border-neutral-100 dark:border-neutral-800 rounded-2xl font-bold outline-none focus:border-primary transition-all" 
+              className="w-full p-6 bg-neutral-50 dark:bg-neutral-950 border border-neutral-100 dark:border-neutral-800 rounded-[1.5rem] md:rounded-[2rem] font-bold text-lg outline-none focus:border-primary transition-all shadow-inner" 
             />
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-4">
               <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-neutral-400">R$</span>
+                <span className="absolute left-5 top-1/2 -translate-y-1/2 text-[10px] font-black text-neutral-400 uppercase tracking-widest">R$</span>
                 <input 
                   type="number" 
                   step="0.01"
                   value={price} 
                   onChange={e => setPrice(e.target.value)} 
-                  placeholder="Valor (opcional)" 
-                  className="w-full p-4 pl-10 bg-neutral-50 dark:bg-neutral-950 border border-neutral-100 dark:border-neutral-800 rounded-2xl text-xs font-bold outline-none focus:border-primary" 
+                  placeholder="Valor" 
+                  className="w-full p-6 pl-12 bg-neutral-50 dark:bg-neutral-950 border border-neutral-100 dark:border-neutral-800 rounded-[1.5rem] md:rounded-[2rem] text-sm font-bold outline-none focus:border-primary shadow-inner" 
                 />
               </div>
               <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-neutral-400">QTD</span>
+                <span className="absolute left-5 top-1/2 -translate-y-1/2 text-[10px] font-black text-neutral-400 uppercase tracking-widest">QTD</span>
                 <input 
                   type="number" 
                   value={quantity} 
                   onChange={e => setQuantity(e.target.value)} 
                   placeholder="1" 
-                  className="w-full p-4 pl-12 bg-neutral-50 dark:bg-neutral-950 border border-neutral-100 dark:border-neutral-800 rounded-2xl text-xs font-bold outline-none focus:border-primary" 
+                  className="w-full p-6 pl-14 bg-neutral-50 dark:bg-neutral-950 border border-neutral-100 dark:border-neutral-800 rounded-[1.5rem] md:rounded-[2rem] text-sm font-bold outline-none focus:border-primary shadow-inner" 
                 />
               </div>
             </div>
-            <button type="submit" className="w-full bg-primary text-neutral-950 py-5 rounded-3xl font-black uppercase tracking-[0.2em] text-[10px] shadow-glow active:scale-95 transition-all">
+            <button type="submit" className="w-full bg-primary text-neutral-950 py-6 rounded-[1.5rem] md:rounded-[2rem] font-black uppercase tracking-[0.25em] text-xs shadow-glow active:scale-95 transition-all">
               Adicionar à Lista
             </button>
           </form>

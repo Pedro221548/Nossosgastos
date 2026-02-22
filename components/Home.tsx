@@ -24,10 +24,10 @@ interface HomeProps {
 
 const PremiumLogo = ({ className = "" }: { className?: string }) => (
   <div className={`relative flex items-center justify-center ${className}`}>
-    <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full animate-pulse"></div>
-    <div className="relative w-12 h-12 xs:w-14 xs:h-14 bg-neutral-900 border-2 border-primary/30 rounded-[1.2rem] xs:rounded-[1.5rem] flex items-center justify-center shadow-glow overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent"></div>
-      <Heart size={24} className="text-primary logo-glow" fill="currentColor" strokeWidth={0} />
+    <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full animate-pulse"></div>
+    <div className="relative w-16 h-16 xs:w-20 xs:h-20 bg-neutral-900 border-2 border-primary/30 rounded-[1.5rem] xs:rounded-[2rem] flex items-center justify-center shadow-glow overflow-hidden group">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent group-hover:opacity-100 transition-opacity"></div>
+      <Heart size={32} className="text-primary logo-glow transform group-hover:scale-110 transition-transform" fill="currentColor" strokeWidth={0} />
     </div>
   </div>
 );
@@ -74,70 +74,69 @@ export const Home: React.FC<HomeProps> = ({
 
   return (
     <div className="space-y-6 xs:space-y-8 animate-slide-up pb-24 px-1 sm:px-0">
-      <div className="flex flex-col items-center justify-center text-center space-y-3 xs:space-y-4 px-1 pt-2">
+      <div className="flex flex-col items-center justify-center text-center space-y-4 xs:space-y-6 px-1 pt-4">
         <PremiumLogo />
-        <div className="space-y-1">
-          <p className="text-[8px] xs:text-[9px] font-black text-neutral-400 uppercase tracking-[0.4em] italic">
+        <div className="space-y-2">
+          <p className="text-[10px] xs:text-xs font-black text-neutral-500 uppercase tracking-[0.4em] italic">
             SINCRONIZAÇÃO EM TEMPO REAL
           </p>
-          <h2 className="text-2xl xs:text-3xl md:text-4xl font-display font-black text-neutral-900 dark:text-white uppercase tracking-tighter italic leading-none truncate max-w-[280px]">
+          <h2 className="text-3xl xs:text-4xl md:text-6xl font-display font-black text-neutral-900 dark:text-white uppercase tracking-tighter italic leading-none truncate max-w-[320px] md:max-w-none">
             {familyName.split(' ')[0]} <span className="text-primary">SINC</span>
           </h2>
-          <div className="flex items-center justify-center space-x-2 mt-2">
-            <p className="text-[8px] font-black text-neutral-500 uppercase tracking-[0.2em]">{formattedDate}</p>
+          <div className="flex items-center justify-center space-x-3 mt-4">
+            <p className="text-[10px] font-black text-neutral-500 uppercase tracking-[0.2em]">{formattedDate}</p>
             <span className="text-neutral-300 dark:text-neutral-800 opacity-30">|</span>
-            <div className="flex items-center space-x-1.5">
-              <Clock size={10} className="text-primary animate-pulse" />
-              <p className="text-[8px] font-black text-neutral-600 dark:text-neutral-400 uppercase tracking-widest tabular-nums">{formattedTime}</p>
+            <div className="flex items-center space-x-2">
+              <Clock size={12} className="text-primary animate-pulse" />
+              <p className="text-[10px] font-black text-neutral-600 dark:text-neutral-400 uppercase tracking-widest tabular-nums">{formattedTime}</p>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="relative group overflow-hidden bg-neutral-950 rounded-[2.2rem] xs:rounded-[2.5rem] p-6 xs:p-8 md:p-12 shadow-2xl transition-all border border-neutral-800 mx-1">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[100px] rounded-full -mr-32 -mt-32"></div>
-        <div className="relative z-10 space-y-4 xs:space-y-6 text-center md:text-left">
-          <div className="flex items-center justify-center md:justify-start space-x-2">
-             <ShieldCheck size={10} className="text-primary" />
-             <span className="text-[8px] font-black text-neutral-500 uppercase tracking-[0.3em]">Fluxo de Caixa Real</span>
+      <div className="relative group overflow-hidden bg-neutral-950 rounded-[2.5rem] xs:rounded-[3rem] p-8 xs:p-10 md:p-16 shadow-2xl transition-all border border-neutral-800 mx-1">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-primary/5 blur-[120px] rounded-full -mr-40 -mt-40"></div>
+        <div className="relative z-10 space-y-6 xs:space-y-8 text-center md:text-left">
+          <div className="flex items-center justify-center md:justify-start space-x-3">
+             <ShieldCheck size={14} className="text-primary" />
+             <span className="text-[10px] font-black text-neutral-500 uppercase tracking-[0.3em]">Fluxo de Caixa Real</span>
           </div>
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 xs:gap-5">
-            <div className="space-y-1">
-              <p className="text-neutral-400 text-[9px] xs:text-[10px] font-black uppercase tracking-[0.2em]">Disponível Líquido</p>
-              <div className="flex items-baseline justify-center md:justify-start space-x-1.5 xs:space-x-2">
-                <span className="text-base xs:text-lg font-black text-primary italic shrink-0">R$</span>
-                <h3 className="text-3xl xs:text-4xl sm:text-5xl md:text-7xl font-display font-black text-white tracking-tighter italic tabular-nums leading-none truncate">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 xs:gap-8">
+            <div className="space-y-2">
+              <p className="text-neutral-400 text-xs xs:text-sm font-black uppercase tracking-[0.2em]">Disponível Líquido</p>
+              <div className="flex items-baseline justify-center md:justify-start space-x-2 xs:space-x-3">
+                <span className="text-xl xs:text-2xl font-black text-primary italic shrink-0">R$</span>
+                <h3 className="text-4xl xs:text-5xl sm:text-6xl md:text-8xl font-display font-black text-white tracking-tighter italic tabular-nums leading-none truncate">
                   {balance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </h3>
               </div>
             </div>
             <button 
               onClick={() => onNavigate('dashboard')}
-              className="flex items-center justify-center space-x-2.5 bg-white/5 border border-white/10 px-5 py-3.5 rounded-2xl transition-all active:scale-95 group/btn"
+              className="flex items-center justify-center space-x-3 bg-white/5 border border-white/10 px-8 py-5 rounded-2xl transition-all active:scale-95 group/btn hover:bg-white/10"
             >
-              <TrendingUp size={14} className="text-primary group-hover/btn:translate-x-1 transition-transform" />
-              <span className="text-[9px] font-black text-white uppercase tracking-widest italic">EXTRATO</span>
+              <TrendingUp size={18} className="text-primary group-hover/btn:translate-x-1 transition-transform" />
+              <span className="text-xs font-black text-white uppercase tracking-widest italic">EXTRATO</span>
             </button>
           </div>
         </div>
       </div>
 
       {/* Grid corrigida sem props inválidas */}
-      <div className="grid grid-cols-4 gap-2 xs:gap-3 px-1 sm:px-2">
-        <QuickActionCircle icon={<Plus size={24} strokeWidth={3} />} label="NOVO" color="bg-primary text-neutral-950" onClick={onOpenAddModal} />
-        <QuickActionCircle icon={<ShoppingCart size={20} />} label="COMPRA" color="bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800" onClick={() => onNavigate('shopping')} />
-        <QuickActionCircle icon={<Target size={20} />} label="METAS" color="bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800" onClick={() => onNavigate('goals')} />
-        <QuickActionCircle icon={<Zap size={20} />} label="SINC" color="bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800" onClick={() => onNavigate('mediator')} />
+      <div className="grid grid-cols-3 gap-3 xs:gap-4 px-1 sm:px-2">
+        <QuickActionCircle icon={<Plus size={28} strokeWidth={3} />} label="NOVO" color="bg-primary text-neutral-950" onClick={onOpenAddModal} />
+        <QuickActionCircle icon={<ShoppingCart size={24} />} label="COMPRA" color="bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800" onClick={() => onNavigate('shopping')} />
+        <QuickActionCircle icon={<Target size={24} />} label="METAS" color="bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800" onClick={() => onNavigate('goals')} />
       </div>
     </div>
   );
 };
 
 const QuickActionCircle = ({ icon, label, color, onClick }: any) => (
-  <button onClick={onClick} className="flex flex-col items-center space-y-2 xs:space-y-3 group w-full">
-    <div className={`w-full aspect-square rounded-[1.2rem] xs:rounded-[1.8rem] flex items-center justify-center shadow-lg active:scale-90 transition-all border border-transparent group-hover:border-primary/30 ${color}`}>
-      {icon}
+  <button onClick={onClick} className="flex flex-col items-center space-y-3 xs:space-y-4 group w-full">
+    <div className={`w-full aspect-square rounded-[1.8rem] xs:rounded-[2.5rem] flex items-center justify-center shadow-lg active:scale-90 transition-all border border-transparent group-hover:border-primary/50 ${color}`}>
+      {React.cloneElement(icon, { className: "w-7 h-7 xs:w-9 xs:h-9" })}
     </div>
-    <span className="text-[7px] xs:text-[8px] font-black text-neutral-500 uppercase tracking-widest group-hover:text-primary transition-colors text-center truncate w-full">{label}</span>
+    <span className="text-[11px] xs:text-xs font-black text-neutral-500 uppercase tracking-widest group-hover:text-primary transition-colors text-center truncate w-full italic">{label}</span>
   </button>
 );

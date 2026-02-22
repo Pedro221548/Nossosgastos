@@ -75,4 +75,4 @@ export interface ChatMessage {
   timestamp: Date;
 }
 
-export type AppTab = 'home' | 'dashboard' | 'analytics' | 'goals' | 'budget' | 'shopping' | 'alexa' | 'mediator' | 'invoices';
+export type AppTab = 'home' | 'dashboard' | 'analytics' | 'goals' | 'budget' | 'shopping' | 'invoices';

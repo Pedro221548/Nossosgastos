@@ -130,11 +130,10 @@ export const Home: React.FC<HomeProps> = ({
         </div>
       </div>
 
-      <div className="grid grid-cols-4 gap-2 px-1">
+      <div className="grid grid-cols-3 gap-2 px-1">
         <QuickActionCircle icon={<Plus size={24} strokeWidth={3} />} label="Novo" color="bg-primary text-neutral-950" onClick={onOpenAddModal} />
         <QuickActionCircle icon={<ShoppingCart size={22} />} label="Lista" color="bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800" onClick={() => onNavigate('shopping')} />
         <QuickActionCircle icon={<Target size={22} />} label="Metas" color="bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800" onClick={() => onNavigate('goals')} />
-        <QuickActionCircle icon={<Zap size={22} />} label="Alexa" color="bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800" onClick={() => onNavigate('alexa')} />
       </div>
     </div>
   );

@@ -24,12 +24,12 @@ export const Goals: React.FC<GoalsProps> = ({ goals, onUpdateGoal, onSaveGoal, o
 
   return (
     <div className="space-y-8 md:space-y-12 animate-in fade-in px-1 pb-20">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div className="text-center md:text-left space-y-2">
-          <h2 className="text-3xl font-display font-black text-neutral-900 dark:text-white uppercase tracking-tighter italic">Nossas Metas</h2>
-          <p className="text-neutral-500 text-xs font-bold uppercase tracking-widest">Investindo no nosso futuro juntos</p>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+        <div className="text-center md:text-left space-y-3">
+          <h2 className="text-4xl md:text-6xl font-display font-black text-neutral-900 dark:text-white uppercase tracking-tighter italic leading-none">Nossas Metas</h2>
+          <p className="text-neutral-500 text-[10px] md:text-xs font-bold uppercase tracking-[0.3em]">Investindo no nosso futuro juntos</p>
         </div>
-        <button onClick={() => { setEditingGoal(null); setIsModalOpen(true); }} className="bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 px-8 py-5 rounded-[2rem] font-black uppercase tracking-widest text-[10px] shadow-2xl transition-all"><Plus size={18} strokeWidth={3} className="inline mr-2" />Novo Objetivo</button>
+        <button onClick={() => { setEditingGoal(null); setIsModalOpen(true); }} className="bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 px-10 py-6 rounded-[2.5rem] font-black uppercase tracking-widest text-xs shadow-2xl transition-all active:scale-95 hover:shadow-glow"><Plus size={20} strokeWidth={3} className="inline mr-2" />Novo Objetivo</button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -49,13 +49,13 @@ export const Goals: React.FC<GoalsProps> = ({ goals, onUpdateGoal, onSaveGoal, o
                 </div>
                 <h3 className="absolute bottom-4 left-6 text-white font-display font-black text-2xl uppercase tracking-tight italic">{goal.title}</h3>
               </div>
-              <div className="p-6 md:p-8">
-                <div className="flex justify-between items-end mb-4">
-                  <div className="space-y-1"><span className="text-[10px] text-neutral-400 font-bold uppercase tracking-widest">Acumulado</span><p className="text-2xl font-display font-black text-neutral-900 dark:text-white">R$ {goal.currentAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p></div>
-                  <div className="text-right"><span className="text-[10px] text-neutral-400 font-bold uppercase tracking-widest">Meta</span><p className="text-xs font-bold text-neutral-500 italic">R$ {goal.targetAmount.toLocaleString('pt-BR')}</p></div>
+              <div className="p-8 md:p-10">
+                <div className="flex justify-between items-end mb-6">
+                  <div className="space-y-2"><span className="text-[10px] md:text-xs text-neutral-400 font-bold uppercase tracking-widest">Acumulado</span><p className="text-3xl font-display font-black text-neutral-900 dark:text-white leading-none">R$ {goal.currentAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p></div>
+                  <div className="text-right"><span className="text-[10px] md:text-xs text-neutral-400 font-bold uppercase tracking-widest">Meta</span><p className="text-sm font-bold text-neutral-500 italic">R$ {goal.targetAmount.toLocaleString('pt-BR')}</p></div>
                 </div>
-                <div className="h-4 bg-neutral-100 dark:bg-neutral-950 rounded-full border border-neutral-200 dark:border-neutral-800 p-1 mb-6"><div className={`h-full ${goal.color} rounded-full transition-all duration-1000 shadow-glow`} style={{ width: `${percentage}%` }} /></div>
-                <button onClick={() => setIsContributionOpen({ isOpen: true, goalId: goal.id })} className="w-full text-[10px] font-black bg-primary px-6 py-5 rounded-3xl uppercase tracking-widest shadow-glow active:scale-95 transition-all">Adicionar Economia</button>
+                <div className="h-5 bg-neutral-100 dark:bg-neutral-950 rounded-full border border-neutral-200 dark:border-neutral-800 p-1 mb-8"><div className={`h-full ${goal.color} rounded-full transition-all duration-1000 shadow-glow`} style={{ width: `${percentage}%` }} /></div>
+                <button onClick={() => setIsContributionOpen({ isOpen: true, goalId: goal.id })} className="w-full text-xs font-black bg-primary px-8 py-6 rounded-[2rem] uppercase tracking-widest shadow-glow active:scale-95 transition-all">Adicionar Economia</button>
               </div>
             </div>
           );

@@ -32,26 +32,26 @@ const CustomTooltip = ({ active, payload, label }: any) => {
     const saldo = ganhos - gastos;
 
     return (
-      <div className="bg-neutral-900 border border-neutral-800 p-3 md:p-4 rounded-xl md:rounded-2xl shadow-2xl backdrop-blur-md">
-        <p className="text-[8px] md:text-[10px] font-black text-neutral-400 uppercase tracking-widest mb-2 md:mb-3 border-b border-neutral-800 pb-2 text-left">{label}</p>
-        <div className="space-y-1.5 md:space-y-2">
-          <div className="flex items-center justify-between space-x-4 md:space-x-8">
-            <div className="flex items-center space-x-2">
-              <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-emerald-500" />
-              <span className="text-[8px] md:text-[10px] font-bold text-neutral-500 uppercase tracking-tighter">Ganhos</span>
+      <div className="bg-neutral-900/95 border border-neutral-800 p-4 md:p-6 rounded-2xl md:rounded-[2.5rem] shadow-2xl backdrop-blur-xl">
+        <p className="text-[10px] md:text-xs font-black text-neutral-400 uppercase tracking-widest mb-4 md:mb-6 border-b border-neutral-800 pb-3 text-left">{label}</p>
+        <div className="space-y-3 md:space-y-4">
+          <div className="flex items-center justify-between space-x-8 md:space-x-12">
+            <div className="flex items-center space-x-3">
+              <div className="w-2 h-2 md:w-3 md:h-3 rounded-full bg-emerald-500" />
+              <span className="text-[10px] md:text-xs font-bold text-neutral-500 uppercase tracking-tighter">Ganhos</span>
             </div>
-            <span className="text-[10px] md:text-xs font-black text-emerald-400">R$ {ganhos.toLocaleString('pt-BR')}</span>
+            <span className="text-xs md:text-sm font-black text-emerald-400">R$ {ganhos.toLocaleString('pt-BR')}</span>
           </div>
-          <div className="flex items-center justify-between space-x-4 md:space-x-8">
-            <div className="flex items-center space-x-2">
-              <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-primary" />
-              <span className="text-[8px] md:text-[10px] font-bold text-neutral-500 uppercase tracking-tighter">Gastos</span>
+          <div className="flex items-center justify-between space-x-8 md:space-x-12">
+            <div className="flex items-center space-x-3">
+              <div className="w-2 h-2 md:w-3 md:h-3 rounded-full bg-primary" />
+              <span className="text-[10px] md:text-xs font-bold text-neutral-500 uppercase tracking-tighter">Gastos</span>
             </div>
-            <span className="text-[10px] md:text-xs font-black text-primary">R$ {gastos.toLocaleString('pt-BR')}</span>
+            <span className="text-xs md:text-sm font-black text-primary">R$ {gastos.toLocaleString('pt-BR')}</span>
           </div>
-          <div className="pt-1.5 md:pt-2 mt-1.5 md:mt-2 border-t border-neutral-800 flex items-center justify-between">
-            <span className="text-[8px] md:text-[9px] font-black text-neutral-400 uppercase tracking-widest">Saldo</span>
-            <span className={`text-[10px] md:text-xs font-black ${saldo >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
+          <div className="pt-3 md:pt-4 mt-3 md:mt-4 border-t border-neutral-800 flex items-center justify-between">
+            <span className="text-[10px] md:text-xs font-black text-neutral-400 uppercase tracking-widest">Saldo</span>
+            <span className={`text-xs md:text-sm font-black ${saldo >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
               R$ {saldo.toLocaleString('pt-BR')}
             </span>
           </div>
@@ -113,13 +113,13 @@ export const Analytics: React.FC<AnalyticsProps> = ({
     <div className="space-y-6 md:space-y-8 animate-slide-up px-1 pb-24 md:pb-20">
       
       {/* HEADER DINÂMICO */}
-      <div className="flex flex-col items-center justify-center text-center space-y-3 md:space-y-4">
-        <div className="w-12 h-12 md:w-16 md:h-16 bg-neutral-900 border border-primary/20 rounded-2xl md:rounded-[2rem] flex items-center justify-center text-primary shadow-glow transform rotate-3 shrink-0">
-          <Activity className="w-6 h-6 md:w-8 md:h-8" />
+      <div className="flex flex-col items-center justify-center text-center space-y-4 md:space-y-6">
+        <div className="w-16 h-16 md:w-20 md:h-20 bg-neutral-900 border border-primary/20 rounded-[1.5rem] md:rounded-[2.5rem] flex items-center justify-center text-primary shadow-glow transform rotate-3 shrink-0">
+          <Activity className="w-8 h-8 md:w-10 md:h-10" />
         </div>
-        <div className="space-y-1 px-4">
-          <h2 className="text-3xl md:text-5xl font-display font-black text-neutral-900 dark:text-white uppercase tracking-tighter italic leading-none">Saúde Financeira</h2>
-          <p className="text-[8px] md:text-[10px] font-black text-neutral-400 uppercase tracking-[0.3em] md:tracking-[0.4em]">Score de Inteligência do Casal</p>
+        <div className="space-y-2 px-4">
+          <h2 className="text-4xl md:text-6xl font-display font-black text-neutral-900 dark:text-white uppercase tracking-tighter italic leading-none">Saúde Financeira</h2>
+          <p className="text-[10px] md:text-xs font-black text-neutral-400 uppercase tracking-[0.3em] md:tracking-[0.4em]">Score de Inteligência do Casal</p>
         </div>
       </div>
 
@@ -204,33 +204,33 @@ export const Analytics: React.FC<AnalyticsProps> = ({
             <BarChart 
               data={chartData} 
               margin={{ top: 10, right: 10, left: -30, bottom: 0 }}
-              barGap={window.innerWidth < 768 ? 4 : 10}
+              barGap={8}
             >
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#262626" />
               <XAxis 
                 dataKey="name" 
                 axisLine={false} 
                 tickLine={false} 
-                tick={{ fill: '#737373', fontSize: 8, fontWeight: '900' }} 
+                tick={{ fill: '#737373', fontSize: 10, fontWeight: '900' }} 
                 dy={10} 
               />
               <YAxis 
                 axisLine={false} 
                 tickLine={false} 
-                tick={{ fill: '#737373', fontSize: 8, fontWeight: 'bold' }} 
+                tick={{ fill: '#737373', fontSize: 10, fontWeight: 'bold' }} 
               />
               <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.02)' }} />
               <Bar 
                 dataKey="ganhos" 
                 fill="#10b981" 
-                radius={[4, 4, 0, 0]} 
-                barSize={window.innerWidth < 375 ? 10 : window.innerWidth < 768 ? 14 : 28} 
+                radius={[6, 6, 0, 0]} 
+                minPointSize={5}
               />
               <Bar 
                 dataKey="gastos" 
                 fill="#FACC15" 
-                radius={[4, 4, 0, 0]} 
-                barSize={window.innerWidth < 375 ? 10 : window.innerWidth < 768 ? 14 : 28} 
+                radius={[6, 6, 0, 0]} 
+                minPointSize={5}
               />
             </BarChart>
           </ResponsiveContainer>

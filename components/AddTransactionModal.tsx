@@ -136,20 +136,20 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
     <div className="fixed inset-0 z-[110] flex items-end md:items-center justify-center p-0 md:p-4 animate-in fade-in duration-300">
       <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={handleAttemptClose}/>
       
-      <div className="relative bg-[#0F0F0F] w-full max-w-xl md:rounded-[40px] rounded-t-[40px] border-t md:border border-neutral-800 shadow-2xl animate-in slide-in-from-bottom duration-500 overflow-hidden flex flex-col max-h-[92vh] md:max-h-[95vh]">
+      <div className="relative bg-[#0F0F0F] w-full max-w-xl md:rounded-[40px] rounded-t-[40px] border-t md:border border-neutral-800 shadow-2xl animate-in slide-in-from-bottom duration-500 overflow-hidden flex flex-col max-h-[95vh] md:max-h-[90vh]">
         
-        <div className={`absolute left-0 top-0 bottom-0 w-1 md:w-1.5 ${type === 'expense' ? 'bg-red-500' : 'bg-emerald-500'} z-10`} />
+        <div className={`absolute left-0 top-0 bottom-0 w-1.5 md:w-2 ${type === 'expense' ? 'bg-red-500' : 'bg-emerald-500'} z-10`} />
 
-        <div className="px-6 md:px-8 py-4 md:py-6 flex justify-between items-center border-b border-neutral-900 shrink-0">
-          <h2 className="text-base md:text-lg font-display font-black text-white uppercase italic tracking-tighter">
+        <div className="px-8 md:px-10 py-6 md:py-8 flex justify-between items-center border-b border-neutral-900 shrink-0">
+          <h2 className="text-xl md:text-2xl font-display font-black text-white uppercase italic tracking-tighter">
             {editingTransaction ? 'Editar Dados' : 'Novo Lançamento'}
           </h2>
-          <button onClick={handleAttemptClose} className="p-2 md:p-3 bg-neutral-900 rounded-full text-neutral-400 hover:text-white transition-all active:scale-90">
-            <X className="w-5 h-5 md:w-6 md:h-6" />
+          <button onClick={handleAttemptClose} className="p-3 md:p-4 bg-neutral-900 rounded-full text-neutral-400 hover:text-white transition-all active:scale-90">
+            <X className="w-6 h-6 md:w-7 md:h-7" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-5 md:p-8 space-y-6 md:space-y-8 overflow-y-auto pb-32 md:pb-8 scrollbar-hide">
+        <form onSubmit={handleSubmit} className="p-8 md:p-12 space-y-8 md:space-y-10 overflow-y-auto pb-40 md:pb-12 scrollbar-hide">
           
           <div className="space-y-4">
             <input 

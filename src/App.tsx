@@ -8,7 +8,6 @@ import { Goals } from '../components/Goals';
 import { BudgetSettings } from '../components/BudgetSettings'; 
 import { ShoppingList } from '../components/ShoppingList';
 import { Analytics } from '../components/Analytics';
-import { AlexaConnect } from '../components/AlexaConnect';
 import { AddTransactionModal } from '../components/AddTransactionModal';
 import { ConfirmationModal } from '../components/ui/ConfirmationModal';
 import { Login } from '../components/Login';
@@ -25,8 +24,7 @@ import {
   Loader2,
   TrendingUp,
   Home as HomeIcon,
-  ListOrdered,
-  Mic
+  ListOrdered
 } from 'lucide-react';
 
 type Theme = 'dark' | 'light';
@@ -271,7 +269,6 @@ const App: React.FC = () => {
           <SidebarItem icon={<TrendingUp />} label="Análises" active={activeTab === 'analytics'} onClick={() => setActiveTab('analytics')} />
           <SidebarItem icon={<Target />} label="Metas" active={activeTab === 'goals'} onClick={() => setActiveTab('goals')} />
           <SidebarItem icon={<ShoppingCart />} label="Compras" active={activeTab === 'shopping'} onClick={() => setActiveTab('shopping')} />
-          <SidebarItem icon={<Mic />} label="Alexa" active={activeTab === 'alexa'} onClick={() => setActiveTab('alexa')} />
           <SidebarItem icon={<Settings />} label="Ajustes" active={activeTab === 'budget'} onClick={() => setActiveTab('budget')} />
         </nav>
         <div className="mt-auto pt-8 border-t border-neutral-200 dark:border-neutral-800">
@@ -287,7 +284,6 @@ const App: React.FC = () => {
         {activeTab === 'analytics' && <Analytics transactions={transactions} baseIncome={users.A.income + users.B.income} currentDate={currentDate} onMonthChange={(dir: 'prev' | 'next') => { const nd = new Date(currentDate); nd.setMonth(nd.getMonth() + (dir === 'next' ? 1 : -1)); setCurrentDate(nd); }} />}
         {activeTab === 'goals' && <Goals goals={goals} onUpdateGoal={handleUpdateGoalProgress} onSaveGoal={handleSaveGoal} onDeleteGoal={handleDeleteGoal} />}
         {activeTab === 'shopping' && <ShoppingList items={shoppingItems} onAdd={handleAddShoppingItem} onToggle={handleToggleShopping} onDelete={handleDeleteShopping} onClearHistory={handleClearShoppingHistory} />}
-        {activeTab === 'alexa' && <AlexaConnect />}
         {activeTab === 'budget' && <BudgetSettings users={users} familyName={familyName} alertThreshold={alertThreshold} onUpdateUser={(uid: string, data: Partial<User>) => { const key = uid === users.A.id ? 'A' : 'B'; const updated = { ...users, [key]: { ...users[key], ...data } }; setUsers(updated); triggerSync('users', updated); }} onUpdateFamilySettings={(name: string, threshold: number) => { setFamilyName(name); setAlertThreshold(threshold); triggerSync('familyName', name); triggerSync('alertThreshold', threshold); }} currentTheme={theme} onThemeToggle={setTheme} onLogout={() => signOut(auth)} onForceSync={forceFullSync} isSyncing={isSyncing} />}
       </main>
 
@@ -296,7 +292,6 @@ const App: React.FC = () => {
          <MobileNavItem icon={<ListOrdered />} active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} />
          <button onClick={() => { setEditingTransaction(null); setIsAddModalOpen(true); }} className="w-14 h-14 bg-primary rounded-[1.8rem] flex items-center justify-center text-neutral-950 shadow-glow -translate-y-5 active:scale-90 transition-all border-[6px] border-neutral-50 dark:border-neutral-950"><Plus size={28} strokeWidth={3} /></button>
          <MobileNavItem icon={<ShoppingCart />} active={activeTab === 'shopping'} onClick={() => setActiveTab('shopping')} />
-         <MobileNavItem icon={<Mic />} active={activeTab === 'alexa'} onClick={() => setActiveTab('alexa')} />
       </nav>
 
       <AddTransactionModal isOpen={isAddModalOpen} users={users} initialDate={currentDate} onClose={() => { setIsAddModalOpen(false); setEditingTransaction(null); }} onAdd={handleAddOrUpdateTransaction} editingTransaction={editingTransaction} />

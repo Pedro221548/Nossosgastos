@@ -8,8 +8,6 @@ import { Goals } from './components/Goals';
 import { BudgetSettings } from './components/BudgetSettings'; 
 import { ShoppingList } from './components/ShoppingList';
 import { Analytics } from './components/Analytics';
-import { AlexaConnect } from './components/AlexaConnect';
-import { AiMediator } from './components/AiMediator';
 import { InvoiceManager } from './components/InvoiceManager';
 import { AddTransactionModal } from './components/AddTransactionModal';
 import { ConfirmationModal } from './components/ui/ConfirmationModal';
@@ -28,7 +26,6 @@ import {
   TrendingUp,
   Home as HomeIcon,
   ListOrdered,
-  Mic,
   Sparkles,
   FileText
 } from 'lucide-react';
@@ -288,56 +285,59 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-200 flex flex-col md:flex-row transition-colors duration-300">
       
-      <div className="fixed top-[calc(env(safe-area-inset-top)+10px)] right-4 md:right-6 z-[100] flex items-center space-x-2 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-neutral-200 dark:border-neutral-800 shadow-xl">
-        {isSyncing ? <><Loader2 size={10} className="text-primary animate-spin" /><span className="text-[7px] font-black text-neutral-500 uppercase tracking-widest">Sinc</span></> : <><div className="w-1.5 h-1.5 bg-emerald-500 rounded-full" /><span className="text-[7px] font-black text-neutral-400 uppercase tracking-widest">On</span></>}
+      <div className="fixed top-[calc(env(safe-area-inset-top)+10px)] right-4 md:right-6 z-[100] flex items-center space-x-2 bg-white/90 dark:bg-neutral-900/90 backdrop-blur-md px-4 py-2 rounded-full border border-neutral-200 dark:border-neutral-800 shadow-2xl transition-all">
+        {isSyncing ? <><Loader2 size={12} className="text-primary animate-spin" /><span className="text-[10px] font-black text-neutral-500 uppercase tracking-widest">Sincronizando</span></> : <><div className="w-2 h-2 bg-emerald-500 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.5)]" /><span className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">Online</span></>}
       </div>
 
-      <aside className="hidden md:flex flex-col w-72 bg-white dark:bg-neutral-900/50 border-r border-neutral-200 dark:border-neutral-800 sticky top-0 h-screen p-8 z-50">
-        <div className="flex items-center justify-between mb-12">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-neutral-950 rounded-xl flex items-center justify-center text-primary shadow-glow border border-primary/50"><Heart size={20} strokeWidth={3} fill="currentColor" /></div>
+      <aside className="hidden lg:flex flex-col w-80 bg-white dark:bg-neutral-900/50 border-r border-neutral-200 dark:border-neutral-800 sticky top-0 h-screen p-10 z-50">
+        <div className="flex items-center justify-between mb-16">
+          <div className="flex items-center space-x-4">
+            <div className="w-12 h-12 bg-neutral-950 rounded-2xl flex items-center justify-center text-primary shadow-glow border border-primary/30 transform -rotate-3 hover:rotate-0 transition-transform duration-300">
+              <Heart size={24} strokeWidth={3} fill="currentColor" />
+            </div>
             <div>
-              <h1 className="text-lg font-display font-black text-neutral-900 dark:text-white tracking-tight leading-none uppercase italic">NOSSA <span className="text-primary">CARTEIRA</span></h1>
-              <p className="text-[8px] font-bold text-slate-500 uppercase tracking-widest truncate mt-1">{familyName}</p>
+              <h1 className="text-xl font-display font-black text-neutral-900 dark:text-white tracking-tighter leading-none uppercase italic">NOSSA <span className="text-primary">CARTEIRA</span></h1>
+              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] truncate mt-1.5">{familyName}</p>
             </div>
           </div>
         </div>
-        <nav className="flex-1 space-y-2">
+        <nav className="flex-1 space-y-3">
           <SidebarItem icon={<HomeIcon />} label="Home" active={activeTab === 'home'} onClick={() => setActiveTab('home')} />
           <SidebarItem icon={<ListOrdered />} label="Extrato" active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} />
           <SidebarItem icon={<FileText />} label="Faturas" active={activeTab === 'invoices'} onClick={() => setActiveTab('invoices')} />
           <SidebarItem icon={<TrendingUp />} label="Saúde" active={activeTab === 'analytics'} onClick={() => setActiveTab('analytics')} />
           <SidebarItem icon={<Target />} label="Metas" active={activeTab === 'goals'} onClick={() => setActiveTab('goals')} />
-          <SidebarItem icon={<Sparkles />} label="IA Sinc" active={activeTab === 'mediator'} onClick={() => setActiveTab('mediator')} />
           <SidebarItem icon={<ShoppingCart />} label="Compras" active={activeTab === 'shopping'} onClick={() => setActiveTab('shopping')} />
-          <SidebarItem icon={<Mic />} label="Alexa" active={activeTab === 'alexa'} onClick={() => setActiveTab('alexa')} />
           <SidebarItem icon={<Settings />} label="Ajustes" active={activeTab === 'budget'} onClick={() => setActiveTab('budget')} />
         </nav>
-        <div className="mt-auto pt-8 border-t border-neutral-200 dark:border-neutral-800">
-          <button onClick={() => signOut(auth)} className="w-full flex items-center justify-between p-2 hover:bg-red-500/10 rounded-2xl transition-all text-neutral-500 hover:text-red-500">
-            <span className="text-[10px] font-black uppercase tracking-widest ml-2">Sair</span><LogOut size={16} />
+        <div className="mt-auto pt-10 border-t border-neutral-200 dark:border-neutral-800">
+          <button onClick={() => signOut(auth)} className="w-full flex items-center justify-between p-3 hover:bg-red-500/10 rounded-2xl transition-all text-neutral-500 hover:text-red-500 group">
+            <span className="text-xs font-black uppercase tracking-widest ml-2">Sair da Conta</span>
+            <LogOut size={18} className="group-hover:translate-x-1 transition-transform" />
           </button>
         </div>
       </aside>
 
-      <main className="flex-1 max-w-5xl mx-auto w-full px-4 py-6 md:px-12 md:py-16 pb-36 md:pb-16 pt-[calc(1.5rem+env(safe-area-inset-top))]">
+      <main className="flex-1 max-w-6xl mx-auto w-full px-4 py-8 md:px-12 md:py-20 lg:py-24 pb-40 lg:pb-24 pt-[calc(2rem+env(safe-area-inset-top))]">
         {activeTab === 'home' && <Home transactions={transactions} goals={goals} users={users} familyName={familyName} onNavigate={setActiveTab} onOpenAddModal={() => setIsAddModalOpen(true)} />}
-        {activeTab === 'dashboard' && <Dashboard transactions={transactions} totalIncome={users.A.income + users.B.income} currentDate={currentDate} users={users} alertThreshold={alertThreshold} onMonthChange={(dir: 'prev' | 'next') => { const nd = new Date(currentDate); nd.setMonth(nd.getMonth() + (dir === 'next' ? 1 : -1)); setCurrentDate(nd); }} onDelete={handleDeleteTransaction} onTogglePaid={handleTogglePaid} onEdit={(tx: Transaction) => { setEditingTransaction(tx); setIsAddModalOpen(true); }} onClearAll={() => {}} onOpenShopping={() => setActiveTab('shopping')} onOpenAddModal={() => { setEditingTransaction(null); setIsAddModalOpen(true); }} />}
+        {activeTab === 'dashboard' && <Dashboard transactions={transactions} totalIncome={users.A.income + users.B.income} currentDate={currentDate} users={users} familyName={familyName} alertThreshold={alertThreshold} onMonthChange={(dir: 'prev' | 'next') => { const nd = new Date(currentDate); nd.setMonth(nd.getMonth() + (dir === 'next' ? 1 : -1)); setCurrentDate(nd); }} onDelete={handleDeleteTransaction} onTogglePaid={handleTogglePaid} onEdit={(tx: Transaction) => { setEditingTransaction(tx); setIsAddModalOpen(true); }} onClearAll={() => {}} onOpenShopping={() => setActiveTab('shopping')} onOpenAddModal={() => { setEditingTransaction(null); setIsAddModalOpen(true); }} />}
         {activeTab === 'invoices' && <InvoiceManager invoices={invoices} onSaveInvoice={handleSaveInvoice} onDeleteInvoice={handleDeleteInvoice} />}
         {activeTab === 'analytics' && <Analytics transactions={transactions} baseIncome={users.A.income + users.B.income} currentDate={currentDate} onMonthChange={(dir: 'prev' | 'next') => { const nd = new Date(currentDate); nd.setMonth(nd.getMonth() + (dir === 'next' ? 1 : -1)); setCurrentDate(nd); }} />}
         {activeTab === 'goals' && <Goals goals={goals} onUpdateGoal={handleUpdateGoalProgress} onSaveGoal={handleSaveGoal} onDeleteGoal={handleDeleteGoal} />}
-        {activeTab === 'mediator' && <AiMediator transactions={transactions} users={users} goals={goals} />}
         {activeTab === 'shopping' && <ShoppingList items={shoppingItems} onAdd={handleAddShoppingItem} onToggle={handleToggleShopping} onDelete={handleDeleteShopping} onClearHistory={handleClearShoppingHistory} />}
-        {activeTab === 'alexa' && <AlexaConnect />}
         {activeTab === 'budget' && <BudgetSettings users={users} familyName={familyName} alertThreshold={alertThreshold} onUpdateUser={(uid: string, data: Partial<User>) => { const key = uid === users.A.id ? 'A' : 'B'; const updated = { ...users, [key]: { ...users[key], ...data } }; setUsers(updated); triggerSync('users', updated); }} onUpdateFamilySettings={(name: string, threshold: number) => { setFamilyName(name); setAlertThreshold(threshold); triggerSync('familyName', name); triggerSync('alertThreshold', threshold); }} currentTheme={theme} onThemeToggle={setTheme} onLogout={() => signOut(auth)} onForceSync={forceFullSync} isSyncing={isSyncing} />}
       </main>
 
-      <nav className="md:hidden fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] left-4 right-4 h-16 bg-white/80 dark:bg-neutral-900/90 backdrop-blur-2xl border border-neutral-200 dark:border-neutral-800 rounded-[2.5rem] flex justify-around items-center z-[100] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.4)] px-2">
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-[calc(70px+env(safe-area-inset-bottom))] bg-white/95 dark:bg-neutral-950/95 backdrop-blur-3xl border-t border-neutral-200 dark:border-neutral-800 flex justify-around items-start z-[100] shadow-[0_-10px_40px_rgba(0,0,0,0.1)] px-2 pt-2">
          <MobileNavItem icon={<HomeIcon />} active={activeTab === 'home'} onClick={() => setActiveTab('home')} />
          <MobileNavItem icon={<ListOrdered />} active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} />
-         <button onClick={() => { setEditingTransaction(null); setIsAddModalOpen(true); }} className="w-14 h-14 bg-primary rounded-[1.8rem] flex items-center justify-center text-neutral-950 shadow-glow -translate-y-5 active:scale-90 transition-all border-[6px] border-neutral-50 dark:border-neutral-950"><Plus size={28} strokeWidth={3} /></button>
+         <div className="relative -top-8">
+           <button onClick={() => { setEditingTransaction(null); setIsAddModalOpen(true); }} className="w-16 h-16 bg-primary rounded-[2rem] flex items-center justify-center text-neutral-950 shadow-glow active:scale-90 transition-all border-[6px] border-neutral-50 dark:border-neutral-950">
+             <Plus size={32} strokeWidth={3} />
+           </button>
+         </div>
          <MobileNavItem icon={<FileText />} active={activeTab === 'invoices'} onClick={() => setActiveTab('invoices')} />
-         <MobileNavItem icon={<Sparkles />} active={activeTab === 'mediator'} onClick={() => setActiveTab('mediator')} />
+         <MobileNavItem icon={<Settings />} active={activeTab === 'budget'} onClick={() => setActiveTab('budget')} />
       </nav>
 
       <AddTransactionModal isOpen={isAddModalOpen} users={users} initialDate={currentDate} onClose={() => { setIsAddModalOpen(false); setEditingTransaction(null); }} onAdd={handleAddOrUpdateTransaction} editingTransaction={editingTransaction} />
@@ -347,14 +347,17 @@ const App: React.FC = () => {
 };
 
 const SidebarItem = ({ icon, label, active, onClick }: { icon: any, label: string, active: boolean, onClick: () => void }) => (
-  <button onClick={onClick} className={`w-full flex items-center space-x-4 px-4 py-3.5 rounded-2xl transition-all duration-200 group ${active ? 'bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-white shadow-sm ring-1 ring-neutral-200 dark:ring-neutral-700' : 'text-neutral-500 hover:bg-neutral-50 hover:text-neutral-900 dark:hover:text-white'}`}>
-    <div className={active ? 'text-primary' : 'text-neutral-400 group-hover:text-neutral-600 dark:group-hover:text-neutral-400'}>{React.cloneElement(icon, { size: 18, strokeWidth: active ? 2.5 : 2 })}</div>
-    <span className="text-[11px] font-bold uppercase tracking-widest">{label}</span>
+  <button onClick={onClick} className={`w-full flex items-center space-x-5 px-5 py-4 rounded-2xl transition-all duration-300 group ${active ? 'bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-white shadow-md ring-1 ring-neutral-200 dark:ring-neutral-700' : 'text-neutral-500 hover:bg-neutral-50 hover:text-neutral-900 dark:hover:text-white'}`}>
+    <div className={active ? 'text-primary scale-110' : 'text-neutral-400 group-hover:text-neutral-600 dark:group-hover:text-neutral-400 group-hover:scale-110 transition-transform'}>{React.cloneElement(icon, { size: 20, strokeWidth: active ? 2.5 : 2 })}</div>
+    <span className="text-xs font-bold uppercase tracking-[0.15em]">{label}</span>
   </button>
 );
 
 const MobileNavItem = ({ icon, active, onClick }: { icon: any, active: boolean, onClick: () => void }) => (
-  <button onClick={onClick} className={`p-4 rounded-2xl transition-all ${active ? 'text-primary' : 'text-neutral-400 opacity-60'}`}>{React.cloneElement(icon, { size: 22, strokeWidth: active ? 3.5 : 2 })}</button>
+  <button onClick={onClick} className={`flex flex-col items-center justify-center p-3 rounded-2xl transition-all ${active ? 'text-primary' : 'text-neutral-400 opacity-60'}`}>
+    {React.cloneElement(icon, { size: 24, strokeWidth: active ? 2.5 : 2 })}
+    <div className={`w-1 h-1 rounded-full bg-primary mt-1.5 transition-all ${active ? 'opacity-100 scale-100' : 'opacity-0 scale-0'}`} />
+  </button>
 );
 
 export default App;
