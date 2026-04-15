@@ -9,7 +9,8 @@ import {
   ChevronLeft, 
   ChevronRight,
   Clock,
-  CircleDashed
+  CircleDashed,
+  Share2
 } from 'lucide-react';
 
 interface DashboardProps {
@@ -70,6 +71,28 @@ export const Dashboard: React.FC<DashboardProps> = ({
     };
   }, [filteredList, baseIncome, currentMonthKey]);
 
+  const handleShareWhatsApp = () => {
+    const formatCurrency = (val: number) => `R$ ${val.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+    
+    let message = `📊 *Resumo Financeiro - ${monthLabel}*\n\n`;
+    message += `💰 *Saldo Livre (Estimado):* ${formatCurrency(stats.balance)}\n`;
+    message += `🏦 *Saldo Atual em Conta:* ${formatCurrency(stats.balance + stats.pending)}\n`;
+    message += `⏳ *A Pagar:* ${formatCurrency(stats.pending)}\n`;
+    message += `✅ *Pagos:* ${formatCurrency(stats.paid)}\n\n`;
+    
+    message += `*--- Detalhamento (${filteredList.length} itens) ---*\n`;
+    
+    filteredList.forEach(tx => {
+      const isActuallyPaid = tx.isFixed ? (tx.paidMonths?.includes(currentMonthKey) ?? false) : tx.isPaid;
+      const statusIcon = isActuallyPaid ? '✅' : '⏳';
+      const typeIcon = tx.type === 'revenue' ? '📈' : '📉';
+      message += `${statusIcon} ${tx.title} - ${formatCurrency(tx.amount)}\n`;
+    });
+
+    const encodedMessage = encodeURIComponent(message);
+    window.open(`https://wa.me/?text=${encodedMessage}`, '_blank');
+  };
+
   return (
     <div className="space-y-6 md:space-y-8 animate-slide-up text-left max-w-2xl mx-auto px-1 sm:px-0 pb-24">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 px-2 sm:px-0">
@@ -121,7 +144,17 @@ export const Dashboard: React.FC<DashboardProps> = ({
       <div className="space-y-4">
         <div className="flex items-center justify-between px-4">
           <h3 className="text-[10px] font-black text-neutral-500 uppercase tracking-[0.3em]">Detalhamento</h3>
-          <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">{filteredList.length} Itens</span>
+          <div className="flex items-center space-x-4">
+            <button 
+              onClick={handleShareWhatsApp}
+              className="flex items-center space-x-1.5 text-neutral-400 hover:text-emerald-500 transition-colors active:scale-95"
+              title="Compartilhar no WhatsApp"
+            >
+              <Share2 className="w-3.5 h-3.5" />
+              <span className="text-[9px] font-bold uppercase tracking-widest hidden sm:inline">Compartilhar</span>
+            </button>
+            <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">{filteredList.length} Itens</span>
+          </div>
         </div>
         <div className="space-y-4 px-1 sm:px-0">
           {filteredList.map((tx) => {
