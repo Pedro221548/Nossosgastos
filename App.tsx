@@ -11,6 +11,7 @@ import { Analytics } from './components/Analytics';
 import { InvoiceManager } from './components/InvoiceManager';
 import { AddTransactionModal } from './components/AddTransactionModal';
 import { ConfirmationModal } from './components/ui/ConfirmationModal';
+import { TransactionDetailModal } from './components/TransactionDetailModal';
 import { Login } from './components/Login';
 import { auth, syncData, listenToData, listenToFirestoreTransactions, updateFirestoreTransaction, deleteFirestoreTransaction, firestore } from './services/firebase';
 import { onAuthStateChanged, signOut, User as FirebaseUser } from 'firebase/auth';
@@ -47,9 +48,10 @@ const App: React.FC = () => {
   const [familyName, setFamilyName] = useState('Nossa Família');
   const [alertThreshold, setAlertThreshold] = useState(15);
 
-  const [currentDate, setCurrentDate] = useState(new Date());
+  const [currentDate, setCurrentDate] = useState(new Date(2026, 4, 1)); // Iniciando em Maio conforme solicitado
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
+  const [viewingTransaction, setViewingTransaction] = useState<Transaction | null>(null);
 
   const [confirmModal, setConfirmModal] = useState<{
     isOpen: boolean;
@@ -320,7 +322,7 @@ const App: React.FC = () => {
 
       <main className="flex-1 max-w-6xl mx-auto w-full px-4 py-8 md:px-12 md:py-20 lg:py-24 pb-40 lg:pb-24 pt-[calc(2rem+env(safe-area-inset-top))]">
         {activeTab === 'home' && <Home transactions={transactions} goals={goals} shoppingItems={shoppingItems} users={users} familyName={familyName} onNavigate={setActiveTab} onOpenAddModal={() => setIsAddModalOpen(true)} onUpdateUser={(uid, data) => { const key = uid === users.A.id ? 'A' : 'B'; const updated = { ...users, [key]: { ...users[key], ...data } }; setUsers(updated); triggerSync('users', updated); }} />}
-        {activeTab === 'dashboard' && <Dashboard transactions={transactions} totalIncome={users.A.income + users.B.income} currentDate={currentDate} users={users} familyName={familyName} alertThreshold={alertThreshold} onMonthChange={(dir: 'prev' | 'next') => { const nd = new Date(currentDate); nd.setMonth(nd.getMonth() + (dir === 'next' ? 1 : -1)); setCurrentDate(nd); }} onDelete={handleDeleteTransaction} onTogglePaid={handleTogglePaid} onEdit={(tx: Transaction) => { setEditingTransaction(tx); setIsAddModalOpen(true); }} onClearAll={() => {}} onOpenShopping={() => setActiveTab('shopping')} onOpenAddModal={() => { setEditingTransaction(null); setIsAddModalOpen(true); }} />}
+        {activeTab === 'dashboard' && <Dashboard transactions={transactions} totalIncome={users.A.income + users.B.income} currentDate={currentDate} users={users} familyName={familyName} alertThreshold={alertThreshold} onMonthChange={(dir: 'prev' | 'next') => { const nd = new Date(currentDate); nd.setMonth(nd.getMonth() + (dir === 'next' ? 1 : -1)); setCurrentDate(nd); }} onDelete={handleDeleteTransaction} onTogglePaid={handleTogglePaid} onEdit={(tx: Transaction) => { setEditingTransaction(tx); setIsAddModalOpen(true); }} onViewDetail={(tx) => setViewingTransaction(tx)} onClearAll={() => {}} onOpenShopping={() => setActiveTab('shopping')} onOpenAddModal={() => { setEditingTransaction(null); setIsAddModalOpen(true); }} />}
         {activeTab === 'invoices' && <InvoiceManager invoices={invoices} onSaveInvoice={handleSaveInvoice} onDeleteInvoice={handleDeleteInvoice} />}
         {activeTab === 'analytics' && <Analytics transactions={transactions} baseIncome={users.A.income + users.B.income} currentDate={currentDate} onMonthChange={(dir: 'prev' | 'next') => { const nd = new Date(currentDate); nd.setMonth(nd.getMonth() + (dir === 'next' ? 1 : -1)); setCurrentDate(nd); }} />}
         {activeTab === 'goals' && <Goals goals={goals} onUpdateGoal={handleUpdateGoalProgress} onSaveGoal={handleSaveGoal} onDeleteGoal={handleDeleteGoal} />}
@@ -341,6 +343,7 @@ const App: React.FC = () => {
       </nav>
 
       <AddTransactionModal isOpen={isAddModalOpen} users={users} initialDate={currentDate} onClose={() => { setIsAddModalOpen(false); setEditingTransaction(null); }} onAdd={handleAddOrUpdateTransaction} editingTransaction={editingTransaction} />
+      <TransactionDetailModal isOpen={!!viewingTransaction} transaction={viewingTransaction} onClose={() => setViewingTransaction(null)} onEdit={(tx) => { setEditingTransaction(tx); setIsAddModalOpen(true); }} onDelete={handleDeleteTransaction} users={users} currentMonthKey={`${currentDate.getFullYear()}-${currentDate.getMonth() + 1}`} />
       <ConfirmationModal isOpen={confirmModal.isOpen} title={confirmModal.title} message={confirmModal.message} variant={confirmModal.variant} onConfirm={confirmModal.onConfirm} onCancel={() => setConfirmModal(prev => ({ ...prev, isOpen: false }))} />
     </div>
   );

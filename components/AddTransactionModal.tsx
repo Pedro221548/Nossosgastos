@@ -25,6 +25,7 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
   const [amount, setAmount] = useState('');
   const [title, setTitle] = useState('');
   const [date, setDate] = useState('');
+  const [referenceDate, setReferenceDate] = useState('');
   const [category, setCategory] = useState(CATEGORIES[0]);
   const [spenderId, setSpenderId] = useState(users.A.id);
   const [isFixed, setIsFixed] = useState(false);
@@ -46,6 +47,23 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
         setDate(editingTransaction.date);
       }
 
+      if (editingTransaction.referenceDate) {
+        if (editingTransaction.referenceDate.includes('/')) {
+          const [d, m, y] = editingTransaction.referenceDate.split('/');
+          setReferenceDate(`${y}-${m}-${d}`);
+        } else {
+          setReferenceDate(editingTransaction.referenceDate);
+        }
+      } else {
+        // Se não tiver data de referência, usamos a data do próprio lançamento como base
+        if (editingTransaction.date.includes('/')) {
+          const [d, m, y] = editingTransaction.date.split('/');
+          setReferenceDate(`${y}-${m}-${d}`);
+        } else {
+          setReferenceDate(editingTransaction.date);
+        }
+      }
+
       const cat = CATEGORIES.find(c => c.id === editingTransaction.category) || CATEGORIES[0];
       setCategory(cat);
       setSpenderId(editingTransaction.spenderId);
@@ -64,6 +82,7 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
       const month = (baseDate.getMonth() + 1).toString().padStart(2, '0');
       
       setDate(`${year}-${month}-${day}`);
+      setReferenceDate(`${year}-${month}-${day}`);
       
       const saved = localStorage.getItem('nc_draft_tx');
       if (saved && !editingTransaction) {
@@ -71,7 +90,7 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
         setType(draft.type || 'expense');
         setAmount(draft.amount || '');
         setTitle(draft.title || '');
-      } else {
+      } else if (!editingTransaction) {
         setType('expense');
         setAmount('');
         setTitle('');
@@ -108,6 +127,13 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
 
     const [y, m, d] = date.split('-');
     const formattedDate = `${d}/${m}/${y}`;
+    
+    let formattedRefDate = '';
+    if (referenceDate) {
+      const [ry, rm, rd] = referenceDate.split('-');
+      formattedRefDate = `${rd}/${rm}/${ry}`;
+    }
+
     const installmentsCount = parseInt(totalInstallments);
 
     const tx: Transaction = {
@@ -116,6 +142,7 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
       amount: parseFloat(amount),
       category: category.id,
       date: formattedDate,
+      referenceDate: formattedRefDate || undefined,
       spenderId,
       emoji: category.emoji,
       type,
@@ -162,7 +189,7 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
           </div>
 
           <div className="space-y-3">
-            <label className="text-[9px] md:text-[10px] font-black text-neutral-500 uppercase tracking-widest px-1">Data do Lançamento</label>
+            <label className="text-[9px] md:text-[10px] font-black text-primary uppercase tracking-widest px-1">Data de Referência (Mês/Ano)</label>
             <div className="relative group">
               <div className="absolute left-6 md:left-8 top-1/2 -translate-y-1/2 text-neutral-500 transition-colors group-focus-within:text-primary z-20 pointer-events-none">
                 <CalendarIcon className="w-5 h-5 md:w-6 md:h-6" />
@@ -170,9 +197,25 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
               
               <input 
                 type="date" 
+                value={referenceDate} 
+                onChange={e => setReferenceDate(e.target.value)} 
+                className="w-full px-8 pl-16 md:pl-20 py-5 md:py-7 bg-neutral-950/50 border border-neutral-800 rounded-2xl md:rounded-[2.5rem] font-display font-black text-white text-lg md:text-2xl outline-none focus:border-primary focus:bg-neutral-900/80 transition-all [color-scheme:dark] shadow-xl tracking-tighter relative z-10 appearance-none text-left" 
+              />
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <label className="text-[9px] md:text-[10px] font-black text-neutral-500 uppercase tracking-widest px-1 opacity-60">Data do Pagamento (Vencimento)</label>
+            <div className="relative group">
+              <div className="absolute left-6 md:left-8 top-1/2 -translate-y-1/2 text-neutral-500 transition-colors group-focus-within:text-neutral-300 z-20 pointer-events-none">
+                <CalendarIcon className="w-5 h-5 md:w-6 md:h-6" />
+              </div>
+              
+              <input 
+                type="date" 
                 value={date} 
                 onChange={e => setDate(e.target.value)} 
-                className="w-full px-8 pl-16 md:pl-20 py-5 md:py-7 bg-neutral-950/50 border border-neutral-800 rounded-2xl md:rounded-[2.5rem] font-display font-black text-white text-lg md:text-2xl outline-none focus:border-primary/50 focus:bg-neutral-900/80 transition-all [color-scheme:dark] shadow-xl tracking-tighter relative z-10 appearance-none text-left" 
+                className="w-full px-8 pl-16 md:pl-20 py-5 md:py-7 bg-neutral-950/50 border border-neutral-800 rounded-2xl md:rounded-[2.5rem] font-display font-black text-white text-lg md:text-2xl outline-none focus:border-neutral-700 focus:bg-neutral-900/80 transition-all [color-scheme:dark] shadow-xl tracking-tighter relative z-10 appearance-none text-left" 
               />
             </div>
           </div>
