@@ -4,15 +4,17 @@ import { User, Transaction, Goal } from './types';
 export const USERS: { A: User; B: User } = {
   A: {
     id: 'user_a',
-    name: 'Alex',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alex',
+    name: 'Pedro',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Pedro',
     income: 5000,
+    currentBalance: 0
   },
   B: {
     id: 'user_b',
-    name: 'Sam',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sam',
+    name: 'Emilly',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Emilly',
     income: 3500,
+    currentBalance: 0
   },
 };
 

@@ -4,6 +4,7 @@ export interface User {
   name: string;
   avatar: string;
   income: number; 
+  currentBalance?: number;
 }
 
 export type TransactionType = 'expense' | 'revenue';

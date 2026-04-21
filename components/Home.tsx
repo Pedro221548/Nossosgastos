@@ -23,6 +23,7 @@ interface HomeProps {
   familyName: string;
   onNavigate: (tab: AppTab) => void;
   onOpenAddModal: () => void;
+  onUpdateUser: (userId: string, data: Partial<User>) => void;
 }
 
 const PremiumLogo = ({ className = "" }: { className?: string }) => (
@@ -42,9 +43,11 @@ export const Home: React.FC<HomeProps> = ({
   users, 
   familyName, 
   onNavigate, 
-  onOpenAddModal 
+  onOpenAddModal,
+  onUpdateUser
 }) => {
   const [now, setNow] = useState(new Date());
+  const [editingBalance, setEditingBalance] = useState<{ userId: string; value: string } | null>(null);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -93,6 +96,27 @@ export const Home: React.FC<HomeProps> = ({
   const closestGoal = [...goals]
     .filter(g => g.currentAmount < g.targetAmount)
     .sort((a, b) => (b.currentAmount / b.targetAmount) - (a.currentAmount / a.targetAmount))[0];
+
+  const totalBankBalance = (users.A.currentBalance || 0) + (users.B.currentBalance || 0);
+
+  const billsToPay = currentMonthTransactions
+    .filter(t => t.type === 'expense' && !(t.isFixed ? t.paidMonths?.includes(monthKey) : t.isPaid))
+    .sort((a, b) => b.amount - a.amount); // Prioritize larger bills for recommendation
+
+  let tempBalance = totalBankBalance;
+  const recommendedBills = [];
+  for (const bill of billsToPay) {
+    if (tempBalance >= bill.amount) {
+      recommendedBills.push(bill);
+      tempBalance -= bill.amount;
+    }
+  }
+
+  const handleBalanceUpdate = (userId: string, value: string) => {
+    const numericValue = parseFloat(value) || 0;
+    onUpdateUser(userId, { currentBalance: numericValue });
+    setEditingBalance(null);
+  };
 
   const formattedDate = now.toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric', month: 'short' }).toUpperCase();
   const formattedTime = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
@@ -146,6 +170,107 @@ export const Home: React.FC<HomeProps> = ({
           </div>
         </div>
       </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 px-1 sm:px-2">
+        {/* Pedro's Balance */}
+        <div className="bg-white dark:bg-neutral-900 border-2 border-primary/20 rounded-[2rem] p-6 space-y-4 shadow-xl">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 rounded-xl overflow-hidden border-2 border-primary/30">
+                <img src={users.A.avatar} alt={users.A.name} className="w-full h-full object-cover" />
+              </div>
+              <span className="text-[10px] font-black text-neutral-500 uppercase tracking-widest">{users.A.name}</span>
+            </div>
+            <ShieldCheck size={14} className="text-primary opacity-40" />
+          </div>
+          <div className="space-y-1">
+            <p className="text-[9px] font-black text-neutral-400 uppercase tracking-widest leading-none">Saldo em Conta</p>
+            {editingBalance?.userId === users.A.id ? (
+              <input 
+                autoFocus
+                type="number"
+                defaultValue={users.A.currentBalance}
+                onBlur={(e) => handleBalanceUpdate(users.A.id, e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleBalanceUpdate(users.A.id, (e.target as HTMLInputElement).value)}
+                className="w-full bg-neutral-100 dark:bg-neutral-950 border border-primary rounded-xl px-4 py-2 text-xl font-display font-black text-neutral-900 dark:text-white outline-none"
+              />
+            ) : (
+              <h4 
+                onClick={() => setEditingBalance({ userId: users.A.id, value: (users.A.currentBalance || 0).toString() })}
+                className="text-2xl font-display font-black text-neutral-900 dark:text-white leading-tight italic cursor-pointer hover:text-primary transition-colors tabular-nums"
+              >
+                R$ {(users.A.currentBalance || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+              </h4>
+            )}
+          </div>
+        </div>
+
+        {/* Emilly's Balance */}
+        <div className="bg-white dark:bg-neutral-900 border-2 border-blue-500/20 rounded-[2rem] p-6 space-y-4 shadow-xl">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 rounded-xl overflow-hidden border-2 border-blue-500/30">
+                <img src={users.B.avatar} alt={users.B.name} className="w-full h-full object-cover" />
+              </div>
+              <span className="text-[10px] font-black text-neutral-500 uppercase tracking-widest">{users.B.name}</span>
+            </div>
+            <ShieldCheck size={14} className="text-blue-500 opacity-40" />
+          </div>
+          <div className="space-y-1">
+            <p className="text-[9px] font-black text-neutral-400 uppercase tracking-widest leading-none">Saldo em Conta</p>
+            {editingBalance?.userId === users.B.id ? (
+              <input 
+                autoFocus
+                type="number"
+                defaultValue={users.B.currentBalance}
+                onBlur={(e) => handleBalanceUpdate(users.B.id, e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleBalanceUpdate(users.B.id, (e.target as HTMLInputElement).value)}
+                className="w-full bg-neutral-100 dark:bg-neutral-950 border border-blue-500 rounded-xl px-4 py-2 text-xl font-display font-black text-neutral-900 dark:text-white outline-none"
+              />
+            ) : (
+              <h4 
+                onClick={() => setEditingBalance({ userId: users.B.id, value: (users.B.currentBalance || 0).toString() })}
+                className="text-2xl font-display font-black text-neutral-900 dark:text-white leading-tight italic cursor-pointer hover:text-blue-500 transition-colors tabular-nums"
+              >
+                R$ {(users.B.currentBalance || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+              </h4>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {totalBankBalance > 0 && recommendedBills.length > 0 && (
+        <div className="relative group overflow-hidden bg-emerald-500/5 dark:bg-emerald-500/10 rounded-[2.5rem] border border-emerald-500/20 p-8 mx-1 animate-slide-up">
+          <div className="absolute top-0 right-0 w-40 h-40 bg-emerald-500/10 blur-[80px] rounded-full -mr-20 -mt-20"></div>
+          <div className="relative z-10 space-y-4">
+            <div className="flex items-center space-x-3">
+               <Zap size={14} className="text-emerald-500" />
+               <span className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-[0.3em]">Recomendação do Casal</span>
+            </div>
+            <div className="space-y-4">
+              <p className="text-neutral-600 dark:text-neutral-400 text-[11px] font-bold uppercase tracking-widest">
+                Com os <span className="text-emerald-500">R$ {totalBankBalance.toLocaleString('pt-BR')}</span> combinados de vocês, dá para pagar:
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {recommendedBills.map(bill => (
+                  <div key={bill.id} className="bg-white dark:bg-neutral-800 border border-emerald-500/20 px-3 py-2 rounded-xl flex items-center space-x-2 shadow-sm">
+                    <span className="text-lg">{bill.emoji}</span>
+                    <span className="text-[10px] font-bold text-neutral-900 dark:text-white uppercase truncate max-w-[100px]">{bill.title}</span>
+                    <span className="text-[10px] font-black text-emerald-500 tabular-nums">R$ {bill.amount.toLocaleString()}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="flex items-center justify-between pt-2 border-t border-emerald-500/10">
+                <p className="text-[9px] font-black text-neutral-500 uppercase tracking-widest italic">Total sugerido: R$ {recommendedBills.reduce((acc, b) => acc + b.amount, 0).toLocaleString('pt-BR')}</p>
+                <button 
+                  onClick={() => onNavigate('dashboard')}
+                  className="text-[9px] font-black text-emerald-600 underline uppercase tracking-widest"
+                >Ir para Extrato</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Grid corrigida sem props inválidas */}
       <div className="grid grid-cols-3 gap-3 xs:gap-4 px-1 sm:px-2">
