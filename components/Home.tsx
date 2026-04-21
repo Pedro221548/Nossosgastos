@@ -46,19 +46,12 @@ export const Home: React.FC<HomeProps> = ({
   onOpenAddModal,
   onUpdateUser
 }) => {
-  const [now, setNow] = useState(new Date(2026, 4, 1));
+  const [now, setNow] = useState(new Date());
   const [editingBalance, setEditingBalance] = useState<{ userId: string; value: string } | null>(null);
 
   useEffect(() => {
     const timer = setInterval(() => {
-      // Mantendo em Maio para testes/exibição se o usuário preferir, 
-      // ou apenas deixando o estado inicial. 
-      // Se ele quiser tempo real (horas/minutos), o ideal é atualizar apenas horas.
-      // Mas para consistência com o "mês que ele quis dizer", vou travar em Maio.
-      const d = new Date();
-      d.setMonth(4); // Maio
-      d.setFullYear(2026);
-      setNow(d);
+      setNow(new Date());
     }, 1000);
     return () => clearInterval(timer);
   }, []);
@@ -68,19 +61,8 @@ export const Home: React.FC<HomeProps> = ({
   const monthKey = `${currentYear}-${currentMonth + 1}`;
 
   const currentMonthTransactions = transactions.filter(t => {
-    // Priorizar Data de Referência para definir o mês
-    const dateToUse = t.referenceDate || t.date;
-    const [day, month, year] = dateToUse.split('/').map(Number);
-    const tDate = new Date(year, month - 1, day);
-
-    const isMatch = tDate.getMonth() === currentMonth && tDate.getFullYear() === currentYear;
-    
-    // Para despesas fixas
-    const [origD, origM, origY] = t.date.split('/').map(Number);
-    const origDate = new Date(origY, origM - 1, origD);
-    const isFixedMatch = t.isFixed && (origDate.getFullYear() < currentYear || (origDate.getFullYear() === currentYear && origDate.getMonth() <= currentMonth));
-
-    return isMatch || isFixedMatch;
+    const [d, m, y] = t.date.split('/').map(Number);
+    return m === currentMonth + 1 && y === currentYear || (t.isFixed);
   });
 
   const totalIncome = users.A.income + users.B.income + currentMonthTransactions

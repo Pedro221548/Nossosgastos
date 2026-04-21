@@ -15,7 +15,6 @@ export interface Transaction {
   amount: number;
   category: string;
   date: string;
-  referenceDate?: string;
   spenderId: string; 
   emoji: string;
   type: TransactionType;

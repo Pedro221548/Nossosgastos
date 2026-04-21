@@ -24,7 +24,6 @@ interface DashboardProps {
   onDelete: (id: string) => void;
   onTogglePaid: (id: string, monthKey?: string) => void;
   onEdit: (tx: Transaction) => void;
-  onViewDetail: (tx: Transaction) => void;
   onClearAll: () => void;
   onOpenShopping: () => void;
   onOpenAddModal: () => void;
@@ -38,8 +37,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
   onMonthChange,
   onDelete, 
   onTogglePaid, 
-  onEdit,
-  onViewDetail
+  onEdit
 }) => {
   const currentMonthKey = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}`;
   const month = currentDate.toLocaleString('pt-BR', { month: 'long' });
@@ -47,18 +45,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
   const filteredList = useMemo(() => {
     return transactions.filter(t => {
-      // Priorizar Data de Referência para definir em qual mês o lançamento aparece
-      const dateToUse = t.referenceDate || t.date;
-      const [day, month, year] = dateToUse.split('/').map(Number);
+      const [day, month, year] = t.date.split('/').map(Number);
       const tDate = new Date(year, month - 1, day);
-      
       const isCurrentMonth = tDate.getMonth() === currentDate.getMonth() && tDate.getFullYear() === currentDate.getFullYear();
-      
-      // Para despesas fixas, usamos a data original para saber quando começou
-      const [origD, origM, origY] = t.date.split('/').map(Number);
-      const origDate = new Date(origY, origM - 1, origD);
-      const isFixedAndRelevant = t.isFixed && (origDate.getFullYear() < currentDate.getFullYear() || (origDate.getFullYear() === currentDate.getFullYear() && origDate.getMonth() <= currentDate.getMonth()));
-      
+      const isFixedAndRelevant = t.isFixed && (tDate.getFullYear() < currentDate.getFullYear() || (tDate.getFullYear() === currentDate.getFullYear() && tDate.getMonth() <= currentDate.getMonth()));
       return isCurrentMonth || isFixedAndRelevant;
     }).sort((a, b) => a.amount - b.amount);
   }, [transactions, currentDate]);
@@ -172,8 +162,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
             return (
               <div 
                 key={tx.id} 
-                onClick={() => onViewDetail(tx)}
-                className={`group relative bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-[1.8rem] p-4 xs:p-5 transition-all duration-300 shadow-sm overflow-hidden cursor-pointer ${isActuallyPaid ? 'bg-neutral-50/50 dark:bg-neutral-900/40' : 'hover:shadow-2xl hover:border-primary/20'}`}
+                className={`group relative bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-[1.8rem] p-4 xs:p-5 transition-all duration-300 shadow-sm overflow-hidden ${isActuallyPaid ? 'bg-neutral-50/50 dark:bg-neutral-900/40' : 'hover:shadow-2xl hover:border-primary/20'}`}
               >
                 <div className={`absolute left-0 top-0 bottom-0 w-1.5 transition-all ${isActuallyPaid ? 'bg-emerald-500' : 'bg-amber-500'}`} />
                 
@@ -190,13 +179,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
                         <span className="text-[8px] xs:text-[9px] font-black text-neutral-400 uppercase tracking-widest truncate">{tx.category}</span>
                         <span className="text-neutral-200 dark:text-neutral-800 opacity-20">|</span>
                         <span className="text-[8px] xs:text-[9px] font-black text-neutral-400 uppercase tracking-widest flex items-center truncate">
-                          {tx.isFixed ? <Clock className="w-3 h-3 mr-1 shrink-0" /> : <Calendar className="w-3 h-3 mr-1 shrink-0 text-emerald-500" />}
+                          {tx.isFixed ? <Clock className="w-3 h-3 mr-1 shrink-0" /> : null}
                           {tx.isFixed ? 'FIXO' : tx.date}
-                          {tx.referenceDate && tx.referenceDate !== tx.date && (
-                             <span className="ml-2 px-1.5 py-0.5 bg-primary/10 border border-primary/20 rounded-md text-[7px] text-primary font-black animate-pulse">
-                               REF: {tx.referenceDate.split('/').slice(1).join('/')}
-                             </span>
-                          )}
                         </span>
                       </div>
                     </div>
@@ -209,7 +193,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                     </p>
                     <div className="flex items-center space-x-2">
                        <button 
-                        onClick={(e) => { e.stopPropagation(); onTogglePaid(tx.id, tx.isFixed ? currentMonthKey : undefined); }} 
+                        onClick={() => onTogglePaid(tx.id, tx.isFixed ? currentMonthKey : undefined)} 
                         className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-full border transition-all active:scale-90 ${
                           isActuallyPaid 
                             ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-500 font-black' 
@@ -220,8 +204,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
                          <span className="text-[8px] font-black uppercase tracking-widest">{isActuallyPaid ? 'PAGO' : 'PEND'}</span>
                        </button>
                        <div className="flex bg-neutral-950 rounded-full border border-neutral-800 p-0.5 shadow-inner">
-                          <button onClick={(e) => { e.stopPropagation(); onEdit(tx); }} className="p-1.5 text-neutral-500 hover:text-primary transition-colors active:scale-90"><Edit3 className="w-3.5 h-3.5" /></button>
-                          <button onClick={(e) => { e.stopPropagation(); onDelete(tx.id); }} className="p-1.5 text-neutral-500 hover:text-red-500 transition-colors active:scale-90"><Trash2 className="w-3.5 h-3.5" /></button>
+                          <button onClick={() => onEdit(tx)} className="p-1.5 text-neutral-500 hover:text-primary transition-colors active:scale-90"><Edit3 className="w-3.5 h-3.5" /></button>
+                          <button onClick={() => onDelete(tx.id)} className="p-1.5 text-neutral-500 hover:text-red-500 transition-colors active:scale-90"><Trash2 className="w-3.5 h-3.5" /></button>
                        </div>
                     </div>
                   </div>
