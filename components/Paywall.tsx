@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import { Heart, CheckCircle2, ShieldCheck, Zap, LogOut, Loader2 } from 'lucide-react';
 import { signOut } from 'firebase/auth';
 import { auth, syncData } from '../services/firebase';
-import { initMercadoPago, Payment } from '@mercadopago/sdk-react';
+import { initMercadoPago, CardPayment } from '@mercadopago/sdk-react';
 
-if (import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY) {
-  initMercadoPago(import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY, { locale: 'pt-BR' });
+const MP_KEY = import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY?.trim();
+if (MP_KEY) {
+  initMercadoPago(MP_KEY, { locale: 'pt-BR' });
 }
 
 interface PaywallProps {
@@ -16,7 +17,7 @@ interface PaywallProps {
 
 export const Paywall: React.FC<PaywallProps> = ({ onSubscribeSuccess, daysUntilDeletion, onCancel }) => {
   const [showCheckout, setShowCheckout] = useState(false);
-  const [brickError, setBrickError] = useState(!import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY);
+  const [brickError, setBrickError] = useState(!MP_KEY);
   const [brickDiagnostic, setBrickDiagnostic] = useState<string | null>(null);
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -162,9 +163,15 @@ export const Paywall: React.FC<PaywallProps> = ({ onSubscribeSuccess, daysUntilD
                       <p className="text-xs text-neutral-500 mb-6 font-medium">A chave do Mercado Pago não está configurada neste ambiente ou é inválida.</p>
                       
                       {brickDiagnostic && (
-                        <div className="bg-red-500/10 border border-red-500/20 text-red-500 text-[10px] p-3 rounded-lg mb-6 text-left w-full break-all">
-                          <strong className="block mb-1 text-red-400">Diagnóstico do Erro:</strong>
-                          {brickDiagnostic}
+                        <div className="bg-red-500/10 border border-red-500/20 text-red-500 text-[10px] p-4 rounded-lg mb-6 text-left w-full break-normal shadow-inner space-y-2">
+                          <strong className="block text-red-400 border-b border-red-500/20 pb-1 mb-2">Diagnóstico do Erro:</strong>
+                          <p className="font-mono bg-red-950/50 p-2 rounded text-[9px] break-all mb-2">{brickDiagnostic}</p>
+                          <p>Isso geralmente acontece por três motivos:</p>
+                          <ol className="list-decimal pl-4 space-y-1">
+                            <li>Você colocou o <strong>Access Token</strong> no lugar da <strong>Public Key</strong> no <code className="bg-red-500/20 px-1 rounded">.env</code>. Verifique se a variável <code className="bg-red-500/20 px-1 rounded">VITE_MERCADOPAGO_PUBLIC_KEY</code> termina com a sua chave pública (começando com <code className="bg-red-500/20 px-1 rounded">APP_USR-</code>).</li>
+                            <li>Sua chave pública é de produção, mas o domínio do app (<code className="bg-red-500/20 px-1 rounded">{window.location.hostname}</code>) não está autorizado no painel do Mercado Pago.</li>
+                            <li>Sua conta Mercado Pago não possui as credenciais configuradas corretamente para Checkout Transparente.</li>
+                          </ol>
                         </div>
                       )}
 
@@ -189,8 +196,10 @@ export const Paywall: React.FC<PaywallProps> = ({ onSubscribeSuccess, daysUntilD
                          {paymentError}
                        </div>
                      )}
-                     <Payment
-                        initialization={{ amount: 19.90 }}
+                     <CardPayment
+                        initialization={{ 
+                          amount: 19.90
+                        }}
                         customization={{
                           visual: {
                             style: {
@@ -199,24 +208,40 @@ export const Paywall: React.FC<PaywallProps> = ({ onSubscribeSuccess, daysUntilD
                                 textPrimaryColor: '#ffffff',
                                 textSecondaryColor: '#a3a3a3',
                                 inputBackgroundColor: '#171717',
-                                formBackgroundColor: '#0a0a0a',
-                                baseColor: '#fde047',
-                                baseColorFirstVariant: '#facc15',
-                                baseColorSecondVariant: '#eab308'
+                                baseColor: '#fde047'
                               }
                             }
-                          },
-                          paymentMethods: {
-                            ticket: "all",
-                            creditCard: "all",
-                            bankTransfer: "all",
-                          },
+                          }
                         }}
-                        onSubmit={async ({ selectedPaymentMethod, formData }) => {
-                           await handlePaymentSubmit(formData);
+                        onSubmit={async (formData, additionalData) => {
+                           const submitData = {
+                             type: "online",
+                             total_amount: String(formData.transaction_amount),
+                             external_reference: "ext_ref_" + Date.now(),
+                             processing_mode: "automatic",
+                             transactions: {
+                               payments: [
+                                 {
+                                   amount: String(formData.transaction_amount),
+                                   payment_method: {
+                                     id: formData.payment_method_id,
+                                     type: additionalData?.paymentTypeId || "credit_card",
+                                     token: formData.token,
+                                     installments: formData.installments,
+                                   },
+                                 },
+                               ],
+                             },
+                             payer: {
+                               email: formData.payer?.email || auth.currentUser?.email || "",
+                               identification: formData.payer?.identification,
+                             },
+                           };
+                           await handlePaymentSubmit(submitData);
                         }}
                         onError={(error) => {
                           console.error("Brick error:", error);
+                          setBrickDiagnostic(error instanceof Error ? error.message : JSON.stringify(error));
                           setBrickError(true);
                         }}
                         onReady={() => {

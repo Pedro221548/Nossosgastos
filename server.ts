@@ -25,51 +25,35 @@ async function startServer() {
   // Process payment securely on the server
   app.post("/api/process_payment", async (req, res) => {
     try {
-      const { transaction_amount, token, description, installments, payment_method_id, issuer_id, payer } = req.body;
-      
-      const paymentData: any = {
-        transaction_amount: Number(transaction_amount),
-        description,
-        payment_method_id,
-        payer: {
-          email: payer?.email,
-        },
-      };
-
-      if (token) paymentData.token = token;
-      if (installments) paymentData.installments = Number(installments);
-      if (issuer_id) paymentData.issuer_id = issuer_id;
-      
-      if (payer?.identification?.type && payer?.identification?.number) {
-        paymentData.payer.identification = {
-          type: payer.identification.type,
-          number: payer.identification.number,
-        };
-      }
+      const submitData = req.body;
 
       if (!process.env.MERCADOPAGO_ACCESS_TOKEN) {
         return res.status(400).json({ error: "Access token do Mercado Pago ausente nas variáveis de ambiente" });
       }
 
-      const response = await payment.create({ body: paymentData });
-      res.json(response);
+      const orderResponse = await fetch("https://api.mercadopago.com/v1/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN}`,
+          "X-Idempotency-Key": Date.now().toString() + Math.random().toString(),
+        },
+        body: JSON.stringify(submitData),
+      });
+
+      const responseData = await orderResponse.json();
+
+      if (!orderResponse.ok) {
+        throw new Error(responseData.message || JSON.stringify(responseData));
+      }
+
+      res.json(responseData);
     } catch (error: any) {
       console.error("Payment processing error:", error);
       
-      // Attempt to extract detailed API error from MercadoPago
-      let errorDetails = "Unknown error";
-      if (error && error.message) {
-         errorDetails = error.message;
-      }
-      
-      // Sometimes MercadoPago SDK wraps the original fetch response error
-      if (error && error.cause) {
-         errorDetails += ` | Cause: ${JSON.stringify(error.cause)}`;
-      }
-
       res.status(400).json({ 
         error: "Erro no processamento do pagamento",
-        message: errorDetails,
+        message: error.message || "Unknown error",
         raw: JSON.stringify(error) 
       });
     }
