@@ -140,126 +140,128 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
     <div className="fixed inset-0 z-[110] flex items-end md:items-center justify-center p-0 md:p-4 animate-in fade-in duration-300">
       <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={handleAttemptClose}/>
       
-      <div className="relative bg-[#0F0F0F] w-full max-w-xl md:rounded-[40px] rounded-t-[40px] border-t md:border border-neutral-800 shadow-2xl animate-in slide-in-from-bottom duration-500 overflow-hidden flex flex-col max-h-[95vh] md:max-h-[90vh]">
+      <div className="relative bg-[#0F0F0F] w-full max-w-xl md:rounded-[40px] rounded-t-[30px] border-t md:border border-neutral-800 shadow-2xl animate-in slide-in-from-bottom duration-500 flex flex-col max-h-[90vh]">
         
-        <div className={`absolute left-0 top-0 bottom-0 w-1.5 md:w-2 ${type === 'expense' ? 'bg-red-500' : 'bg-emerald-500'} z-10`} />
+        <div className={`absolute left-0 top-0 bottom-0 w-1 md:w-2 ${type === 'expense' ? 'bg-red-500' : 'bg-emerald-500'} z-10`} />
 
-        <div className="px-8 md:px-10 py-6 md:py-8 flex justify-between items-center border-b border-neutral-900 shrink-0">
-          <h2 className="text-xl md:text-2xl font-display font-black text-white uppercase italic tracking-tighter">
+        <div className="px-5 md:px-10 py-4 md:py-8 flex justify-between items-center border-b border-neutral-900 shrink-0">
+          <h2 className="text-lg md:text-2xl font-display font-black text-white uppercase italic tracking-tighter">
             {editingTransaction ? 'Editar Dados' : 'Novo Lançamento'}
           </h2>
-          <button onClick={handleAttemptClose} className="p-3 md:p-4 bg-neutral-900 rounded-full text-neutral-400 hover:text-white transition-all active:scale-90">
-            <X className="w-6 h-6 md:w-7 md:h-7" />
+          <button onClick={handleAttemptClose} className="p-2 md:p-4 bg-neutral-900 rounded-full text-neutral-400 hover:text-white transition-all active:scale-90">
+            <X className="w-5 h-5 md:w-7 md:h-7" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-8 md:p-12 space-y-8 md:space-y-10 overflow-y-auto pb-40 md:pb-12 scrollbar-hide">
-          
-          <div className="space-y-4">
-            <input 
-              type="text" 
-              value={title} 
-              onChange={e => setTitle(e.target.value)} 
-              placeholder="Ex: Mercado, Luz..." 
-              className="w-full bg-neutral-900/50 border border-neutral-800 rounded-2xl md:rounded-3xl px-6 md:px-8 py-4 md:py-6 text-lg md:text-xl font-bold text-white placeholder:text-neutral-700 outline-none focus:border-primary transition-all shadow-inner" 
-            />
-          </div>
-
-          <div className="space-y-3">
-            <label className="text-[9px] md:text-[10px] font-black text-neutral-500 uppercase tracking-widest px-1">Data do Lançamento</label>
-            <div className="relative group">
-              <div className="absolute left-6 md:left-8 top-1/2 -translate-y-1/2 text-neutral-500 transition-colors group-focus-within:text-primary z-20 pointer-events-none">
-                <CalendarIcon className="w-5 h-5 md:w-6 md:h-6" />
-              </div>
-              
+        <div className="flex-1 overflow-y-auto scrollbar-hide p-5 md:p-12 pb-20 md:pb-12">
+          <form onSubmit={handleSubmit} className="space-y-5 md:space-y-10">
+            
+            <div className="space-y-1.5 md:space-y-4">
               <input 
-                type="date" 
-                value={date} 
-                onChange={e => setDate(e.target.value)} 
-                className="w-full px-8 pl-16 md:pl-20 py-5 md:py-7 bg-neutral-950/50 border border-neutral-800 rounded-2xl md:rounded-[2.5rem] font-display font-black text-white text-lg md:text-2xl outline-none focus:border-primary/50 focus:bg-neutral-900/80 transition-all [color-scheme:dark] shadow-xl tracking-tighter relative z-10 appearance-none text-left" 
+                type="text" 
+                value={title} 
+                onChange={e => setTitle(e.target.value)} 
+                placeholder="Ex: Mercado, Luz..." 
+                className="w-full bg-neutral-900/50 border border-neutral-800 rounded-xl md:rounded-3xl px-5 py-3.5 md:px-8 md:py-6 text-base md:text-xl font-bold text-white placeholder:text-neutral-700 outline-none focus:border-primary transition-all shadow-inner" 
               />
             </div>
-          </div>
 
-          <div className="space-y-4">
-             <label className="text-[9px] md:text-[10px] font-black text-neutral-500 uppercase tracking-widest px-1">Tipo e Status</label>
-             <div className="grid grid-cols-3 gap-2 md:gap-3">
-                <button type="button" onClick={() => setIsPaid(!isPaid)} className={`flex flex-col items-center justify-center py-4 md:py-6 rounded-2xl md:rounded-3xl border transition-all ${isPaid ? 'bg-emerald-500/10 border-emerald-500 text-emerald-500' : 'bg-neutral-900/30 border-neutral-800 text-neutral-600'}`}>
-                  <Check className="w-6 h-6 md:w-8 md:h-8" strokeWidth={3} />
-                  <span className="text-[8px] md:text-[9px] font-black uppercase mt-1.5 md:mt-2">{isPaid ? 'Confirmado' : 'Pendente'}</span>
-                </button>
-                <button type="button" onClick={() => { setIsFixed(!isFixed); if(!isFixed) setIsInstallment(false); }} className={`flex flex-col items-center justify-center py-4 md:py-6 rounded-2xl md:rounded-3xl border transition-all ${isFixed ? 'bg-primary/10 border-primary text-primary' : 'bg-neutral-900/30 border-neutral-800 text-neutral-600'}`}>
-                  <Repeat className="w-6 h-6 md:w-8 md:h-8" />
-                  <span className="text-[8px] md:text-[9px] font-black uppercase mt-1.5 md:mt-2">Fixo/Mês</span>
-                </button>
-                <button type="button" onClick={() => { setIsInstallment(!isInstallment); if(!isInstallment) setIsFixed(false); }} className={`flex flex-col items-center justify-center py-4 md:py-6 rounded-2xl md:rounded-3xl border transition-all ${isInstallment ? 'bg-blue-500/10 border-blue-500 text-blue-500' : 'bg-neutral-900/30 border-neutral-800 text-neutral-600'}`}>
-                  <CreditCard className="w-6 h-6 md:w-8 md:h-8" />
-                  <span className="text-[8px] md:text-[9px] font-black uppercase mt-1.5 md:mt-2">Parcelado</span>
-                </button>
-             </div>
-          </div>
-
-          {isInstallment && (
-            <div className="space-y-4 animate-in slide-in-from-top duration-300">
-              <label className="text-[9px] md:text-[10px] font-black text-neutral-500 uppercase tracking-widest px-1">Número de Parcelas</label>
+            <div className="space-y-1.5 md:space-y-3">
+              <label className="text-[9px] md:text-[10px] font-black text-neutral-500 uppercase tracking-widest px-1">Data do Lançamento</label>
               <div className="relative group">
-                <Hash className="absolute left-6 md:left-8 top-1/2 -translate-y-1/2 text-neutral-500 group-focus-within:text-blue-500 transition-colors z-20 pointer-events-none" size={20} />
+                <div className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 text-neutral-500 transition-colors group-focus-within:text-primary z-20 pointer-events-none">
+                  <CalendarIcon className="w-4 h-4 md:w-6 md:h-6" />
+                </div>
+                
                 <input 
-                  type="number" 
-                  min="2"
-                  max="120"
-                  value={totalInstallments} 
-                  onChange={e => setTotalInstallments(e.target.value)} 
-                  className="w-full pl-16 md:pl-20 pr-8 py-5 md:py-7 bg-neutral-950/50 border border-neutral-800 rounded-2xl md:rounded-[2.5rem] font-display font-black text-white text-lg md:text-2xl outline-none focus:border-blue-500/50 transition-all shadow-xl tracking-tighter"
-                  placeholder="2"
+                  type="date" 
+                  value={date} 
+                  onChange={e => setDate(e.target.value)} 
+                  className="w-full px-5 pl-11 md:pl-20 py-3.5 md:py-7 bg-neutral-950/50 border border-neutral-800 rounded-xl md:rounded-[2.5rem] font-display font-black text-white text-base md:text-2xl outline-none focus:border-primary/50 focus:bg-neutral-900/80 transition-all [color-scheme:dark] shadow-xl tracking-tighter relative z-10 appearance-none text-left" 
                 />
               </div>
             </div>
-          )}
 
-          <div className="space-y-4">
-            <label className="text-[9px] md:text-[10px] font-black text-neutral-500 uppercase tracking-widest px-1">Responsável</label>
-            <div className="grid grid-cols-2 gap-3 md:gap-4">
-              {[users.A, users.B].map(u => (
-                <button 
-                  key={u.id}
-                  type="button" 
-                  onClick={() => setSpenderId(u.id)} 
-                  className={`flex items-center justify-center space-x-2 md:space-x-3 p-3 md:p-4 rounded-[1.5rem] md:rounded-[2.5rem] border-2 transition-all ${spenderId === u.id ? 'border-primary bg-primary/5 shadow-glow' : 'border-neutral-900 bg-neutral-900/30 text-neutral-600 opacity-50'}`}
-                >
-                  <img src={u.avatar} className={`w-6 h-6 md:w-8 md:h-8 rounded-full border-2 ${spenderId === u.id ? 'border-primary' : 'border-neutral-800'}`} />
-                  <span className="font-black text-[8px] md:text-[9px] uppercase tracking-widest">{u.name}</span>
-                </button>
-              ))}
+            <div className="space-y-1.5 md:space-y-4">
+               <label className="text-[9px] md:text-[10px] font-black text-neutral-500 uppercase tracking-widest px-1">Tipo e Status</label>
+               <div className="grid grid-cols-3 gap-2 md:gap-3">
+                  <button type="button" onClick={() => setIsPaid(!isPaid)} className={`flex flex-col items-center justify-center py-3 md:py-6 rounded-xl md:rounded-3xl border transition-all ${isPaid ? 'bg-emerald-500/10 border-emerald-500 text-emerald-500' : 'bg-neutral-900/30 border-neutral-800 text-neutral-600'}`}>
+                    <Check className="w-5 h-5 md:w-8 md:h-8" strokeWidth={3} />
+                    <span className="text-[8px] md:text-[9px] font-black uppercase mt-1 md:mt-2">{isPaid ? 'Confirmado' : 'Pendente'}</span>
+                  </button>
+                  <button type="button" onClick={() => { setIsFixed(!isFixed); if(!isFixed) setIsInstallment(false); }} className={`flex flex-col items-center justify-center py-3 md:py-6 rounded-xl md:rounded-3xl border transition-all ${isFixed ? 'bg-primary/10 border-primary text-primary' : 'bg-neutral-900/30 border-neutral-800 text-neutral-600'}`}>
+                    <Repeat className="w-5 h-5 md:w-8 md:h-8" />
+                    <span className="text-[8px] md:text-[9px] font-black uppercase mt-1 md:mt-2">Fixo/Mês</span>
+                  </button>
+                  <button type="button" onClick={() => { setIsInstallment(!isInstallment); if(!isInstallment) setIsFixed(false); }} className={`flex flex-col items-center justify-center py-3 md:py-6 rounded-xl md:rounded-3xl border transition-all ${isInstallment ? 'bg-blue-500/10 border-blue-500 text-blue-500' : 'bg-neutral-900/30 border-neutral-800 text-neutral-600'}`}>
+                    <CreditCard className="w-5 h-5 md:w-8 md:h-8" />
+                    <span className="text-[8px] md:text-[9px] font-black uppercase mt-1 md:mt-2">Parcelado</span>
+                  </button>
+               </div>
             </div>
-          </div>
 
-          <div className="space-y-4">
-             <label className="text-[9px] md:text-[10px] font-black text-neutral-500 uppercase tracking-widest px-1">Valor Final {isInstallment ? '(por parcela)' : ''}</label>
-             <div className="relative group">
-               <span className="absolute left-6 md:left-10 top-1/2 -translate-y-1/2 text-xl md:text-2xl font-black text-neutral-700 transition-colors group-focus-within:text-white">R$</span>
-               <input 
-                 type="number" 
-                 inputMode="decimal"
-                 value={amount} 
-                 onChange={e => setAmount(e.target.value)} 
-                 placeholder="0,00" 
-                 className="w-full bg-neutral-900/50 border border-neutral-800 rounded-[2.5rem] md:rounded-[3.5rem] px-16 md:px-24 py-6 md:py-10 text-3xl md:text-5xl font-display font-black text-white outline-none focus:border-primary transition-all tracking-tighter italic" 
-               />
-             </div>
-          </div>
+            {isInstallment && (
+              <div className="space-y-1.5 md:space-y-4 animate-in slide-in-from-top duration-300">
+                <label className="text-[9px] md:text-[10px] font-black text-neutral-500 uppercase tracking-widest px-1">Número de Parcelas</label>
+                <div className="relative group">
+                  <Hash className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 text-neutral-500 group-focus-within:text-blue-500 transition-colors z-20 pointer-events-none" size={16} />
+                  <input 
+                    type="number" 
+                    min="2"
+                    max="120"
+                    value={totalInstallments} 
+                    onChange={e => setTotalInstallments(e.target.value)} 
+                    className="w-full pl-11 md:pl-20 pr-5 md:pr-8 py-3.5 md:py-7 bg-neutral-950/50 border border-neutral-800 rounded-xl md:rounded-[2.5rem] font-display font-black text-white text-base md:text-2xl outline-none focus:border-blue-500/50 transition-all shadow-xl tracking-tighter"
+                    placeholder="2"
+                  />
+                </div>
+              </div>
+            )}
 
-          <div className="pt-4 md:pt-6 mb-6 md:mb-0">
-              <button 
-                type="submit" 
-                disabled={!amount || !title} 
-                className="w-full py-6 md:py-8 rounded-2xl md:rounded-[2.5rem] bg-primary text-neutral-950 font-display font-black text-xs md:text-sm uppercase tracking-[0.2em] md:tracking-[0.25em] shadow-glow active:scale-95 flex items-center justify-center space-x-3 transition-all disabled:opacity-30"
-              >
-                <Zap className="w-5 h-5 md:w-6 md:h-6" fill="currentColor" />
-                <span>CONFIRMAR AGENDAMENTO</span>
-              </button>
-          </div>
-        </form>
+            <div className="space-y-1.5 md:space-y-4">
+              <label className="text-[9px] md:text-[10px] font-black text-neutral-500 uppercase tracking-widest px-1">Responsável</label>
+              <div className="grid grid-cols-2 gap-2 md:gap-4">
+                {[users.A, users.B].map(u => (
+                  <button 
+                    key={u.id}
+                    type="button" 
+                    onClick={() => setSpenderId(u.id)} 
+                    className={`flex items-center justify-center space-x-2 md:space-x-3 p-2 md:p-4 rounded-xl md:rounded-[2.5rem] border transition-all ${spenderId === u.id ? 'border-primary bg-primary/5 shadow-glow' : 'border-neutral-900 bg-neutral-900/30 text-neutral-600 opacity-50'}`}
+                  >
+                    <img src={u.avatar} className={`w-5 h-5 md:w-8 md:h-8 rounded-full border border-neutral-800 ${spenderId === u.id ? 'border-primary' : ''}`} />
+                    <span className="font-black text-[8px] md:text-[9px] uppercase tracking-widest truncate max-w-[80%]">{u.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-1.5 md:space-y-4">
+               <label className="text-[9px] md:text-[10px] font-black text-neutral-500 uppercase tracking-widest px-1">Valor Final {isInstallment ? '(por parcela)' : ''}</label>
+               <div className="relative group">
+                 <span className="absolute left-5 md:left-10 top-1/2 -translate-y-1/2 text-lg md:text-2xl font-black text-neutral-700 transition-colors group-focus-within:text-white">R$</span>
+                 <input 
+                   type="number" 
+                   inputMode="decimal"
+                   value={amount} 
+                   onChange={e => setAmount(e.target.value)} 
+                   placeholder="0,00" 
+                   className="w-full bg-neutral-900/50 border border-neutral-800 rounded-[1.5rem] md:rounded-[3.5rem] px-12 md:px-24 py-5 md:py-10 text-2xl md:text-5xl font-display font-black text-white outline-none focus:border-primary transition-all tracking-tighter italic" 
+                 />
+               </div>
+            </div>
+
+            <div className="pt-2 md:pt-6 shrink-0 mt-auto">
+                <button 
+                  type="submit" 
+                  disabled={!amount || !title} 
+                  className="w-full py-4 md:py-8 rounded-xl md:rounded-[2.5rem] bg-primary text-neutral-950 font-display font-black text-[10px] md:text-sm uppercase tracking-[0.2em] md:tracking-[0.25em] shadow-glow active:scale-95 flex items-center justify-center space-x-2 md:space-x-3 transition-all disabled:opacity-30"
+                >
+                  <Zap className="w-4 h-4 md:w-6 md:h-6" fill="currentColor" />
+                  <span>Confirmar Agendamento</span>
+                </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );
