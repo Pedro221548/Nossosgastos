@@ -395,16 +395,17 @@ const App: React.FC = () => {
         {activeTab === 'budget' && <BudgetSettings users={users} familyName={familyName} alertThreshold={alertThreshold} onUpdateUser={(uid: string, data: Partial<User>) => { const key = uid === users.A.id ? 'A' : 'B'; const updated = { ...users, [key]: { ...users[key], ...data } }; setUsers(updated); triggerSync('users', updated); }} onUpdateFamilySettings={(name: string, threshold: number) => { setFamilyName(name); setAlertThreshold(threshold); triggerSync('familyName', name); triggerSync('alertThreshold', threshold); }} currentTheme={theme} onThemeToggle={setTheme} onLogout={() => signOut(auth)} onForceSync={forceFullSync} isSyncing={isSyncing} />}
       </main>
 
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-[calc(70px+env(safe-area-inset-bottom))] bg-white/95 dark:bg-neutral-950/95 backdrop-blur-3xl border-t border-neutral-200 dark:border-neutral-800 flex justify-around items-start z-[100] shadow-[0_-10px_40px_rgba(0,0,0,0.1)] px-2 pt-2">
-         <MobileNavItem icon={<HomeIcon />} active={activeTab === 'home'} onClick={() => setActiveTab('home')} />
-         <MobileNavItem icon={<ListOrdered />} active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} />
-         <div className="relative -top-8">
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-[calc(80px+env(safe-area-inset-bottom))] bg-white/95 dark:bg-neutral-950/95 backdrop-blur-3xl border-t border-neutral-200 dark:border-neutral-800 flex justify-around items-start z-[100] shadow-[0_-10px_40px_rgba(0,0,0,0.1)] px-1 pt-2 pb-[env(safe-area-inset-bottom)]">
+         <MobileNavItem icon={<HomeIcon />} label="Home" active={activeTab === 'home'} onClick={() => setActiveTab('home')} />
+         <MobileNavItem icon={<ListOrdered />} label="Extrato" active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} />
+         <div className="relative -top-8 px-2 flex flex-col items-center">
            <button onClick={() => { setEditingTransaction(null); setIsAddModalOpen(true); }} className="w-16 h-16 bg-primary rounded-[2rem] flex items-center justify-center text-neutral-950 shadow-glow active:scale-90 transition-all border-[6px] border-neutral-50 dark:border-neutral-950">
              <Plus size={32} strokeWidth={3} />
            </button>
+           <span className="text-[9px] font-black text-neutral-500 uppercase tracking-widest mt-2 hidden sm:block">Novo</span>
          </div>
-         <MobileNavItem icon={<FileText />} active={activeTab === 'invoices'} onClick={() => setActiveTab('invoices')} />
-         <MobileNavItem icon={<Settings />} active={activeTab === 'budget'} onClick={() => setActiveTab('budget')} />
+         <MobileNavItem icon={<FileText />} label="Faturas" active={activeTab === 'invoices'} onClick={() => setActiveTab('invoices')} />
+         <MobileNavItem icon={<Settings />} label="Ajustes" active={activeTab === 'budget'} onClick={() => setActiveTab('budget')} />
       </nav>
 
       <AddTransactionModal isOpen={isAddModalOpen} users={users} initialDate={currentDate} onClose={() => { setIsAddModalOpen(false); setEditingTransaction(null); }} onAdd={handleAddOrUpdateTransaction} editingTransaction={editingTransaction} />
@@ -420,10 +421,15 @@ const SidebarItem = ({ icon, label, active, onClick }: { icon: any, label: strin
   </button>
 );
 
-const MobileNavItem = ({ icon, active, onClick }: { icon: any, active: boolean, onClick: () => void }) => (
-  <button onClick={onClick} className={`flex flex-col items-center justify-center p-3 rounded-2xl transition-all ${active ? 'text-primary' : 'text-neutral-400 opacity-60'}`}>
-    {React.cloneElement(icon, { size: 24, strokeWidth: active ? 2.5 : 2 })}
-    <div className={`w-1 h-1 rounded-full bg-primary mt-1.5 transition-all ${active ? 'opacity-100 scale-100' : 'opacity-0 scale-0'}`} />
+const MobileNavItem = ({ icon, label, active, onClick }: { icon: any, label: string, active: boolean, onClick: () => void }) => (
+  <button onClick={onClick} className={`flex flex-col items-center justify-center p-2 rounded-2xl transition-all flex-1 ${active ? 'text-primary' : 'text-neutral-400 opacity-60'}`}>
+    <div className={`transition-transform duration-300 ${active ? '-translate-y-1' : ''}`}>
+      {React.cloneElement(icon, { size: 22, strokeWidth: active ? 2.5 : 2 })}
+    </div>
+    <span className={`text-[9px] font-black uppercase tracking-widest mt-1 transition-all duration-300 ${active ? 'opacity-100' : 'opacity-0 h-0 hidden'}`}>
+      {label}
+    </span>
+    {/* active dot for non-active states that become active, replaced by label now, but kept for transition smoothness if wanted */}
   </button>
 );
 

@@ -122,6 +122,10 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
       isPaid: isPaid,
       isFixed: isFixed,
       paidMonths: editingTransaction?.paidMonths || [],
+      referenceMonth: editingTransaction?.referenceMonth || (() => {
+        const base = initialDate || new Date();
+        return `${base.getFullYear()}-${base.getMonth() + 1}`;
+      })(),
       installments: (isInstallment && installmentsCount > 1) ? {
         current: editingTransaction?.installments?.current || 1,
         total: installmentsCount

@@ -62,7 +62,14 @@ export const Home: React.FC<HomeProps> = ({
 
   const currentMonthTransactions = transactions.filter(t => {
     const [d, m, y] = t.date.split('/').map(Number);
-    return m === currentMonth + 1 && y === currentYear || (t.isFixed);
+    let refMonth = m - 1;
+    let refYear = y;
+    if (t.referenceMonth) {
+       const [ry, rm] = t.referenceMonth.split('-');
+       refYear = Number(ry);
+       refMonth = Number(rm) - 1;
+    }
+    return refMonth === currentMonth && refYear === currentYear || (t.isFixed);
   });
 
   const totalIncome = users.A.income + users.B.income + currentMonthTransactions
@@ -84,9 +91,16 @@ export const Home: React.FC<HomeProps> = ({
   const pendingTransactions = transactions
     .filter(t => t.type === 'expense' && !t.isPaid && !t.isFixed)
     .sort((a, b) => {
-      const [da, ma, ya] = a.date.split('/').map(Number);
-      const [db, mb, yb] = b.date.split('/').map(Number);
-      return new Date(ya, ma - 1, da).getTime() - new Date(yb, mb - 1, db).getTime();
+      const getRefDate = (tx: Transaction) => {
+        let rm = Number(tx.date.split('/')[1]) - 1;
+        let ry = Number(tx.date.split('/')[2]);
+        if (tx.referenceMonth) {
+           ry = Number(tx.referenceMonth.split('-')[0]);
+           rm = Number(tx.referenceMonth.split('-')[1]) - 1;
+        }
+        return new Date(ry, rm, Number(tx.date.split('/')[0])).getTime();
+      };
+      return getRefDate(a) - getRefDate(b);
     });
   
   const nextBill = pendingTransactions[0];

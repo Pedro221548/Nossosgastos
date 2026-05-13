@@ -46,9 +46,17 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const filteredList = useMemo(() => {
     return transactions.filter(t => {
       const [day, month, year] = t.date.split('/').map(Number);
-      const tDate = new Date(year, month - 1, day);
-      const isCurrentMonth = tDate.getMonth() === currentDate.getMonth() && tDate.getFullYear() === currentDate.getFullYear();
-      const isFixedAndRelevant = t.isFixed && (tDate.getFullYear() < currentDate.getFullYear() || (tDate.getFullYear() === currentDate.getFullYear() && tDate.getMonth() <= currentDate.getMonth()));
+      
+      let refMonth = month - 1;
+      let refYear = year;
+      if (t.referenceMonth) {
+         const [ry, rm] = t.referenceMonth.split('-');
+         refYear = Number(ry);
+         refMonth = Number(rm) - 1;
+      }
+      
+      const isCurrentMonth = refMonth === currentDate.getMonth() && refYear === currentDate.getFullYear();
+      const isFixedAndRelevant = t.isFixed && (refYear < currentDate.getFullYear() || (refYear === currentDate.getFullYear() && refMonth <= currentDate.getMonth()));
       return isCurrentMonth || isFixedAndRelevant;
     }).sort((a, b) => a.amount - b.amount);
   }, [transactions, currentDate]);

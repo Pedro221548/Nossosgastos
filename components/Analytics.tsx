@@ -82,14 +82,21 @@ export const Analytics: React.FC<AnalyticsProps> = ({
     data.forEach(monthBucket => {
       transactions.forEach(t => {
         const [day, month, year] = t.date.split('/').map(Number);
-        const tDate = new Date(year, month - 1, day);
         
-        const isSameMonth = tDate.getMonth() === monthBucket.fullDate.getMonth() && 
-                            tDate.getFullYear() === monthBucket.fullDate.getFullYear();
+        let refMonth = month - 1;
+        let refYear = year;
+        if (t.referenceMonth) {
+           const [ry, rm] = t.referenceMonth.split('-');
+           refYear = Number(ry);
+           refMonth = Number(rm) - 1;
+        }
+
+        const isSameMonth = refMonth === monthBucket.fullDate.getMonth() && 
+                            refYear === monthBucket.fullDate.getFullYear();
         
         const isProjectedFixed = t.isFixed && (
-          tDate.getFullYear() < monthBucket.fullDate.getFullYear() || 
-          (tDate.getFullYear() === monthBucket.fullDate.getFullYear() && tDate.getMonth() <= monthBucket.fullDate.getMonth())
+          refYear < monthBucket.fullDate.getFullYear() || 
+          (refYear === monthBucket.fullDate.getFullYear() && refMonth <= monthBucket.fullDate.getMonth())
         );
 
         if (isSameMonth || isProjectedFixed) {

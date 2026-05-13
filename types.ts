@@ -23,6 +23,7 @@ export interface Transaction {
   paidMonths?: string[];
   isDeleted?: boolean;
   recurringGroupId?: string; 
+  referenceMonth?: string;
   installments?: {
     current: number;
     total: number;
