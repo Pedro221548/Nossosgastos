@@ -17,6 +17,7 @@ const PremiumLogo = () => (
 export const Login: React.FC<{ onLoginSuccess: () => void }> = ({ onLoginSuccess }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -28,6 +29,12 @@ export const Login: React.FC<{ onLoginSuccess: () => void }> = ({ onLoginSuccess
     setLoading(true);
     setError('');
     setMessage('');
+
+    if (isRegistering && password !== confirmPassword) {
+      setError('As senhas não coincidem.');
+      setLoading(false);
+      return;
+    }
 
     try {
       if (isRegistering) {
@@ -112,6 +119,23 @@ export const Login: React.FC<{ onLoginSuccess: () => void }> = ({ onLoginSuccess
                   </button>
                 </div>
               </div>
+
+              {isRegistering && (
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-neutral-500 uppercase tracking-widest ml-1">Confirmar Senha</label>
+                  <div className="relative">
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-600" size={18} />
+                    <input 
+                      type={showPassword ? 'text' : 'password'} 
+                      required 
+                      value={confirmPassword}
+                      onChange={e => setConfirmPassword(e.target.value)}
+                      className="w-full bg-neutral-950 border border-neutral-800 rounded-2xl py-4 pl-12 pr-12 text-white font-semibold outline-none focus:border-primary transition-all"
+                      placeholder="••••••••"
+                    />
+                  </div>
+                </div>
+              )}
             </div>
 
             {error && <p className="text-red-500 text-[10px] font-bold uppercase text-center">{error}</p>}
@@ -133,13 +157,21 @@ export const Login: React.FC<{ onLoginSuccess: () => void }> = ({ onLoginSuccess
 
           <div className="mt-8 flex flex-col space-y-4 items-center">
             <button 
-              onClick={() => setIsRegistering(!isRegistering)}
+              type="button"
+              onClick={() => {
+                setIsRegistering(!isRegistering);
+                setError('');
+                setMessage('');
+                setPassword('');
+                setConfirmPassword('');
+              }}
               className="text-neutral-500 hover:text-white text-[10px] font-black uppercase tracking-widest transition-colors"
             >
               {isRegistering ? 'Já somos membros? Entrar.' : 'Ainda não temos conta conjunta? Criar.'}
             </button>
             {!isRegistering && (
               <button 
+                type="button"
                 onClick={handleResetPassword}
                 className="text-neutral-700 hover:text-neutral-500 text-[10px] font-bold uppercase tracking-widest"
               >

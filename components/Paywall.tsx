@@ -4,31 +4,25 @@ import { signOut } from 'firebase/auth';
 import { auth, syncData } from '../services/firebase';
 import { initMercadoPago, Payment } from '@mercadopago/sdk-react';
 
-initMercadoPago(import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY || "TEST-b02d8471-bc0d-40d6-8b22-cadb3b4d2454", { locale: 'pt-BR' });
+if (import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY) {
+  initMercadoPago(import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY, { locale: 'pt-BR' });
+}
 
 interface PaywallProps {
   onSubscribeSuccess: () => void;
+  daysUntilDeletion?: number;
+  onCancel?: () => void;
 }
 
-export const Paywall: React.FC<PaywallProps> = ({ onSubscribeSuccess }) => {
+export const Paywall: React.FC<PaywallProps> = ({ onSubscribeSuccess, daysUntilDeletion, onCancel }) => {
   const [showCheckout, setShowCheckout] = useState(false);
-  const [brickError, setBrickError] = useState(false);
+  const [brickError, setBrickError] = useState(!import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY);
+  const [brickDiagnostic, setBrickDiagnostic] = useState<string | null>(null);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const simulateCheckout = () => {
-    setLoading(true);
-    setTimeout(async () => {
-      await syncData('subscription', {
-        status: 'active',
-        plan: 'premium',
-        since: new Date().toISOString()
-      });
-      setLoading(false);
-      onSubscribeSuccess();
-    }, 2500);
-  };
-
   const handlePaymentSubmit = async (paymentFormData: any) => {
+    setPaymentError(null);
     return new Promise<void>((resolve, reject) => {
       fetch("/api/process_payment", {
         method: "POST",
@@ -37,9 +31,9 @@ export const Paywall: React.FC<PaywallProps> = ({ onSubscribeSuccess }) => {
         },
         body: JSON.stringify(paymentFormData),
       })
-        .then((response) => response.json())
-        .then(async (data) => {
-          if (data.status === 'approved' || typeof data.id !== 'undefined') {
+        .then(async (response) => {
+          const data = await response.json();
+          if (response.ok && (data.status === 'approved' || typeof data.id !== 'undefined')) {
             await syncData('subscription', {
               status: 'active',
               plan: 'premium',
@@ -48,12 +42,14 @@ export const Paywall: React.FC<PaywallProps> = ({ onSubscribeSuccess }) => {
             resolve();
             onSubscribeSuccess();
           } else {
-            console.error('Pagamento rejeitado:', data);
+            console.error('Pagamento rejeitado ou erro na API:', data);
+            setPaymentError(data.message || data.error || JSON.stringify(data));
             reject();
           }
         })
         .catch((error) => {
           console.error("Erro ao processar pagamento", error);
+          setPaymentError(error.message || "Erro de conexão com o servidor ao processar pagamento.");
           reject();
         });
     });
@@ -68,6 +64,12 @@ export const Paywall: React.FC<PaywallProps> = ({ onSubscribeSuccess }) => {
         <div className="max-w-4xl w-full grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center md:items-start z-10 w-full">
           
           <div className="space-y-8 text-center md:text-left relative md:sticky top-6 md:top-12 pb-8 md:pb-0 flex flex-col items-center md:items-start">
+            {daysUntilDeletion !== undefined && daysUntilDeletion <= 10 && (
+              <div className="bg-red-500/20 text-red-500 border border-red-500/30 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest text-center w-full shadow-lg">
+                Seu teste acabou. Assine para não perder seus dados em {daysUntilDeletion} {daysUntilDeletion === 1 ? 'dia' : 'dias'}.
+              </div>
+            )}
+            
             <div className="inline-flex items-center justify-center md:justify-start space-x-3 mb-4">
               <div className="w-12 h-12 bg-neutral-900 border border-primary/30 rounded-xl flex items-center justify-center shadow-glow">
                 <Heart size={24} className="text-primary" fill="currentColor" />
@@ -118,8 +120,8 @@ export const Paywall: React.FC<PaywallProps> = ({ onSubscribeSuccess }) => {
 
                 <div className="text-center mt-6 mb-8">
                   <span className="text-primary text-xl font-bold align-top pr-1">R$</span>
-                  <span className="text-6xl font-display font-black italic tracking-tighter">1</span>
-                  <span className="text-2xl font-bold">,00</span>
+                  <span className="text-6xl font-display font-black italic tracking-tighter">19</span>
+                  <span className="text-2xl font-bold">,90</span>
                 </div>
 
                 <div className="space-y-4 mb-8">
@@ -159,19 +161,36 @@ export const Paywall: React.FC<PaywallProps> = ({ onSubscribeSuccess }) => {
                       <h4 className="font-bold mb-2 text-white">Checkout Indisponível</h4>
                       <p className="text-xs text-neutral-500 mb-6 font-medium">A chave do Mercado Pago não está configurada neste ambiente ou é inválida.</p>
                       
+                      {brickDiagnostic && (
+                        <div className="bg-red-500/10 border border-red-500/20 text-red-500 text-[10px] p-3 rounded-lg mb-6 text-left w-full break-all">
+                          <strong className="block mb-1 text-red-400">Diagnóstico do Erro:</strong>
+                          {brickDiagnostic}
+                        </div>
+                      )}
+
                       <button 
-                        onClick={simulateCheckout}
-                        disabled={loading}
-                        className="bg-primary text-neutral-950 w-full py-4 rounded-xl font-black uppercase tracking-widest text-[11px] shadow-lg flex items-center justify-center space-x-2 disabled:opacity-50"
+                        onClick={() => window.location.reload()}
+                        className="bg-primary text-neutral-950 w-full py-4 rounded-xl font-black uppercase tracking-widest text-[11px] shadow-lg flex items-center justify-center space-x-2"
                       >
-                        {loading ? <Loader2 size={16} className="animate-spin" /> : null}
-                        <span>Simular Pagamento Seguro (Teste)</span>
+                        <span>Tentar Novamente</span>
                       </button>
+                      
+                      {onCancel && (
+                        <div className="flex justify-center mt-4">
+                          <button onClick={onCancel} className="mt-2 text-[10px] uppercase font-bold text-neutral-400 hover:text-white transition-colors">Voltar a usar o app</button>
+                        </div>
+                      )}
                     </div>
                  ) : (
                    <div className="px-0 sm:px-1 pt-1">
+                     {paymentError && (
+                       <div className="mx-4 mt-4 mb-2 bg-red-500/10 border border-red-500/20 text-red-500 text-[10px] p-3 rounded-lg text-left break-all">
+                         <strong className="block mb-1 text-red-400">Erro no Processamento:</strong>
+                         {paymentError}
+                       </div>
+                     )}
                      <Payment
-                        initialization={{ amount: 1 }}
+                        initialization={{ amount: 19.90 }}
                         customization={{
                           visual: {
                             style: {
@@ -183,8 +202,7 @@ export const Paywall: React.FC<PaywallProps> = ({ onSubscribeSuccess }) => {
                                 formBackgroundColor: '#0a0a0a',
                                 baseColor: '#fde047',
                                 baseColorFirstVariant: '#facc15',
-                                baseColorSecondVariant: '#eab308',
-                                outlinePrimaryColor: '#fde047',
+                                baseColorSecondVariant: '#eab308'
                               }
                             }
                           },
@@ -209,6 +227,11 @@ export const Paywall: React.FC<PaywallProps> = ({ onSubscribeSuccess }) => {
                         <ShieldCheck size={10} />
                         <span>Transação via Mercado Pago</span>
                      </div>
+                     {onCancel && (
+                       <div className="flex justify-center pb-6">
+                         <button onClick={onCancel} className="mt-2 text-[10px] uppercase font-bold text-neutral-400 hover:text-white transition-colors">Voltar a usar o app</button>
+                       </div>
+                     )}
                    </div>
                  )}
                </div>

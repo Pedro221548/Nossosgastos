@@ -6,7 +6,7 @@ import cors from "cors";
 
 // Initialize MercadoPago
 const mpClient = new MercadoPagoConfig({
-  accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN || "TEST-83861543-ACCESS-TOKEN-MOCK",
+  accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN || "",
 });
 const payment = new Payment(mpClient);
 
@@ -47,17 +47,31 @@ async function startServer() {
         };
       }
 
-      // Ensure access token is set
-      if (!process.env.MERCADOPAGO_ACCESS_TOKEN || process.env.MERCADOPAGO_ACCESS_TOKEN.includes('MOCK')) {
-        console.warn("Mercado Pago Access Token is missing. Simulating success instead of charging actually.");
-        return res.json({ status: "approved", status_detail: "accredited", id: 123456789 });
+      if (!process.env.MERCADOPAGO_ACCESS_TOKEN) {
+        return res.status(400).json({ error: "Access token do Mercado Pago ausente nas variáveis de ambiente" });
       }
 
       const response = await payment.create({ body: paymentData });
       res.json(response);
     } catch (error: any) {
       console.error("Payment processing error:", error);
-      res.status(500).json({ error: error.message || "An error occurred while processing payment" });
+      
+      // Attempt to extract detailed API error from MercadoPago
+      let errorDetails = "Unknown error";
+      if (error && error.message) {
+         errorDetails = error.message;
+      }
+      
+      // Sometimes MercadoPago SDK wraps the original fetch response error
+      if (error && error.cause) {
+         errorDetails += ` | Cause: ${JSON.stringify(error.cause)}`;
+      }
+
+      res.status(400).json({ 
+        error: "Erro no processamento do pagamento",
+        message: errorDetails,
+        raw: JSON.stringify(error) 
+      });
     }
   });
 

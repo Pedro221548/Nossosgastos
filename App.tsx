@@ -43,6 +43,8 @@ const App: React.FC = () => {
   const [isSyncing, setIsSyncing] = useState(false);
   const [activeTab, setActiveTab] = useState<AppTab>('home');
   const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem('nc_theme') as Theme) || 'dark');
+  const [nowMs, setNowMs] = useState(Date.now());
+  const [forcePaywall, setForcePaywall] = useState(false);
   
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [goals, setGoals] = useState<Goal[]>([]);
@@ -127,6 +129,11 @@ const App: React.FC = () => {
     localStorage.setItem('nc_theme', theme);
     document.documentElement.classList.toggle('dark', theme === 'dark');
   }, [theme]);
+
+  useEffect(() => {
+    const interval = setInterval(() => setNowMs(Date.now()), 60000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleSaveInvoice = async (invoice: Invoice) => {
     setIsSyncing(true);
@@ -317,14 +324,35 @@ const App: React.FC = () => {
     return <div className="min-h-screen bg-neutral-950 flex items-center justify-center"><Loader2 className="text-primary animate-spin" size={48} /></div>;
   }
 
-  if (!subscription || subscription.status !== 'active') {
-    return <Paywall onSubscribeSuccess={() => setSubscription({ status: 'active' })} />;
+  const creationTimeMs = user ? new Date(user.metadata.creationTime || Date.now()).getTime() : Date.now();
+  const trialEndMs = creationTimeMs + (7 * 24 * 3600 * 1000);
+  const trialTimeLeftMs = trialEndMs - nowMs;
+  const hasActiveTrial = trialTimeLeftMs > 0;
+  
+  const deletionEndMs = trialEndMs + (10 * 24 * 3600 * 1000);
+  const deletionTimeLeftMs = deletionEndMs - nowMs;
+  const daysUntilDeletion = Math.max(0, Math.ceil(deletionTimeLeftMs / (24 * 3600 * 1000)));
+
+  const hasSubscription = subscription && subscription.status === 'active';
+  const isLocked = (!hasSubscription && !hasActiveTrial) || forcePaywall;
+
+  if (isLocked) {
+    return <Paywall onSubscribeSuccess={() => { setSubscription({ status: 'active' }); setForcePaywall(false); }} onCancel={hasActiveTrial ? () => setForcePaywall(false) : undefined} daysUntilDeletion={daysUntilDeletion} />;
   }
+
+  const trialDaysLeft = Math.floor(trialTimeLeftMs / (24 * 3600 * 1000));
+  const trialHoursLeft = Math.floor((trialTimeLeftMs % (24 * 3600 * 1000)) / (3600 * 1000));
 
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-200 flex flex-col md:flex-row transition-colors duration-300">
       
-      <div className="fixed top-[calc(env(safe-area-inset-top)+10px)] right-4 md:right-6 z-[100] flex items-center space-x-2 bg-white/90 dark:bg-neutral-900/90 backdrop-blur-md px-4 py-2 rounded-full border border-neutral-200 dark:border-neutral-800 shadow-2xl transition-all">
+      {!hasSubscription && hasActiveTrial && (
+        <div className="fixed top-0 left-0 right-0 z-[200] bg-primary text-neutral-950 text-[10px] sm:text-xs font-black uppercase tracking-widest py-2 px-4 text-center shadow-lg">
+          Período de Teste Grátis: Restam {trialDaysLeft} dias e {trialHoursLeft} horas. <button onClick={() => setForcePaywall(true)} className="underline ml-2">Assinar Agora</button>
+        </div>
+      )}
+
+      <div className={`fixed top-[calc(env(safe-area-inset-top)+10px)] right-4 md:right-6 z-[100] flex items-center space-x-2 bg-white/90 dark:bg-neutral-900/90 backdrop-blur-md px-4 py-2 rounded-full border border-neutral-200 dark:border-neutral-800 shadow-2xl transition-all ${!hasSubscription && hasActiveTrial ? 'mt-8' : ''}`}>
         {isSyncing ? <><Loader2 size={12} className="text-primary animate-spin" /><span className="text-[10px] font-black text-neutral-500 uppercase tracking-widest">Sincronizando</span></> : <><div className="w-2 h-2 bg-emerald-500 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.5)]" /><span className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">Online</span></>}
       </div>
 
