@@ -55,7 +55,7 @@ export const listenToFirestoreTransactions = (callback: (data: any[]) => void) =
   const user = auth.currentUser;
   if (!user) return;
 
-  const q = query(collection(firestore, "transacoes"));
+  const q = query(collection(firestore, "transacoes"), where("tenantId", "==", user.uid));
 
   return onSnapshot(q, (snapshot) => {
     const transactions = snapshot.docs.map(doc => ({

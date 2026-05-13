@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { USERS } from './constants';
 import { Transaction, User, Goal, ShoppingItem, AppTab, Invoice } from './types';
 import { Home } from './components/Home';
+import { Landing } from './components/Landing';
+import { Paywall } from './components/Paywall';
 import { Dashboard } from './components/Dashboard';
 import { Goals } from './components/Goals';
 import { BudgetSettings } from './components/BudgetSettings'; 
@@ -35,6 +37,9 @@ type Theme = 'dark' | 'light';
 const App: React.FC = () => {
   const [user, setUser] = useState<FirebaseUser | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
+  const [showLogin, setShowLogin] = useState(false);
+  const [subscription, setSubscription] = useState<any>(null);
+  const [subscriptionLoaded, setSubscriptionLoaded] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [activeTab, setActiveTab] = useState<AppTab>('home');
   const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem('nc_theme') as Theme) || 'dark');
@@ -75,6 +80,15 @@ const App: React.FC = () => {
     const unsubUsers = listenToData('users', (data: { A: User; B: User }) => data && setUsers(data));
     const unsubFamily = listenToData('familyName', (data: string) => data && setFamilyName(data));
     const unsubThreshold = listenToData('alertThreshold', (data: number) => data && setAlertThreshold(data));
+    const unsubSubscription = listenToData('subscription', (data: any) => {
+      setSubscription(data);
+      setSubscriptionLoaded(true);
+    });
+    
+    // Fallback if no subscription data is found quickly
+    const subTimeout = setTimeout(() => {
+      setSubscriptionLoaded(true);
+    }, 1000);
 
     const unsubFirestore = listenToFirestoreTransactions((data: any[]) => {
       const mappedTransactions: Transaction[] = data.map(item => {
@@ -104,7 +118,8 @@ const App: React.FC = () => {
 
     return () => {
       unsubGoals?.(); unsubShopping?.(); unsubInvoices?.(); unsubUsers?.(); unsubFamily?.(); 
-      unsubThreshold?.(); unsubFirestore?.();
+      unsubThreshold?.(); unsubSubscription?.(); unsubFirestore?.();
+      clearTimeout(subTimeout);
     };
   }, [user]);
 
@@ -185,7 +200,8 @@ const App: React.FC = () => {
         pago: tx.isPaid,
         isFixed: tx.isFixed,
         paidMonths: tx.paidMonths || [],
-        installments: currentInstallment ? { current: currentInstallment, total: tx.installments!.total } : null
+        installments: currentInstallment ? { current: currentInstallment, total: tx.installments!.total } : null,
+        tenantId: user?.uid
       });
 
       if (editingTransaction) {
@@ -280,7 +296,30 @@ const App: React.FC = () => {
   };
 
   if (authLoading) return <div className="min-h-screen bg-neutral-950 flex items-center justify-center"><Loader2 className="text-primary animate-spin" size={48} /></div>;
-  if (!user) return <Login onLoginSuccess={() => {}} />;
+  if (!user) {
+    if (showLogin) {
+      return (
+        <div className="relative">
+          <button 
+            onClick={() => setShowLogin(false)}
+            className="absolute top-6 left-6 z-50 text-white flex items-center space-x-2 bg-neutral-900 border border-neutral-800 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-neutral-800 transition-colors"
+          >
+            Voltar
+          </button>
+          <Login onLoginSuccess={() => {}} />
+        </div>
+      );
+    }
+    return <Landing onStartClick={() => setShowLogin(true)} />;
+  }
+
+  if (!subscriptionLoaded) {
+    return <div className="min-h-screen bg-neutral-950 flex items-center justify-center"><Loader2 className="text-primary animate-spin" size={48} /></div>;
+  }
+
+  if (!subscription || subscription.status !== 'active') {
+    return <Paywall onSubscribeSuccess={() => setSubscription({ status: 'active' })} />;
+  }
 
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-200 flex flex-col md:flex-row transition-colors duration-300">
