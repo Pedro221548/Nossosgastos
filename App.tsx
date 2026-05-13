@@ -325,7 +325,7 @@ const App: React.FC = () => {
   }
 
   const creationTimeMs = user ? new Date(user.metadata.creationTime || Date.now()).getTime() : Date.now();
-  const trialEndMs = creationTimeMs + (7 * 24 * 3600 * 1000);
+  const trialEndMs = creationTimeMs + (30 * 24 * 3600 * 1000);
   const trialTimeLeftMs = trialEndMs - nowMs;
   const hasActiveTrial = trialTimeLeftMs > 0;
   

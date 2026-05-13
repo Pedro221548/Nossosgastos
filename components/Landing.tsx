@@ -50,7 +50,7 @@ export const Landing: React.FC<{ onStartClick: () => void }> = ({ onStartClick }
           onClick={onStartClick}
           className="mt-12 bg-primary text-neutral-950 px-8 py-5 rounded-2xl font-black uppercase tracking-widest text-xs sm:text-sm shadow-glow hover:bg-yellow-300 transition-all flex items-center space-x-3 active:scale-95"
         >
-          <span>Começar Teste Grátis de 7 Dias</span>
+          <span>Começar Teste Grátis de 30 Dias</span>
           <ArrowRight size={18} strokeWidth={3} />
         </button>
 
