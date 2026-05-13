@@ -25,35 +25,29 @@ async function startServer() {
   // Process payment securely on the server
   app.post("/api/process_payment", async (req, res) => {
     try {
-      const submitData = req.body;
+      const paymentData = req.body;
 
       if (!process.env.MERCADOPAGO_ACCESS_TOKEN) {
         return res.status(400).json({ error: "Access token do Mercado Pago ausente nas variáveis de ambiente" });
       }
 
-      const orderResponse = await fetch("https://api.mercadopago.com/v1/orders", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN}`,
-          "X-Idempotency-Key": Date.now().toString() + Math.random().toString(),
-        },
-        body: JSON.stringify(submitData),
-      });
+      const response = await payment.create({ body: paymentData });
 
-      const responseData = await orderResponse.json();
-
-      if (!orderResponse.ok) {
-        throw new Error(responseData.message || JSON.stringify(responseData));
-      }
-
-      res.json(responseData);
+      res.json(response);
     } catch (error: any) {
       console.error("Payment processing error:", error);
       
+      let errorDetails = "Unknown error";
+      if (error && error.message) {
+         errorDetails = error.message;
+      }
+      if (error && error.cause) {
+         errorDetails += ` | Cause: ${JSON.stringify(error.cause)}`;
+      }
+
       res.status(400).json({ 
         error: "Erro no processamento do pagamento",
-        message: error.message || "Unknown error",
+        message: errorDetails,
         raw: JSON.stringify(error) 
       });
     }

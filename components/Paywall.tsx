@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Heart, CheckCircle2, ShieldCheck, Zap, LogOut, Loader2 } from 'lucide-react';
 import { signOut } from 'firebase/auth';
 import { auth, syncData } from '../services/firebase';
-import { initMercadoPago, CardPayment } from '@mercadopago/sdk-react';
+import { initMercadoPago, Payment } from '@mercadopago/sdk-react';
 
 const MP_KEY = import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY?.trim();
 if (MP_KEY) {
@@ -196,9 +196,12 @@ export const Paywall: React.FC<PaywallProps> = ({ onSubscribeSuccess, daysUntilD
                          {paymentError}
                        </div>
                      )}
-                     <CardPayment
+                     <Payment
                         initialization={{ 
-                          amount: 19.90
+                          amount: 19.90,
+                          payer: {
+                            email: auth.currentUser?.email || ''
+                          }
                         }}
                         customization={{
                           visual: {
@@ -211,33 +214,15 @@ export const Paywall: React.FC<PaywallProps> = ({ onSubscribeSuccess, daysUntilD
                                 baseColor: '#fde047'
                               }
                             }
-                          }
+                          },
+                          paymentMethods: {
+                            ticket: "all",
+                            creditCard: "all",
+                            bankTransfer: "all",
+                          },
                         }}
-                        onSubmit={async (formData, additionalData) => {
-                           const submitData = {
-                             type: "online",
-                             total_amount: String(formData.transaction_amount),
-                             external_reference: "ext_ref_" + Date.now(),
-                             processing_mode: "automatic",
-                             transactions: {
-                               payments: [
-                                 {
-                                   amount: String(formData.transaction_amount),
-                                   payment_method: {
-                                     id: formData.payment_method_id,
-                                     type: additionalData?.paymentTypeId || "credit_card",
-                                     token: formData.token,
-                                     installments: formData.installments,
-                                   },
-                                 },
-                               ],
-                             },
-                             payer: {
-                               email: formData.payer?.email || auth.currentUser?.email || "",
-                               identification: formData.payer?.identification,
-                             },
-                           };
-                           await handlePaymentSubmit(submitData);
+                        onSubmit={async (formData) => {
+                           await handlePaymentSubmit(formData);
                         }}
                         onError={(error) => {
                           console.error("Brick error:", error);
