@@ -20,6 +20,7 @@ export const Paywall: React.FC<PaywallProps> = ({ onSubscribeSuccess, daysUntilD
   const [brickError, setBrickError] = useState(!MP_KEY);
   const [brickDiagnostic, setBrickDiagnostic] = useState<string | null>(null);
   const [paymentError, setPaymentError] = useState<string | null>(null);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handlePaymentSubmit = async (paymentFormData: any) => {
@@ -52,7 +53,7 @@ export const Paywall: React.FC<PaywallProps> = ({ onSubscribeSuccess, daysUntilD
               since: new Date().toISOString()
             });
             resolve();
-            onSubscribeSuccess();
+            setPaymentSuccess(true);
           } else {
             console.error('Pagamento rejeitado ou erro na API:', data);
             setPaymentError(data.message || data.error || JSON.stringify(data));
@@ -124,7 +125,26 @@ export const Paywall: React.FC<PaywallProps> = ({ onSubscribeSuccess, daysUntilD
           </div>
 
           <div className={`mx-auto bg-neutral-900 border-2 border-primary/30 shadow-glow relative transition-all duration-300 w-full ${showCheckout ? 'max-w-md p-4 sm:p-6 md:p-8 rounded-[1.5rem] sm:rounded-[2.5rem]' : 'max-w-sm p-6 sm:p-8 rounded-[2.5rem]'}`}>
-            {!showCheckout ? (
+            {paymentSuccess ? (
+              <div className="flex flex-col items-center justify-center text-center animate-in zoom-in duration-500 py-8">
+                <div className="w-20 h-20 bg-emerald-500/10 rounded-full flex items-center justify-center mb-6">
+                  <CheckCircle2 size={40} className="text-emerald-500" />
+                </div>
+                <h3 className="text-2xl font-display font-black uppercase tracking-tighter mb-4 text-white">
+                  Muito Obrigado!
+                </h3>
+                <p className="text-neutral-400 font-medium mb-8">
+                  Sua assinatura foi ativada com sucesso. Aproveite todas as funcionalidades premium do app, agora você pode convidar seu parceiro(a).
+                </p>
+                <button
+                  onClick={onSubscribeSuccess}
+                  className="w-full bg-primary text-neutral-950 py-5 rounded-2xl font-black uppercase tracking-widest text-[11px] shadow-glow hover:bg-primary/90 transition-all flex items-center justify-center space-x-2 active:scale-95"
+                >
+                  <Zap size={18} fill="currentColor" />
+                  <span>Começar a Usar</span>
+                </button>
+              </div>
+            ) : !showCheckout ? (
               <>
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-neutral-950 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg">
                   Assinatura Mensal
