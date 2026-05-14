@@ -121,8 +121,8 @@ export const Paywall: React.FC<PaywallProps> = ({ onSubscribeSuccess, daysUntilD
 
                 <div className="text-center mt-6 mb-8">
                   <span className="text-primary text-xl font-bold align-top pr-1">R$</span>
-                  <span className="text-6xl font-display font-black italic tracking-tighter">19</span>
-                  <span className="text-2xl font-bold">,90</span>
+                  <span className="text-6xl font-display font-black italic tracking-tighter">1</span>
+                  <span className="text-2xl font-bold">,00</span>
                 </div>
 
                 <div className="space-y-4 mb-8">
@@ -198,7 +198,7 @@ export const Paywall: React.FC<PaywallProps> = ({ onSubscribeSuccess, daysUntilD
                      )}
                      <Payment
                         initialization={{ 
-                          amount: 19.90,
+                          amount: 1.00,
                           payer: {
                             email: auth.currentUser?.email || ''
                           }
@@ -221,8 +221,9 @@ export const Paywall: React.FC<PaywallProps> = ({ onSubscribeSuccess, daysUntilD
                             bankTransfer: "all",
                           },
                         }}
-                        onSubmit={async (formData) => {
-                           await handlePaymentSubmit(formData);
+                        onSubmit={async (param: any) => {
+                           const paymentData = param.formData || param;
+                           await handlePaymentSubmit(paymentData);
                         }}
                         onError={(error) => {
                           console.error("Brick error:", error);

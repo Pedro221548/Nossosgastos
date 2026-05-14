@@ -51,7 +51,11 @@ export const Login: React.FC<{ onLoginSuccess: () => void }> = ({ onLoginSuccess
     } catch (err: any) {
       console.error(err);
       if (err.code !== 'auth/popup-closed-by-user') {
-        setError('Erro ao autenticar com Google. Tente novamente.');
+        if (err.code === 'auth/unauthorized-domain') {
+          setError(`Para testar o Login do Google neste ambiente, adicione o seguinte domínio: ${window.location.hostname} no painel de Authentication do Firebase na aba Settings > Authorized domains.`);
+        } else {
+          setError('Erro ao autenticar com Google. Tente novamente.');
+        }
       }
     } finally {
       setLoading(false);
