@@ -33,7 +33,18 @@ export const Paywall: React.FC<PaywallProps> = ({ onSubscribeSuccess, daysUntilD
         body: JSON.stringify(paymentFormData),
       })
         .then(async (response) => {
-          const data = await response.json();
+          let data;
+          try {
+            data = await response.json();
+          } catch (e) {
+            // Em caso de erro de parsing de JSON (ex: resposta 404 em HTML no Vercel)
+            const text = await response.text().catch(() => "");
+            console.error("Erro ao analisar resposta:", text);
+            setPaymentError(`Erro no servidor: O backend não está respondendo corretamente. Se você publicou na Vercel, certifique-se de configurar a API e colocar a variável MERCADOPAGO_ACCESS_TOKEN nela.`);
+            reject();
+            return;
+          }
+
           if (response.ok && (data.status === 'approved' || typeof data.id !== 'undefined')) {
             await syncData('subscription', {
               status: 'active',
@@ -162,15 +173,15 @@ export const Paywall: React.FC<PaywallProps> = ({ onSubscribeSuccess, daysUntilD
                       <h4 className="font-bold mb-2 text-white">Checkout Indisponível</h4>
                       <p className="text-xs text-neutral-500 mb-6 font-medium">A chave do Mercado Pago não está configurada neste ambiente ou é inválida.</p>
                       
-                      {brickDiagnostic && (
+                      {(!MP_KEY || brickDiagnostic) && (
                         <div className="bg-red-500/10 border border-red-500/20 text-red-500 text-[10px] p-4 rounded-lg mb-6 text-left w-full break-normal shadow-inner space-y-2">
                           <strong className="block text-red-400 border-b border-red-500/20 pb-1 mb-2">Diagnóstico do Erro:</strong>
-                          <p className="font-mono bg-red-950/50 p-2 rounded text-[9px] break-all mb-2">{brickDiagnostic}</p>
+                          {brickDiagnostic && <p className="font-mono bg-red-950/50 p-2 rounded text-[9px] break-all mb-2">{brickDiagnostic}</p>}
                           <p>Isso geralmente acontece por três motivos:</p>
                           <ol className="list-decimal pl-4 space-y-1">
-                            <li>Você colocou o <strong>Access Token</strong> no lugar da <strong>Public Key</strong> no <code className="bg-red-500/20 px-1 rounded">.env</code>. Verifique se a variável <code className="bg-red-500/20 px-1 rounded">VITE_MERCADOPAGO_PUBLIC_KEY</code> termina com a sua chave pública (começando com <code className="bg-red-500/20 px-1 rounded">APP_USR-</code>).</li>
-                            <li>Sua chave pública é de produção, mas o domínio do app (<code className="bg-red-500/20 px-1 rounded">{window.location.hostname}</code>) não está autorizado no painel do Mercado Pago.</li>
-                            <li>Sua conta Mercado Pago não possui as credenciais configuradas corretamente para Checkout Transparente.</li>
+                            <li><strong>Chave Ausente:</strong> Você precisa adicionar a variável <code className="bg-red-500/20 px-1 rounded">VITE_MERCADOPAGO_PUBLIC_KEY</code> e <code className="bg-red-500/20 px-1 rounded">MERCADOPAGO_ACCESS_TOKEN</code> nas configurações de variáveis de ambiente do AI Studio (no menu lateral esquerdo da engrenagem).</li>
+                            <li><strong>Chave Invertida:</strong> Você colocou o Access Token no lugar da Public Key. A <code className="bg-red-500/20 px-1 rounded">VITE_MERCADOPAGO_PUBLIC_KEY</code> sempre começa com <code className="bg-red-500/20 px-1 rounded">APP_USR-</code>.</li>
+                            <li><strong>Domínio não autorizado:</strong> Sua chave pública é de produção, mas o domínio do app (<code className="bg-red-500/20 px-1 rounded">{window.location.hostname}</code>) não está autorizado no painel de segurança do Mercado Pago.</li>
                           </ol>
                         </div>
                       )}
