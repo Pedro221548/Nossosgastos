@@ -21,17 +21,77 @@ export const Paywall: React.FC<PaywallProps> = ({ onSubscribeSuccess, daysUntilD
   const [brickDiagnostic, setBrickDiagnostic] = useState<string | null>(null);
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [pendingPaymentId, setPendingPaymentId] = useState<string | null>(localStorage.getItem('mp_pending_payment_id') || null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const paymentId = searchParams.get('payment_id') || searchParams.get('collection_id');
+    if (paymentId) {
+      setPendingPaymentId(paymentId);
+      setShowCheckout(true);
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (pendingPaymentId) {
+      localStorage.setItem('mp_pending_payment_id', pendingPaymentId);
+    } else {
+      localStorage.removeItem('mp_pending_payment_id');
+    }
+  }, [pendingPaymentId]);
+
+  useEffect(() => {
+    if (!pendingPaymentId) return;
+
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/check_payment?id=${pendingPaymentId}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.status === 'approved') {
+            await syncData('subscription', {
+              status: 'active',
+              plan: 'premium',
+              since: new Date().toISOString()
+            });
+            setPaymentSuccess(true);
+            setPendingPaymentId(null);
+            clearInterval(interval);
+          } else if (data.status === 'rejected' || data.status === 'cancelled') {
+            setPaymentError('O pagamento foi recusado ou cancelado.');
+            setPendingPaymentId(null);
+            clearInterval(interval);
+          }
+        }
+      } catch (err) {
+        console.error("Erro ao checar status", err);
+      }
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [pendingPaymentId]);
 
   const handlePaymentSubmit = async (paymentFormData: any) => {
     setPaymentError(null);
     return new Promise<void>((resolve, reject) => {
+      let bodyStr;
+      try {
+        bodyStr = JSON.stringify(paymentFormData);
+      } catch (e) {
+        console.error("Erro ao serializar paymentFormData", e);
+        setPaymentError("Formato de dados inválido.");
+        reject();
+        return;
+      }
+      
       fetch("/api/process_payment", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(paymentFormData),
+        body: bodyStr,
       })
         .then(async (response) => {
           let data;
@@ -46,7 +106,7 @@ export const Paywall: React.FC<PaywallProps> = ({ onSubscribeSuccess, daysUntilD
             return;
           }
 
-          if (response.ok && (data.status === 'approved' || typeof data.id !== 'undefined')) {
+          if (response.ok && data.status === 'approved') {
             await syncData('subscription', {
               status: 'active',
               plan: 'premium',
@@ -54,6 +114,15 @@ export const Paywall: React.FC<PaywallProps> = ({ onSubscribeSuccess, daysUntilD
             });
             resolve();
             setPaymentSuccess(true);
+          } else if (response.ok && data.status === 'pending') {
+             // For PIX and ticket, it will be pending. 
+             // Resolve to let the Brick show the QR Code or instructions.
+             setPendingPaymentId(data.id.toString());
+             resolve();
+             // We do NOT set paymentSuccess(true) here because the user still needs to pay.
+          } else if (response.ok && typeof data.id !== 'undefined') {
+             setPendingPaymentId(data.id.toString());
+             resolve();
           } else {
             console.error('Pagamento rejeitado ou erro na API:', data);
             setPaymentError(data.message || data.error || JSON.stringify(data));
@@ -253,12 +322,43 @@ export const Paywall: React.FC<PaywallProps> = ({ onSubscribeSuccess, daysUntilD
                           },
                         }}
                         onSubmit={async (param: any) => {
-                           const paymentData = param.formData || param;
-                           await handlePaymentSubmit(paymentData);
+                           try {
+                             let paymentData = param.formData ? param.formData : param;
+                             
+                             // Extrair APENAS os campos necessários para a API do Mercado Pago
+                             // Isso previne qualquer erro de 'circular structure' caso a lib mande objetos complexos.
+                             const cleanData = {
+                               transaction_amount: paymentData.transaction_amount,
+                               installments: paymentData.installments,
+                               token: paymentData.token,
+                               issuer_id: paymentData.issuer_id,
+                               payment_method_id: paymentData.payment_method_id,
+                               payer: paymentData.payer ? {
+                                 email: paymentData.payer.email,
+                                 identification: paymentData.payer.identification,
+                                 first_name: paymentData.payer.first_name,
+                                 last_name: paymentData.payer.last_name
+                               } : undefined
+                             };
+
+                             await handlePaymentSubmit(cleanData);
+                           } catch (err) {
+                             console.error("onSubmit error", err);
+                           }
                         }}
                         onError={(error) => {
                           console.error("Brick error:", error);
-                          setBrickDiagnostic(error instanceof Error ? error.message : JSON.stringify(error));
+                          let diagnostic = "Erro desconhecido";
+                          if (error instanceof Error) {
+                            diagnostic = error.message;
+                          } else {
+                            try {
+                               diagnostic = JSON.stringify(error);
+                            } catch(e) {
+                               diagnostic = String(error) + " (Não foi possível analisar o erro completo)";
+                            }
+                          }
+                          setBrickDiagnostic(diagnostic);
                           setBrickError(true);
                         }}
                         onReady={() => {

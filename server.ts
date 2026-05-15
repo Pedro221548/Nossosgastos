@@ -53,6 +53,23 @@ async function startServer() {
     }
   });
 
+  // Check payment securely on the server
+  app.get("/api/check_payment", async (req, res) => {
+    try {
+      const { id } = req.query;
+
+      if (!id || typeof id !== 'string') {
+        return res.status(400).json({ error: "Missing payment id" });
+      }
+
+      const response = await payment.get({ id });
+      res.json(response);
+    } catch (error: any) {
+      console.error("Payment check error:", error);
+      res.status(400).json({ error: "Erro ao verificar pagamento", details: error.message });
+    }
+  });
+
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({

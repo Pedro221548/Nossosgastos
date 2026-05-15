@@ -29,7 +29,9 @@ import {
   Home as HomeIcon,
   ListOrdered,
   Sparkles,
-  FileText
+  FileText,
+  Bell,
+  X
 } from 'lucide-react';
 
 type Theme = 'dark' | 'light';
@@ -51,8 +53,20 @@ const App: React.FC = () => {
   const [shoppingItems, setShoppingItems] = useState<ShoppingItem[]>([]);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [users, setUsers] = useState<{ A: User; B: User }>(USERS);
+  const usersRef = React.useRef(users);
   const [familyName, setFamilyName] = useState('Nossa Família');
   const [alertThreshold, setAlertThreshold] = useState(15);
+  const [toastData, setToastData] = useState<{title: string, message: string} | null>(null);
+
+  useEffect(() => {
+    usersRef.current = users;
+  }, [users]);
+
+  useEffect(() => {
+    if ("Notification" in window && Notification.permission === "default") {
+      Notification.requestPermission();
+    }
+  }, []);
 
   const [currentDate, setCurrentDate] = useState(new Date());
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -116,6 +130,29 @@ const App: React.FC = () => {
         };
       });
       setTransactions(mappedTransactions);
+    }, (type, data) => {
+       const spenderId = data.userId;
+       const spenderName = spenderId && usersRef.current[spenderId as 'A'|'B'] ? usersRef.current[spenderId as 'A'|'B'].name : 'Seu parceiro';
+       const title = type === 'added' ? 'Novo Cadastro' : 'Atualização';
+       const action = type === 'added' ? 'adicionou' : 'editou';
+       
+       let extraInfo = '';
+       if (data.isFixed) {
+          extraInfo = ' (Fixo)';
+       } else if (data.installments?.total > 1) {
+          extraInfo = ` (Parcelado em ${data.installments.total}x)`;
+       }
+       
+       const paidInfo = data.pago ? 'pago(a)' : 'lançado(a)';
+       const amount = Number(data.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+       const typeStr = data.tipo === 'despesa' ? 'despesa' : 'receita';
+       const msg = `${spenderName} ${action} uma ${typeStr}: ${data.descricao} de ${amount} que já consta como ${paidInfo}${extraInfo}.`;
+
+       setToastData({ title, message: msg });
+       if ("Notification" in window && Notification.permission === "granted" && document.hidden) {
+         new Notification(title, { body: msg, icon: '/icon-192x192.png' });
+       }
+       setTimeout(() => setToastData(null), 8000);
     });
 
     return () => {
@@ -346,6 +383,19 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-200 flex flex-col md:flex-row transition-colors duration-300">
       
+      {toastData && (
+        <div className="fixed top-10 left-1/2 -translate-x-1/2 z-[150] bg-neutral-900 border border-primary/20 shadow-2xl rounded-3xl p-4 flex items-center space-x-4 text-white max-w-[90vw] w-[400px] mx-auto animate-in fade-in slide-in-from-top-10 duration-500">
+          <div className="w-12 h-12 bg-primary/20 rounded-2xl flex items-center justify-center text-primary shrink-0 shadow-glow">
+            <Bell size={24} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-[10px] font-black tracking-widest text-primary uppercase mb-0.5">{toastData.title}</p>
+            <p className="text-xs font-semibold leading-relaxed text-neutral-200">{toastData.message}</p>
+          </div>
+          <button onClick={() => setToastData(null)} className="text-neutral-500 hover:text-white transition-colors p-2"><X size={16}/></button>
+        </div>
+      )}
+
       {!hasSubscription && hasActiveTrial && (
         <div className="fixed top-0 left-0 right-0 z-[200] bg-primary text-neutral-950 text-[10px] sm:text-xs font-black uppercase tracking-widest py-2 px-4 text-center shadow-lg">
           Período de Teste Grátis: Restam {trialDaysLeft} dias e {trialHoursLeft} horas. <button onClick={() => setForcePaywall(true)} className="underline ml-2">Assinar Agora</button>

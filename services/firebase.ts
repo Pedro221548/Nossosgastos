@@ -51,18 +51,33 @@ export const listenToData = (path: string, callback: (data: any) => void) => {
 };
 
 // Helpers para Firestore (Transações)
-export const listenToFirestoreTransactions = (callback: (data: any[]) => void) => {
+export const listenToFirestoreTransactions = (
+  callback: (data: any[]) => void,
+  onRemoteChange?: (type: 'added' | 'modified', data: any) => void
+) => {
   const user = auth.currentUser;
   if (!user) return;
 
   const q = query(collection(firestore, "transacoes"), where("tenantId", "==", user.uid));
 
+  let isFirstSnapshot = true;
+
   return onSnapshot(q, (snapshot) => {
+    if (!isFirstSnapshot && onRemoteChange) {
+      snapshot.docChanges().forEach(change => {
+        if (!change.doc.metadata.hasPendingWrites) {
+          if (change.type === 'added') onRemoteChange('added', change.doc.data());
+          if (change.type === 'modified') onRemoteChange('modified', change.doc.data());
+        }
+      });
+    }
+
     const transactions = snapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data()
     }));
     callback(transactions);
+    isFirstSnapshot = false;
   });
 };
 

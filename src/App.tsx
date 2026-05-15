@@ -24,7 +24,9 @@ import {
   Loader2,
   TrendingUp,
   Home as HomeIcon,
-  ListOrdered
+  ListOrdered,
+  Bell,
+  X
 } from 'lucide-react';
 
 type Theme = 'dark' | 'light';
@@ -40,8 +42,20 @@ const App: React.FC = () => {
   const [goals, setGoals] = useState<Goal[]>([]);
   const [shoppingItems, setShoppingItems] = useState<ShoppingItem[]>([]);
   const [users, setUsers] = useState<{ A: User; B: User }>(USERS);
+  const usersRef = React.useRef(users);
   const [familyName, setFamilyName] = useState('Nossa Família');
   const [alertThreshold, setAlertThreshold] = useState(15);
+  const [toastData, setToastData] = useState<{title: string, message: string} | null>(null);
+
+  useEffect(() => {
+    usersRef.current = users;
+  }, [users]);
+
+  useEffect(() => {
+    if ("Notification" in window && Notification.permission === "default") {
+      Notification.requestPermission();
+    }
+  }, []);
 
   const [currentDate, setCurrentDate] = useState(new Date());
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -95,6 +109,29 @@ const App: React.FC = () => {
         };
       });
       setTransactions(mappedTransactions);
+    }, (type, data) => {
+       const spenderId = data.userId;
+       const spenderName = spenderId && usersRef.current[spenderId as 'A'|'B'] ? usersRef.current[spenderId as 'A'|'B'].name : 'O seu parceiro';
+       const title = type === 'added' ? 'Novo Cadastro' : 'Atualização';
+       const action = type === 'added' ? 'adicionou' : 'editou';
+       
+       let extraInfo = '';
+       if (data.isFixed) {
+          extraInfo = ' (Fixo)';
+       } else if (data.installments?.total > 1) {
+          extraInfo = ` (Parcelado em ${data.installments.total}x)`;
+       }
+       
+       const paidInfo = data.pago ? 'pago(a)' : 'lançado(a)';
+       const amount = Number(data.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+       const typeStr = data.tipo === 'despesa' ? 'despesa' : 'receita';
+       const msg = `${spenderName} ${action} uma ${typeStr}: ${data.descricao} de ${amount} que já consta como ${paidInfo}${extraInfo}.`;
+
+       setToastData({ title, message: msg });
+       if ("Notification" in window && Notification.permission === "granted") {
+         new Notification(title, { body: msg, icon: '/icon-192x192.png' });
+       }
+       setTimeout(() => setToastData(null), 8000);
     });
 
     return () => {
@@ -249,6 +286,19 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-200 flex flex-col md:flex-row transition-colors duration-300">
       
+      {toastData && (
+        <div className="fixed top-10 left-1/2 -translate-x-1/2 z-[150] bg-neutral-900 border border-neutral-800 shadow-2xl rounded-3xl p-4 flex items-center space-x-4 text-white max-w-[90vw] w-[400px] mx-auto animate-in fade-in slide-in-from-top-10 duration-500">
+          <div className="w-12 h-12 bg-primary/20 rounded-2xl flex items-center justify-center text-primary shrink-0 shadow-glow">
+            <Bell size={24} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-[10px] font-black tracking-widest text-primary uppercase mb-0.5">{toastData.title}</p>
+            <p className="text-xs font-semibold leading-relaxed text-neutral-200">{toastData.message}</p>
+          </div>
+          <button onClick={() => setToastData(null)} className="text-neutral-500 hover:text-white transition-colors p-2"><X size={16}/></button>
+        </div>
+      )}
+
       <div className="fixed top-[calc(env(safe-area-inset-top)+10px)] right-4 md:right-6 z-[100] flex items-center space-x-2 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-neutral-200 dark:border-neutral-800 shadow-xl">
         {isSyncing ? <><Loader2 size={10} className="text-primary animate-spin" /><span className="text-[7px] font-black text-neutral-500 uppercase tracking-widest">Sinc</span></> : <><div className="w-1.5 h-1.5 bg-emerald-500 rounded-full" /><span className="text-[7px] font-black text-neutral-400 uppercase tracking-widest">On</span></>}
       </div>
