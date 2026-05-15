@@ -57,6 +57,17 @@ const App: React.FC = () => {
   const [familyName, setFamilyName] = useState('Nossa Família');
   const [alertThreshold, setAlertThreshold] = useState(15);
   const [toastData, setToastData] = useState<{title: string, message: string} | null>(null);
+  const [deviceOwner, setDeviceOwner] = useState<'A' | 'B' | null>(() => {
+    return localStorage.getItem('deviceOwner') as 'A' | 'B' | null;
+  });
+
+  useEffect(() => {
+    if (deviceOwner) {
+      localStorage.setItem('deviceOwner', deviceOwner);
+    } else {
+      localStorage.removeItem('deviceOwner');
+    }
+  }, [deviceOwner]);
 
   useEffect(() => {
     usersRef.current = users;
@@ -131,9 +142,14 @@ const App: React.FC = () => {
       });
       setTransactions(mappedTransactions);
     }, (type, data) => {
-       const spenderId = data.userId;
-       const spenderName = spenderId && usersRef.current[spenderId as 'A'|'B'] ? usersRef.current[spenderId as 'A'|'B'].name : 'Seu parceiro';
-       const title = type === 'added' ? 'Novo Cadastro' : 'Atualização';
+       // Evitar notificação se eu mesmo fiz a alteração noutro separador, 
+       // mas a variável hasPendingWrites deveria cobrir isso. 
+       // Adicionalmente filtramos o deviceOwner
+       if (deviceOwner && data.updatedByDevice === deviceOwner) return;
+
+       const updaterId = data.updatedByDevice || data.userId;
+       const updaterName = updaterId && usersRef.current[updaterId as 'A'|'B'] ? usersRef.current[updaterId as 'A'|'B'].name : 'Seu parceiro';
+       const title = type === 'added' ? 'Nova Transação' : 'Transação Editada';
        const action = type === 'added' ? 'adicionou' : 'editou';
        
        let extraInfo = '';
@@ -146,7 +162,7 @@ const App: React.FC = () => {
        const paidInfo = data.pago ? 'pago(a)' : 'lançado(a)';
        const amount = Number(data.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
        const typeStr = data.tipo === 'despesa' ? 'despesa' : 'receita';
-       const msg = `${spenderName} ${action} uma ${typeStr}: ${data.descricao} de ${amount} que já consta como ${paidInfo}${extraInfo}.`;
+       const msg = `${updaterName} ${action} uma ${typeStr}: ${data.descricao} de ${amount} que já consta como ${paidInfo}${extraInfo}.`;
 
        setToastData({ title, message: msg });
        if ("Notification" in window && Notification.permission === "granted" && document.hidden) {
@@ -222,9 +238,9 @@ const App: React.FC = () => {
       const updatedMonths = currentPaidMonths.includes(targetMonth)
         ? currentPaidMonths.filter(m => m !== targetMonth)
         : [...currentPaidMonths, targetMonth];
-      await updateFirestoreTransaction(id, { paidMonths: updatedMonths });
+      await updateFirestoreTransaction(id, { paidMonths: updatedMonths, updatedByDevice: deviceOwner });
     } else {
-      await updateFirestoreTransaction(id, { pago: !tx.isPaid });
+      await updateFirestoreTransaction(id, { pago: !tx.isPaid, updatedByDevice: deviceOwner });
     }
   };
 
@@ -245,7 +261,8 @@ const App: React.FC = () => {
         isFixed: tx.isFixed,
         paidMonths: tx.paidMonths || [],
         installments: currentInstallment ? { current: currentInstallment, total: tx.installments!.total } : null,
-        tenantId: user?.uid
+        tenantId: user?.uid,
+        updatedByDevice: deviceOwner
       });
 
       if (editingTransaction) {
@@ -383,6 +400,27 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-200 flex flex-col md:flex-row transition-colors duration-300">
       
+      {deviceOwner === null && (
+        <div className="fixed inset-0 z-[300] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-6 sm:p-8 max-w-sm w-full shadow-2xl animate-in fade-in zoom-in-95 duration-300">
+            <h2 className="text-xl font-display font-black text-white text-center mb-2 uppercase tracking-tighter">Quem é você?</h2>
+            <p className="text-sm text-neutral-400 text-center mb-8">
+              Para enviarmos notificações corretas para seu parceiro, precisamos saber quem está usando este aparelho.
+            </p>
+            <div className="grid grid-cols-2 gap-4">
+              <button onClick={() => setDeviceOwner('A')} className="flex flex-col items-center p-4 rounded-2xl bg-neutral-800 hover:bg-neutral-700 hover:ring-2 hover:ring-primary transition-all">
+                <img src={users.A.avatar} className="w-16 h-16 rounded-full mb-3 object-cover border-2 border-transparent hover:border-primary" />
+                <span className="text-sm font-bold text-white truncate max-w-full">{users.A.name}</span>
+              </button>
+              <button onClick={() => setDeviceOwner('B')} className="flex flex-col items-center p-4 rounded-2xl bg-neutral-800 hover:bg-neutral-700 hover:ring-2 hover:ring-primary transition-all">
+                <img src={users.B.avatar} className="w-16 h-16 rounded-full mb-3 object-cover border-2 border-transparent hover:border-primary" />
+                <span className="text-sm font-bold text-white truncate max-w-full">{users.B.name}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {toastData && (
         <div className="fixed top-10 left-1/2 -translate-x-1/2 z-[150] bg-neutral-900 border border-primary/20 shadow-2xl rounded-3xl p-4 flex items-center space-x-4 text-white max-w-[90vw] w-[400px] mx-auto animate-in fade-in slide-in-from-top-10 duration-500">
           <div className="w-12 h-12 bg-primary/20 rounded-2xl flex items-center justify-center text-primary shrink-0 shadow-glow">
@@ -427,7 +465,23 @@ const App: React.FC = () => {
           <SidebarItem icon={<ShoppingCart />} label="Compras" active={activeTab === 'shopping'} onClick={() => setActiveTab('shopping')} />
           <SidebarItem icon={<Settings />} label="Ajustes" active={activeTab === 'budget'} onClick={() => setActiveTab('budget')} />
         </nav>
-        <div className="mt-auto pt-10 border-t border-neutral-200 dark:border-neutral-800">
+        <div className="mt-auto pt-6 border-t border-neutral-200 dark:border-neutral-800 space-y-2">
+          <button 
+            onClick={() => setDeviceOwner(prev => prev === 'A' ? 'B' : 'A')} 
+            className="w-full flex items-center p-3 rounded-2xl bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors text-left"
+            title="Alternar identificação do aparelho"
+          >
+            <div className="w-8 h-8 rounded-full border border-primary overflow-hidden flex-shrink-0 mr-3">
+              <img src={deviceOwner === 'A' ? users.A.avatar : deviceOwner === 'B' ? users.B.avatar : '/icon-192x192.png'} className="w-full h-full object-cover" />
+            </div>
+            <div className="flex-1 min-w-0">
+               <p className="text-[9px] font-black tracking-widest text-neutral-400 uppercase">Aparelho de:</p>
+               <p className="text-xs font-bold text-neutral-900 dark:text-neutral-200 truncate">
+                 {deviceOwner === 'A' ? users.A.name : deviceOwner === 'B' ? users.B.name : 'Selecionar...'}
+               </p>
+            </div>
+          </button>
+          
           <button onClick={() => signOut(auth)} className="w-full flex items-center justify-between p-3 hover:bg-red-500/10 rounded-2xl transition-all text-neutral-500 hover:text-red-500 group">
             <span className="text-xs font-black uppercase tracking-widest ml-2">Sair da Conta</span>
             <LogOut size={18} className="group-hover:translate-x-1 transition-transform" />
