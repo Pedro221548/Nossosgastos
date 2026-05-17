@@ -46,6 +46,30 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         body: body || "",
       },
       data: data || {},
+      webpush: {
+        headers: {
+          Urgency: 'high'
+        },
+        notification: {
+          icon: "/icon-192x192.png",
+          vibrate: [200, 100, 200],
+          requireInteraction: true
+        }
+      },
+      android: {
+        priority: 'high',
+        notification: {
+          sound: 'default'
+        }
+      },
+      apns: {
+        payload: {
+          aps: {
+            contentAvailable: true,
+            sound: 'default'
+          }
+        }
+      }
     };
 
     const response = await admin.messaging().send(message);
