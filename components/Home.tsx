@@ -293,6 +293,12 @@ export const Home: React.FC<HomeProps> = ({
         <QuickActionCircle icon={<Target size={24} />} label="METAS" color="bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800" onClick={() => onNavigate('goals')} />
       </div>
 
+      {/* Ad Space */}
+      <div className="bg-neutral-100/50 dark:bg-neutral-900/50 border-2 border-dashed border-neutral-300 dark:border-neutral-800 rounded-3xl p-6 flex flex-col items-center justify-center text-center space-y-2 opacity-70 mb-8 mx-1 min-h-[120px]">
+        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400">Espaço para Anúncio</span>
+        <span className="text-xs text-neutral-500 dark:text-neutral-500 font-bold">Coloque o seu bloco aqui (ex: AdSense 320x100)</span>
+      </div>
+
       <div className="space-y-4 px-1 pb-4">
         <div className="flex items-center space-x-3 px-2">
            <Zap size={14} className="text-primary" />

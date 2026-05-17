@@ -103,14 +103,14 @@ export const Landing: React.FC<{ onStartClick: () => void }> = ({ onStartClick }
         </div>
 
         {/* Navbar */}
-        <div className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'py-4' : 'py-6'}`}>
-          <div className="px-4 md:px-12 lg:px-16 w-full mx-auto max-w-7xl">
-            <nav className={`liquid-glass rounded-2xl px-5 py-3 flex items-center justify-between transition-all duration-500 border border-white/10 ${scrolled ? 'bg-black/60 shadow-2xl' : 'bg-white/5'}`}>
+        <div className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 flex justify-center ${scrolled ? 'pt-4' : 'pt-8'}`}>
+          <div className="px-4 w-full flex justify-center">
+            <nav className={`rounded-full px-6 py-3 flex items-center justify-between transition-all duration-500 border backdrop-blur-xl w-full max-w-5xl ${scrolled ? 'bg-black/60 border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5)]' : 'bg-black/20 border-white/10 shadow-2xl'}`}>
               
               {/* Logo */}
-              <div className="flex items-center space-x-3 group cursor-pointer">
-                <div className="w-10 h-10 bg-neutral-900 border border-primary/30 rounded-xl flex items-center justify-center shadow-glow group-hover:scale-105 transition-transform">
-                  <Heart size={20} className="text-primary fill-primary/20" />
+              <div className="flex items-center space-x-3 group cursor-pointer" onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}>
+                <div className="w-10 h-10 bg-neutral-900 border border-primary/30 rounded-full flex items-center justify-center shadow-glow group-hover:scale-105 transition-transform duration-300">
+                  <Heart size={18} className="text-primary fill-primary/20" />
                 </div>
                 <div>
                   <h1 className="text-xl font-display font-black tracking-tighter italic leading-none">
@@ -120,18 +120,18 @@ export const Landing: React.FC<{ onStartClick: () => void }> = ({ onStartClick }
               </div>
 
               {/* Center Links (hidden on mobile) */}
-              <div className="hidden md:flex items-center gap-8 text-xs font-bold tracking-widest uppercase">
-                <a href="#funcionalidades" className="text-neutral-400 hover:text-white transition-colors">Recursos</a>
-                <a href="#como-funciona" className="text-neutral-400 hover:text-white transition-colors">Como Funciona</a>
-                <a href="#depoimentos" className="text-neutral-400 hover:text-white transition-colors">Depoimentos</a>
+              <div className="hidden md:flex items-center gap-10 text-[11px] font-bold tracking-[0.2em] uppercase">
+                <a href="#funcionalidades" className="text-neutral-300 hover:text-white transition-colors">Recursos</a>
+                <a href="#como-funciona" className="text-neutral-300 hover:text-white transition-colors">Como Funciona</a>
+                <a href="#depoimentos" className="text-neutral-300 hover:text-white transition-colors">Depoimentos</a>
               </div>
 
               {/* Right Button */}
               <div>
-                <button onClick={onStartClick} className="bg-primary text-neutral-950 px-5 sm:px-6 py-2.5 rounded-xl text-[10px] sm:text-xs font-black uppercase tracking-widest hover:bg-yellow-300 transition-all shadow-glow hover:scale-105 flex items-center space-x-2">
+                <button onClick={onStartClick} className="bg-primary text-neutral-950 px-6 py-3 rounded-full text-xs font-black uppercase tracking-[0.15em] hover:bg-yellow-300 hover:scale-105 active:scale-95 transition-all shadow-glow flex items-center space-x-2">
                   <span className="hidden sm:inline">Acessar App</span>
                   <span className="sm:hidden">Entrar</span>
-                  <LogIn size={16} className="hidden sm:block" />
+                  <LogIn size={16} strokeWidth={2.5} className="hidden sm:block ml-1" />
                 </button>
               </div>
             </nav>
