@@ -450,15 +450,15 @@ const App: React.FC = () => {
         {isSyncing ? <><Loader2 size={12} className="text-primary animate-spin" /><span className="text-[10px] font-black text-neutral-500 uppercase tracking-widest">Sincronizando</span></> : <><div className="w-2 h-2 bg-emerald-500 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.5)]" /><span className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">Online</span></>}
       </div>
 
-      <aside className="hidden lg:flex flex-col w-80 bg-white dark:bg-neutral-900/50 border-r border-neutral-200 dark:border-neutral-800 sticky top-0 h-screen p-10 z-50">
+      <aside className="hidden lg:flex flex-col w-80 bg-white/50 dark:bg-neutral-900/40 border-r border-neutral-200 dark:border-neutral-800/80 sticky top-0 h-screen p-10 z-[100] backdrop-blur-md">
         <div className="flex items-center justify-between mb-16">
           <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 bg-neutral-950 rounded-2xl flex items-center justify-center text-primary shadow-glow border border-primary/30 transform -rotate-3 hover:rotate-0 transition-transform duration-300">
-              <Heart size={24} strokeWidth={3} fill="currentColor" />
+            <div className="w-12 h-12 bg-white/5 dark:bg-neutral-900 rounded-full border border-neutral-200 dark:border-neutral-800 flex items-center justify-center shadow-md group">
+              <Heart size={20} strokeWidth={2} className="text-primary transform group-hover:scale-110 transition-transform" />
             </div>
             <div>
-              <h1 className="text-xl font-display font-black text-neutral-900 dark:text-white tracking-tighter leading-none uppercase italic">NOSSA <span className="text-primary">CARTEIRA</span></h1>
-              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] truncate mt-1.5">{familyName}</p>
+              <h1 className="text-lg font-sans font-medium text-neutral-900 dark:text-white tracking-widest leading-none uppercase">Nossa <span className="text-primary font-semibold">Carteira</span></h1>
+              <p className="text-[9px] font-semibold text-neutral-400 uppercase tracking-[0.3em] truncate mt-1.5">{familyName}</p>
             </div>
           </div>
         </div>
@@ -471,26 +471,26 @@ const App: React.FC = () => {
           <SidebarItem icon={<ShoppingCart />} label="Compras" active={activeTab === 'shopping'} onClick={() => setActiveTab('shopping')} />
           <SidebarItem icon={<Settings />} label="Ajustes" active={activeTab === 'budget'} onClick={() => setActiveTab('budget')} />
         </nav>
-        <div className="mt-auto pt-6 border-t border-neutral-200 dark:border-neutral-800 space-y-2">
+        <div className="mt-auto pt-6 border-t border-neutral-200 dark:border-neutral-800/50 space-y-2">
           <button 
             onClick={() => setDeviceOwner(prev => prev === 'A' ? 'B' : 'A')} 
-            className="w-full flex items-center p-3 rounded-2xl bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors text-left"
+            className="w-full flex items-center p-3 rounded-xl bg-neutral-50 dark:bg-neutral-800/30 hover:bg-white dark:hover:bg-neutral-800/80 hover:shadow-sm border border-transparent hover:border-neutral-200 dark:hover:border-neutral-700/50 transition-all text-left"
             title="Alternar identificação do aparelho"
           >
-            <div className="w-8 h-8 rounded-full border border-primary overflow-hidden flex-shrink-0 mr-3">
+            <div className="w-8 h-8 rounded-full border border-neutral-200 dark:border-neutral-700 overflow-hidden flex-shrink-0 mr-3">
               <img src={deviceOwner === 'A' ? users.A.avatar : deviceOwner === 'B' ? users.B.avatar : '/icon-192x192.png'} className="w-full h-full object-cover" />
             </div>
             <div className="flex-1 min-w-0">
-               <p className="text-[9px] font-black tracking-widest text-neutral-400 uppercase">Aparelho de:</p>
-               <p className="text-xs font-bold text-neutral-900 dark:text-neutral-200 truncate">
+               <p className="text-[8px] font-semibold tracking-widest text-neutral-400 uppercase">Aparelho de:</p>
+               <p className="text-[11px] font-medium text-neutral-900 dark:text-neutral-200 truncate">
                  {deviceOwner === 'A' ? users.A.name : deviceOwner === 'B' ? users.B.name : 'Selecionar...'}
                </p>
             </div>
           </button>
           
-          <button onClick={() => signOut(auth)} className="w-full flex items-center justify-between p-3 hover:bg-red-500/10 rounded-2xl transition-all text-neutral-500 hover:text-red-500 group">
-            <span className="text-xs font-black uppercase tracking-widest ml-2">Sair da Conta</span>
-            <LogOut size={18} className="group-hover:translate-x-1 transition-transform" />
+          <button onClick={() => signOut(auth)} className="w-full flex items-center justify-between p-3 hover:bg-red-500/10 rounded-xl transition-all text-neutral-500 hover:text-red-500 group">
+            <span className="text-[10px] font-semibold uppercase tracking-widest ml-2">Sair da Conta</span>
+            <LogOut size={16} className="group-hover:translate-x-1 transition-transform" />
           </button>
         </div>
       </aside>
@@ -525,9 +525,9 @@ const App: React.FC = () => {
 };
 
 const SidebarItem = ({ icon, label, active, onClick }: { icon: any, label: string, active: boolean, onClick: () => void }) => (
-  <button onClick={onClick} className={`w-full flex items-center space-x-5 px-5 py-4 rounded-2xl transition-all duration-300 group ${active ? 'bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-white shadow-md ring-1 ring-neutral-200 dark:ring-neutral-700' : 'text-neutral-500 hover:bg-neutral-50 hover:text-neutral-900 dark:hover:text-white'}`}>
-    <div className={active ? 'text-primary scale-110' : 'text-neutral-400 group-hover:text-neutral-600 dark:group-hover:text-neutral-400 group-hover:scale-110 transition-transform'}>{React.cloneElement(icon, { size: 20, strokeWidth: active ? 2.5 : 2 })}</div>
-    <span className="text-xs font-bold uppercase tracking-[0.15em]">{label}</span>
+  <button onClick={onClick} className={`w-full flex items-center space-x-5 px-5 py-3.5 rounded-xl transition-all duration-300 group ${active ? 'bg-white dark:bg-neutral-800/80 text-neutral-900 dark:text-white shadow-sm ring-1 ring-neutral-200 dark:ring-neutral-700/50' : 'text-neutral-500 hover:bg-white/50 hover:dark:bg-neutral-800/40 hover:text-neutral-900 dark:hover:text-white'}`}>
+    <div className={active ? 'text-primary' : 'text-neutral-400 group-hover:text-neutral-600 dark:group-hover:text-neutral-300 transition-colors'}>{React.cloneElement(icon, { size: 18, strokeWidth: 2 })}</div>
+    <span className="text-[11px] font-semibold uppercase tracking-widest">{label}</span>
   </button>
 );
 
@@ -536,7 +536,7 @@ const MobileNavItem = ({ icon, label, active, onClick }: { icon: any, label: str
     <div className={`transition-transform duration-300 ${active ? '-translate-y-1' : ''}`}>
       {React.cloneElement(icon, { size: 22, strokeWidth: active ? 2.5 : 2 })}
     </div>
-    <span className={`text-[9px] font-black uppercase tracking-widest mt-1 transition-all duration-300 ${active ? 'opacity-100' : 'opacity-0 h-0 hidden'}`}>
+    <span className={`text-[9px] font-semibold uppercase tracking-widest mt-1 transition-all duration-300 ${active ? 'opacity-100' : 'opacity-0 h-0 hidden'}`}>
       {label}
     </span>
   </button>

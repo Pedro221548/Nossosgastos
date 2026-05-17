@@ -28,10 +28,9 @@ interface HomeProps {
 
 const PremiumLogo = ({ className = "" }: { className?: string }) => (
   <div className={`relative flex items-center justify-center ${className}`}>
-    <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full animate-pulse"></div>
-    <div className="relative w-16 h-16 xs:w-20 xs:h-20 bg-neutral-900 border-2 border-primary/30 rounded-[1.5rem] xs:rounded-[2rem] flex items-center justify-center shadow-glow overflow-hidden group">
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent group-hover:opacity-100 transition-opacity"></div>
-      <Heart size={32} className="text-primary logo-glow transform group-hover:scale-110 transition-transform" fill="currentColor" strokeWidth={0} />
+    <div className="absolute inset-0 bg-primary/10 blur-2xl rounded-full"></div>
+    <div className="relative w-14 h-14 bg-white/5 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-full flex items-center justify-center shadow-lg group backdrop-blur-md">
+      <Heart size={24} className="text-primary transform group-hover:scale-105 transition-transform" strokeWidth={1.5} />
     </div>
   </div>
 );
@@ -136,50 +135,49 @@ export const Home: React.FC<HomeProps> = ({
   const formattedTime = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 
   return (
-    <div className="space-y-6 xs:space-y-8 animate-slide-up pb-24 px-1 sm:px-0">
-      <div className="flex flex-col items-center justify-center text-center space-y-4 xs:space-y-6 px-1 pt-4">
+    <div className="space-y-8 xs:space-y-10 animate-slide-up pb-24 px-1 sm:px-0">
+      <div className="flex flex-col items-center justify-center text-center space-y-5 px-1 pt-6">
         <PremiumLogo />
         <div className="space-y-2">
-          <p className="text-[10px] xs:text-xs font-black text-neutral-500 uppercase tracking-[0.4em] italic">
-            SINCRONIZAÇÃO EM TEMPO REAL
+          <p className="text-[9px] font-semibold text-neutral-400 uppercase tracking-[0.4em]">
+            Visão Compartilhada
           </p>
-          <h2 className="text-3xl xs:text-4xl md:text-6xl font-display font-black text-neutral-900 dark:text-white uppercase tracking-tighter italic leading-none truncate max-w-[320px] md:max-w-none">
-            {familyName.split(' ')[0]} <span className="text-primary">SINC</span>
+          <h2 className="text-3xl md:text-4xl font-sans font-light text-neutral-900 dark:text-white uppercase tracking-widest leading-none truncate max-w-[320px] md:max-w-none">
+            {familyName.split(' ')[0]} <span className="font-semibold text-primary">SINC</span>
           </h2>
-          <div className="flex items-center justify-center space-x-3 mt-4">
-            <p className="text-[10px] font-black text-neutral-500 uppercase tracking-[0.2em]">{formattedDate}</p>
+          <div className="flex items-center justify-center space-x-4 mt-6">
+            <p className="text-[10px] font-medium text-neutral-500 uppercase tracking-[0.2em]">{formattedDate}</p>
             <span className="text-neutral-300 dark:text-neutral-800 opacity-30">|</span>
             <div className="flex items-center space-x-2">
-              <Clock size={12} className="text-primary animate-pulse" />
-              <p className="text-[10px] font-black text-neutral-600 dark:text-neutral-400 uppercase tracking-widest tabular-nums">{formattedTime}</p>
+              <Clock size={12} className="text-primary" />
+              <p className="text-[10px] font-medium text-neutral-600 dark:text-neutral-400 uppercase tracking-widest tabular-nums">{formattedTime}</p>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="relative group overflow-hidden bg-neutral-950 rounded-[2.5rem] xs:rounded-[3rem] p-8 xs:p-10 md:p-16 shadow-2xl transition-all border border-neutral-800 mx-1">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-primary/5 blur-[120px] rounded-full -mr-40 -mt-40"></div>
-        <div className="relative z-10 space-y-6 xs:space-y-8 text-center md:text-left">
-          <div className="flex items-center justify-center md:justify-start space-x-3">
-             <ShieldCheck size={14} className="text-primary" />
-             <span className="text-[10px] font-black text-neutral-500 uppercase tracking-[0.3em]">Fluxo de Caixa Real</span>
-          </div>
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 xs:gap-8">
-            <div className="space-y-2">
-              <p className="text-neutral-400 text-xs xs:text-sm font-black uppercase tracking-[0.2em]">Saldo Livre (Estimado)</p>
-              <div className="flex items-baseline justify-center md:justify-start space-x-2 xs:space-x-3">
-                <span className="text-xl xs:text-2xl font-black text-primary italic shrink-0">R$</span>
-                <h3 className="text-4xl xs:text-5xl sm:text-6xl md:text-8xl font-display font-black text-white tracking-tighter italic tabular-nums leading-none truncate">
+      <div className="relative group overflow-hidden bg-white dark:bg-neutral-900/40 rounded-[2rem] pt-10 pb-12 px-8 xs:px-10 md:px-16 shadow-lg border border-neutral-100 dark:border-neutral-800/80 backdrop-blur-md mx-1">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 blur-[120px] rounded-full -mr-40 -mt-40 pointer-events-none"></div>
+        <div className="relative z-10 space-y-8 md:space-y-12 text-center md:text-left">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+            <div className="space-y-4">
+              <div className="flex items-center justify-center md:justify-start space-x-3">
+                 <ShieldCheck size={14} className="text-primary" />
+                 <span className="text-[10px] font-semibold text-neutral-500 uppercase tracking-[0.3em]">Fluxo de Caixa Real</span>
+              </div>
+              <div className="flex items-baseline justify-center md:justify-start space-x-3">
+                <span className="text-xl xs:text-2xl font-light text-primary shrink-0 opacity-80">R$</span>
+                <h3 className="text-4xl xs:text-5xl sm:text-6xl md:text-[5.5rem] font-sans font-light text-neutral-900 dark:text-white tracking-tight tabular-nums leading-none truncate">
                   {balance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </h3>
               </div>
             </div>
             <button 
               onClick={() => onNavigate('dashboard')}
-              className="flex items-center justify-center space-x-3 bg-white/5 border border-white/10 px-8 py-5 rounded-2xl transition-all active:scale-95 group/btn hover:bg-white/10"
+              className="flex items-center justify-center space-x-3 border border-neutral-200 dark:border-neutral-800 px-8 py-4 rounded-full transition-all active:scale-95 group/btn hover:bg-neutral-50 dark:hover:bg-neutral-800/50"
             >
-              <TrendingUp size={18} className="text-primary group-hover/btn:translate-x-1 transition-transform" />
-              <span className="text-xs font-black text-white uppercase tracking-widest italic">EXTRATO</span>
+              <TrendingUp size={16} className="text-primary group-hover/btn:translate-x-1 transition-transform" />
+              <span className="text-[11px] font-semibold text-neutral-700 dark:text-neutral-300 uppercase tracking-widest">Acessar Extrato</span>
             </button>
           </div>
         </div>
@@ -187,18 +185,18 @@ export const Home: React.FC<HomeProps> = ({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 px-1 sm:px-2">
         {/* Pedro's Balance */}
-        <div className="bg-white dark:bg-neutral-900 border-2 border-primary/20 rounded-[2rem] p-6 space-y-4 shadow-xl">
+        <div className="bg-white/60 dark:bg-neutral-900/40 border border-neutral-200 dark:border-neutral-800 rounded-[2rem] p-8 space-y-6 shadow-sm backdrop-blur-sm">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-xl overflow-hidden border-2 border-primary/30">
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 rounded-full overflow-hidden border border-neutral-200 dark:border-neutral-700">
                 <img src={users.A.avatar} alt={users.A.name} className="w-full h-full object-cover" />
               </div>
-              <span className="text-[10px] font-black text-neutral-500 uppercase tracking-widest">{users.A.name}</span>
+              <span className="text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-widest">{users.A.name}</span>
             </div>
-            <ShieldCheck size={14} className="text-primary opacity-40" />
+            <ShieldCheck size={16} className="text-primary opacity-60" />
           </div>
-          <div className="space-y-1">
-            <p className="text-[9px] font-black text-neutral-400 uppercase tracking-widest leading-none">Saldo em Conta</p>
+          <div className="space-y-2">
+            <p className="text-[10px] font-medium text-neutral-400 uppercase tracking-[0.2em]">Saldo em Conta</p>
             {editingBalance?.userId === users.A.id ? (
               <input 
                 autoFocus
@@ -206,32 +204,32 @@ export const Home: React.FC<HomeProps> = ({
                 defaultValue={users.A.currentBalance}
                 onBlur={(e) => handleBalanceUpdate(users.A.id, e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleBalanceUpdate(users.A.id, (e.target as HTMLInputElement).value)}
-                className="w-full bg-neutral-100 dark:bg-neutral-950 border border-primary rounded-xl px-4 py-2 text-xl font-display font-black text-neutral-900 dark:text-white outline-none"
+                className="w-full bg-white dark:bg-neutral-950 border border-primary/50 shadow-inner rounded-xl px-4 py-3 text-2xl font-light text-neutral-900 dark:text-white outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
               />
             ) : (
               <h4 
                 onClick={() => setEditingBalance({ userId: users.A.id, value: (users.A.currentBalance || 0).toString() })}
-                className="text-2xl font-display font-black text-neutral-900 dark:text-white leading-tight italic cursor-pointer hover:text-primary transition-colors tabular-nums"
+                className="text-3xl font-light text-neutral-900 dark:text-white leading-none cursor-pointer hover:text-primary transition-colors tabular-nums"
               >
-                R$ {(users.A.currentBalance || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                <span className="text-lg opacity-40 mr-1 font-normal">R$</span>{(users.A.currentBalance || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
               </h4>
             )}
           </div>
         </div>
 
         {/* Emilly's Balance */}
-        <div className="bg-white dark:bg-neutral-900 border-2 border-blue-500/20 rounded-[2rem] p-6 space-y-4 shadow-xl">
+        <div className="bg-white/60 dark:bg-neutral-900/40 border border-neutral-200 dark:border-neutral-800 rounded-[2rem] p-8 space-y-6 shadow-sm backdrop-blur-sm">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-xl overflow-hidden border-2 border-blue-500/30">
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 rounded-full overflow-hidden border border-neutral-200 dark:border-neutral-700">
                 <img src={users.B.avatar} alt={users.B.name} className="w-full h-full object-cover" />
               </div>
-              <span className="text-[10px] font-black text-neutral-500 uppercase tracking-widest">{users.B.name}</span>
+              <span className="text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-widest">{users.B.name}</span>
             </div>
-            <ShieldCheck size={14} className="text-blue-500 opacity-40" />
+            <ShieldCheck size={16} className="text-blue-500 opacity-60" />
           </div>
-          <div className="space-y-1">
-            <p className="text-[9px] font-black text-neutral-400 uppercase tracking-widest leading-none">Saldo em Conta</p>
+          <div className="space-y-2">
+            <p className="text-[10px] font-medium text-neutral-400 uppercase tracking-[0.2em]">Saldo em Conta</p>
             {editingBalance?.userId === users.B.id ? (
               <input 
                 autoFocus
@@ -239,14 +237,14 @@ export const Home: React.FC<HomeProps> = ({
                 defaultValue={users.B.currentBalance}
                 onBlur={(e) => handleBalanceUpdate(users.B.id, e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleBalanceUpdate(users.B.id, (e.target as HTMLInputElement).value)}
-                className="w-full bg-neutral-100 dark:bg-neutral-950 border border-blue-500 rounded-xl px-4 py-2 text-xl font-display font-black text-neutral-900 dark:text-white outline-none"
+                className="w-full bg-white dark:bg-neutral-950 border border-blue-500/50 shadow-inner rounded-xl px-4 py-3 text-2xl font-light text-neutral-900 dark:text-white outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
               />
             ) : (
               <h4 
                 onClick={() => setEditingBalance({ userId: users.B.id, value: (users.B.currentBalance || 0).toString() })}
-                className="text-2xl font-display font-black text-neutral-900 dark:text-white leading-tight italic cursor-pointer hover:text-blue-500 transition-colors tabular-nums"
+                className="text-3xl font-light text-neutral-900 dark:text-white leading-none cursor-pointer hover:text-blue-500 transition-colors tabular-nums"
               >
-                R$ {(users.B.currentBalance || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                <span className="text-lg opacity-40 mr-1 font-normal">R$</span>{(users.B.currentBalance || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
               </h4>
             )}
           </div>
@@ -345,26 +343,28 @@ export const Home: React.FC<HomeProps> = ({
 };
 
 const Widget = ({ title, value, icon, subtitle, color, onClick }: any) => (
-  <button onClick={onClick} className={`flex flex-col p-5 rounded-[2rem] border transition-all active:scale-95 text-left space-y-3 group ${color}`}>
+  <button onClick={onClick} className={`flex flex-col p-6 rounded-[2rem] border transition-all active:scale-95 text-left space-y-4 group bg-white/40 dark:bg-neutral-900/40 border-neutral-200 dark:border-neutral-800 backdrop-blur-sm hover:shadow-md`}>
     <div className="flex items-center justify-between">
-      <div className="p-2 rounded-xl bg-white/10 text-primary group-hover:bg-primary group-hover:text-neutral-950 transition-colors">
+      <div className={`p-2 rounded-xl text-neutral-600 dark:text-neutral-400 group-hover:bg-neutral-100 dark:group-hover:bg-neutral-800 transition-colors`}>
         {icon}
       </div>
-      <ChevronRight size={14} className="text-neutral-500 group-hover:translate-x-1 transition-transform" />
+      <ChevronRight size={14} className="text-neutral-400 group-hover:translate-x-1 transition-transform" />
     </div>
     <div>
-      <p className="text-[9px] font-black text-neutral-500 uppercase tracking-widest leading-none mb-1">{title}</p>
-      <h4 className="text-xl xs:text-2xl font-display font-black text-neutral-900 dark:text-white leading-tight italic">{value}</h4>
-      <p className="text-[8px] font-bold text-neutral-400 uppercase tracking-widest mt-1.5 truncate">{subtitle}</p>
+      <p className="text-[10px] font-semibold text-neutral-400 uppercase tracking-widest leading-none mb-1.5">{title}</p>
+      <h4 className="text-xl xs:text-2xl font-sans font-light text-neutral-900 dark:text-white leading-tight mb-1">{value}</h4>
+      <p className="text-[9px] font-medium text-neutral-500 uppercase tracking-wider truncate">{subtitle}</p>
     </div>
   </button>
 );
 
 const QuickActionCircle = ({ icon, label, color, onClick }: any) => (
   <button onClick={onClick} className="flex flex-col items-center space-y-3 xs:space-y-4 group w-full">
-    <div className={`w-full aspect-square rounded-[1.8rem] xs:rounded-[2.5rem] flex items-center justify-center shadow-lg active:scale-90 transition-all border border-transparent group-hover:border-primary/50 ${color}`}>
-      {React.cloneElement(icon, { className: "w-7 h-7 xs:w-9 xs:h-9" })}
+    <div className={`w-full aspect-square rounded-[2rem] flex items-center justify-center shadow-sm active:scale-90 transition-all border border-neutral-200 dark:border-neutral-800 group-hover:border-neutral-300 dark:group-hover:border-neutral-700 bg-white/50 dark:bg-neutral-900/50 backdrop-blur-sm`}>
+      <div className="text-neutral-700 dark:text-neutral-300 group-hover:text-primary transition-colors">
+        {React.cloneElement(icon, { className: "w-6 h-6 xs:w-8 xs:h-8", strokeWidth: 1.5 })}
+      </div>
     </div>
-    <span className="text-[11px] xs:text-xs font-black text-neutral-500 uppercase tracking-widest group-hover:text-primary transition-colors text-center truncate w-full italic">{label}</span>
+    <span className="text-[10px] xs:text-[11px] font-semibold text-neutral-500 uppercase tracking-widest group-hover:text-primary transition-colors text-center w-full">{label}</span>
   </button>
 );
