@@ -211,6 +211,64 @@ export const Landing: React.FC<{ onStartClick: () => void }> = ({ onStartClick }
         </div>
       </section>
 
+      {/* How it Works Section */}
+      <section id="como-funciona" className="py-24 bg-neutral-900/50 px-6 md:px-12 lg:px-16 border-t border-neutral-900 relative">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-20">
+             <h2 className="text-primary font-black uppercase tracking-widest text-xs mb-4">Simples e Rápido</h2>
+             <h3 className="text-4xl md:text-5xl font-medium tracking-tight mb-6">Como Funciona?</h3>
+             <p className="text-neutral-400 max-w-2xl mx-auto text-lg leading-relaxed">Em menos de 3 minutos vocês já estarão sincronizados e prontos para usar o aplicativo.</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-12 relative">
+             <div className="hidden md:block absolute top-12 left-[15%] right-[15%] h-[2px] bg-neutral-800" />
+             <StepCard 
+               step="1"
+               title="Crie sua conta" 
+               description="Comece seu teste de 30 dias grátis. Você só precisa de um e-mail."
+             />
+             <StepCard 
+               step="2"
+               title="Defina o perfil" 
+               description="Nós configuramos automaticamente os avatares e o espaço do casal usando seus nomes."
+             />
+             <StepCard 
+               step="3"
+               title="Tudo pronto!" 
+               description="Acesse o mesmo link no outro celular, escolha de quem é o aparelho e pronto: vocês já estão sincronizados."
+             />
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section id="depoimentos" className="py-24 bg-neutral-950 px-6 md:px-12 lg:px-16 border-t border-neutral-900 relative">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-20">
+             <h2 className="text-primary font-black uppercase tracking-widest text-xs mb-4">Histórias Reais</h2>
+             <h3 className="text-4xl md:text-5xl font-medium tracking-tight mb-6">Casais que mudaram<br/>sua relação com dinheiro.</h3>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+             <TestimonialCard 
+               quote="Antes era uma briga no fim do mês para ver quem pagou o quê pelo WhatsApp. Agora, cada um lança sua parte e o app faz a mágica. Simples assim."
+               author="Mariana e Lucas"
+               time="Usam há 4 meses"
+             />
+             <TestimonialCard 
+               quote="O que eu mais gosto são as metas compartilhadas. Ver a barra da nossa reserva de emergência crescendo juntos mudou a nossa mentalidade financeira."
+               author="Pedro e Juliana"
+               time="Usam há 8 meses"
+             />
+             <TestimonialCard 
+               quote="A gente tentou planilhas, banco compartilhado e outros apps. A Nossa Carteira foi a única solução que não pareceu um 'trabalho' preencher."
+               author="Carlos e Amanda"
+               time="Usam há 1 ano"
+             />
+          </div>
+        </div>
+      </section>
+
       {/* Pricing Section */}
       <section className="relative z-10 bg-neutral-950 pt-24 pb-32 border-t border-neutral-900 px-6">
         <div className="max-w-7xl mx-auto flex flex-col items-center">
@@ -293,5 +351,34 @@ const FeatureCard = ({ icon, title, description }: { icon: React.ReactNode, titl
     </div>
     <h4 className="text-xl font-bold mb-3 text-white">{title}</h4>
     <p className="text-neutral-400 leading-relaxed text-sm">{description}</p>
+  </div>
+);
+
+const StepCard = ({ step, title, description }: { step: string, title: string, description: string }) => (
+  <div className="flex flex-col items-center relative z-10 text-center">
+    <div className="w-24 h-24 bg-neutral-950 border-4 border-neutral-800 rounded-full flex items-center justify-center mb-8 shadow-2xl relative">
+       <span className="text-4xl font-display font-black italic text-white">{step}</span>
+       <div className="absolute inset-0 border-2 border-primary rounded-full blur-[4px] opacity-20"></div>
+    </div>
+    <h4 className="text-2xl font-bold mb-4 text-white">{title}</h4>
+    <p className="text-neutral-400 leading-relaxed text-[15px] max-w-xs">{description}</p>
+  </div>
+);
+
+const TestimonialCard = ({ quote, author, time }: { quote: string, author: string, time: string }) => (
+  <div className="bg-neutral-900/40 border border-neutral-800 p-8 rounded-3xl relative">
+    <div className="text-primary text-6xl font-serif absolute top-6 left-6 opacity-20">"</div>
+    <p className="text-lg text-neutral-300 leading-relaxed mb-8 relative z-10 pt-4 font-light">
+      "{quote}"
+    </p>
+    <div className="flex items-center space-x-4 border-t border-neutral-800 pt-6">
+       <div className="w-10 h-10 bg-neutral-800 rounded-full flex items-center justify-center text-neutral-500 font-bold uppercase">
+         {author.charAt(0)}
+       </div>
+       <div>
+         <p className="text-white font-bold text-sm tracking-wide">{author}</p>
+         <p className="text-neutral-500 text-xs mt-1">{time}</p>
+       </div>
+    </div>
   </div>
 );
