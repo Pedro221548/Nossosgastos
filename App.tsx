@@ -13,7 +13,7 @@ import { InvoiceManager } from './components/InvoiceManager';
 import { AddTransactionModal } from './components/AddTransactionModal';
 import { ConfirmationModal } from './components/ui/ConfirmationModal';
 import { Login } from './components/Login';
-import { auth, syncData, listenToData, listenToFirestoreTransactions, updateFirestoreTransaction, deleteFirestoreTransaction, firestore, requestNotificationPermission } from './services/firebase';
+import { auth, syncData, listenToData, listenToFirestoreTransactions, updateFirestoreTransaction, deleteFirestoreTransaction, firestore, requestNotificationPermission, sendNotificationToPartner } from './services/firebase';
 import { onAuthStateChanged, signOut, User as FirebaseUser } from 'firebase/auth';
 import { collection, addDoc } from 'firebase/firestore';
 import { 
@@ -73,8 +73,10 @@ const App: React.FC = () => {
   }, [users]);
 
   useEffect(() => {
-    requestNotificationPermission();
-  }, []);
+    if (user && deviceOwner) {
+      requestNotificationPermission(deviceOwner);
+    }
+  }, [user, deviceOwner]);
 
   const [currentDate, setCurrentDate] = useState(new Date());
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -277,6 +279,16 @@ const App: React.FC = () => {
         } else {
           const isoDate = `${y}-${m}-${d}`;
           await addDoc(collection(firestore, "transacoes"), createPayload(isoDate));
+        }
+
+        if (deviceOwner) {
+           const partner = deviceOwner === 'A' ? 'B' : 'A';
+           const fromName = deviceOwner === 'A' ? users.A.name : users.B.name;
+           await sendNotificationToPartner(
+             partner, 
+             "Nova Transação", 
+             `O ${fromName} adicionou uma nova transação: ${tx.title}.`
+           );
         }
       }
       setIsAddModalOpen(false);

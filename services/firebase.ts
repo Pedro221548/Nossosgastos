@@ -1,7 +1,7 @@
 
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getDatabase, ref, set, onValue } from "firebase/database";
+import { getDatabase, ref, set, get, onValue } from "firebase/database";
 import { getFirestore, collection, onSnapshot, query, orderBy, where, addDoc, updateDoc, deleteDoc, doc } from "firebase/firestore";
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
 
@@ -30,7 +30,7 @@ if (typeof window !== "undefined") {
   }
 }
 
-export const requestNotificationPermission = async () => {
+export const requestNotificationPermission = async (deviceOwner?: 'A' | 'B' | null) => {
   if (!messaging) return null;
   try {
     const permission = await Notification.requestPermission();
@@ -42,7 +42,11 @@ export const requestNotificationPermission = async () => {
       
       const user = auth.currentUser;
       if (user) {
-        await set(ref(db, `users/${user.uid}/pushToken`), token);
+        if (deviceOwner) {
+          await set(ref(db, `users/${user.uid}/pushTokens/${deviceOwner}`), token);
+        } else {
+          await set(ref(db, `users/${user.uid}/pushToken`), token);
+        }
       }
       
       return token;
@@ -147,6 +151,39 @@ export const deleteFirestoreTransaction = async (id: string) => {
     return true;
   } catch (error) {
     console.error("Erro ao deletar no Firestore:", error);
+    return false;
+  }
+};
+
+export const sendNotificationToPartner = async (partnerOwner: 'A' | 'B', title: string, body: string) => {
+  const user = auth.currentUser;
+  if (!user) return false;
+
+  try {
+    const tokenRef = ref(db, `users/${user.uid}/pushTokens/${partnerOwner}`);
+    const snapshot = await get(tokenRef);
+    const token = snapshot.val();
+    
+    if (!token) {
+      console.log(`No pushToken found for partner ${partnerOwner}`);
+      return false;
+    }
+
+    const response = await fetch('/api/send_notification', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        token,
+        title,
+        body
+      })
+    });
+
+    return response.ok;
+  } catch (error) {
+    console.error("Failed to send notification to partner:", error);
     return false;
   }
 };
