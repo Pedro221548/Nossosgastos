@@ -60,10 +60,13 @@ export const requestNotificationPermission = async (deviceOwner?: 'A' | 'B' | nu
 if (messaging) {
   onMessage(messaging, (payload) => {
     console.log('Message received. ', payload);
-    if (payload.notification) {
+    const title = payload?.data?.title || payload?.notification?.title || "Notificação";
+    const body = payload?.data?.body || payload?.notification?.body || "";
+    
+    if (title || body) {
       if ("Notification" in window && Notification.permission === "granted" && !document.hidden) {
-         new Notification(payload.notification.title || "Notificação", { 
-           body: payload.notification.body, 
+         new Notification(title, { 
+           body: body, 
            icon: '/icon-192x192.png' 
          });
       }

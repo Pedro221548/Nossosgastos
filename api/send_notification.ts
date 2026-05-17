@@ -41,32 +41,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const message: admin.messaging.Message = {
       token,
-      notification: {
+      data: {
         title: title || "Nova notificação",
         body: body || "",
+        ...data
       },
-      data: data || {},
       webpush: {
         headers: {
           Urgency: 'high'
-        },
-        notification: {
-          icon: "/icon-192x192.png",
-          vibrate: [200, 100, 200],
-          requireInteraction: true
         }
       },
       android: {
-        priority: 'high',
-        notification: {
-          sound: 'default'
-        }
+        priority: 'high'
       },
       apns: {
         payload: {
           aps: {
-            contentAvailable: true,
-            sound: 'default'
+            contentAvailable: true
           }
         }
       }
