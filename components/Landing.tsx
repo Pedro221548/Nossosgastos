@@ -1,118 +1,253 @@
-import React from 'react';
-import { Heart, ShieldCheck, Zap, TrendingUp, ChevronRight, Lock, CheckCircle2, ArrowRight } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ArrowRight, Heart, Target, RefreshCw, LogIn, ChevronRight, CheckCircle2 } from 'lucide-react';
+
+const FadeIn: React.FC<{ delay: number; duration: number; children: React.ReactNode; className?: string }> = ({ delay, duration, children, className = '' }) => {
+  const [show, setShow] = useState(false);
+  
+  useEffect(() => {
+    const t = setTimeout(() => setShow(true), delay);
+    return () => clearTimeout(t);
+  }, [delay]);
+
+  return (
+    <div
+      className={`transition-opacity ${className}`}
+      style={{
+        opacity: show ? 1 : 0,
+        transitionDuration: `${duration}ms`,
+        transitionTimingFunction: 'ease-out'
+      }}
+    >
+      {children}
+    </div>
+  );
+};
+
+interface AnimatedHeadingProps {
+  text: string;
+}
+
+const AnimatedHeading: React.FC<AnimatedHeadingProps> = ({ text }) => {
+  const [started, setStarted] = useState(false);
+  
+  useEffect(() => {
+    const t = setTimeout(() => setStarted(true), 200); // 200ms initial delay
+    return () => clearTimeout(t);
+  }, []);
+
+  const lines = text.split('\n');
+  const charDelay = 30;
+
+  return (
+    <h1 
+      className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[5.5rem] font-medium mb-6 leading-[1.1] drop-shadow-2xl" 
+      style={{ letterSpacing: '-0.04em' }}
+    >
+      {lines.map((line, lineIndex) => {
+        const lineLength = line.length;
+        
+        return (
+          <div key={lineIndex} className="block">
+            {line.split('').map((char, charIndex) => {
+              const delay = (lineIndex * lineLength * charDelay) + (charIndex * charDelay);
+              
+              return (
+                <span
+                  key={charIndex}
+                  className="inline-block transition-all"
+                  style={{
+                    opacity: started ? 1 : 0,
+                    transform: started ? 'translateX(0)' : 'translateX(-18px)',
+                    transitionDuration: '500ms',
+                    transitionDelay: `${delay}ms`,
+                    transitionTimingFunction: 'ease-out'
+                  }}
+                >
+                  {char === ' ' ? '\u00A0' : char}
+                </span>
+              );
+            })}
+          </div>
+        );
+      })}
+    </h1>
+  );
+};
 
 export const Landing: React.FC<{ onStartClick: () => void }> = ({ onStartClick }) => {
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 50);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
-    <div className="min-h-screen bg-neutral-950 text-white font-sans overflow-x-hidden">
-      {/* Background Decor */}
-      <div className="fixed top-[-20%] left-[-10%] w-[60%] h-[60%] bg-primary/20 blur-[150px] rounded-full pointer-events-none" />
-      <div className="fixed bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-blue-500/10 blur-[150px] rounded-full pointer-events-none" />
-
-      {/* Navbar */}
-      <nav className="relative z-10 max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-neutral-900 border border-primary/30 rounded-xl flex items-center justify-center shadow-glow">
-            <Heart size={20} className="text-primary" fill="currentColor" />
-          </div>
-          <div>
-            <h1 className="text-xl font-display font-black uppercase tracking-tighter italic leading-none">
-              Nossa <span className="text-primary">Carteira</span>
-            </h1>
-          </div>
-        </div>
-        <button 
-          onClick={onStartClick}
-          className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-primary hover:text-yellow-300 transition-colors"
-        >
-          Entrar / Cadastrar
-        </button>
-      </nav>
-
+    <div className="relative min-h-screen w-full bg-neutral-950 text-white overflow-x-hidden font-sans">
+      
       {/* Hero Section */}
-      <main className="relative z-10 max-w-7xl mx-auto px-6 pt-20 pb-32 flex flex-col items-center text-center">
-        <div className="inline-flex items-center space-x-2 bg-white/5 border border-white/10 rounded-full px-4 py-1.5 mb-8">
-          <span className="flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-primary opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-          </span>
-          <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-400">O app financeiro definitivo para casais</span>
+      <div className="relative min-h-[100svh] flex flex-col pt-24">
+        {/* Background Video */}
+        <div className="absolute inset-0 z-0">
+          <video
+            className="w-full h-full object-cover"
+            src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260403_050628_c4e32401-fab4-4a27-b7a8-6e9291cd5959.mp4"
+            autoPlay
+            loop
+            muted
+            playsInline
+          />
+          {/* Subtle gradient for text readability without being too muddy */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
         </div>
-        
-        <h2 className="text-5xl sm:text-7xl md:text-8xl font-display font-black uppercase tracking-tighter italic leading-[0.9] text-white max-w-4xl">
-          PAREM DE BRIGAR <br/> POR CAUSA DE <span className="text-primary">DINHEIRO.</span>
-        </h2>
-        
-        <p className="mt-8 text-lg sm:text-xl text-neutral-400 max-w-2xl font-medium">
-          Diga adeus às planilhas confusas e grupos do WhatsApp. Sincronize gastos, divida as contas e alcance metas com o seu parceiro(a) em tempo real.
-        </p>
 
-        <button 
-          onClick={onStartClick}
-          className="mt-12 bg-primary text-neutral-950 px-8 py-5 rounded-2xl font-black uppercase tracking-widest text-xs sm:text-sm shadow-glow hover:bg-yellow-300 transition-all flex items-center space-x-3 active:scale-95"
-        >
-          <span>Começar Teste Grátis de 30 Dias</span>
-          <ArrowRight size={18} strokeWidth={3} />
-        </button>
+        {/* Navbar */}
+        <div className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'py-4' : 'py-6'}`}>
+          <div className="px-4 md:px-12 lg:px-16 w-full mx-auto max-w-7xl">
+            <nav className={`liquid-glass rounded-2xl px-5 py-3 flex items-center justify-between transition-all duration-500 border border-white/10 ${scrolled ? 'bg-black/60 shadow-2xl' : 'bg-white/5'}`}>
+              
+              {/* Logo */}
+              <div className="flex items-center space-x-3 group cursor-pointer">
+                <div className="w-10 h-10 bg-neutral-900 border border-primary/30 rounded-xl flex items-center justify-center shadow-glow group-hover:scale-105 transition-transform">
+                  <Heart size={20} className="text-primary fill-primary/20" />
+                </div>
+                <div>
+                  <h1 className="text-xl font-display font-black tracking-tighter italic leading-none">
+                    Nossa <span className="text-primary">Carteira</span>
+                  </h1>
+                </div>
+              </div>
 
-        <p className="mt-4 text-[10px] font-bold text-neutral-500 uppercase tracking-widest">
-          Sem compromisso. Cancele quando quiser.
-        </p>
+              {/* Center Links (hidden on mobile) */}
+              <div className="hidden md:flex items-center gap-8 text-xs font-bold tracking-widest uppercase">
+                <a href="#funcionalidades" className="text-neutral-400 hover:text-white transition-colors">Recursos</a>
+                <a href="#como-funciona" className="text-neutral-400 hover:text-white transition-colors">Como Funciona</a>
+                <a href="#depoimentos" className="text-neutral-400 hover:text-white transition-colors">Depoimentos</a>
+              </div>
 
-        {/* Dashboard Preview Mockup */}
-        <div className="mt-24 w-full max-w-5xl rounded-[2rem] border border-neutral-800 bg-neutral-900/50 backdrop-blur-xl p-4 sm:p-8 shadow-2xl relative">
-          <div className="absolute top-0 right-10 w-32 h-32 bg-primary/20 blur-[60px] rounded-full"></div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            <div className="bg-neutral-950 rounded-2xl p-6 border border-neutral-800">
-              <Zap className="text-primary mb-4" />
-              <h3 className="text-sm font-black uppercase tracking-widest mb-2">Sincronização Real</h3>
-              <p className="text-xs text-neutral-400 leading-relaxed">Adicionou uma despesa? O celular do seu amor apita na mesma hora.</p>
-            </div>
-            <div className="bg-neutral-950 rounded-2xl p-6 border border-neutral-800">
-              <TrendingUp className="text-emerald-500 mb-4" />
-              <h3 className="text-sm font-black uppercase tracking-widest mb-2">Metas do Casal</h3>
-              <p className="text-xs text-neutral-400 leading-relaxed">Viagem de fim de ano ou casa nova? Guardem juntos e vejam o progresso.</p>
-            </div>
-            <div className="bg-neutral-950 rounded-2xl p-6 border border-neutral-800">
-              <Lock className="text-blue-500 mb-4" />
-              <h3 className="text-sm font-black uppercase tracking-widest mb-2">Privacidade</h3>
-              <p className="text-xs text-neutral-400 leading-relaxed">Mostre apenas o que quiser. Vocês decidem o nível de transparência financeira.</p>
-            </div>
+              {/* Right Button */}
+              <div>
+                <button onClick={onStartClick} className="bg-primary text-neutral-950 px-5 sm:px-6 py-2.5 rounded-xl text-[10px] sm:text-xs font-black uppercase tracking-widest hover:bg-yellow-300 transition-all shadow-glow hover:scale-105 flex items-center space-x-2">
+                  <span className="hidden sm:inline">Acessar App</span>
+                  <span className="sm:hidden">Entrar</span>
+                  <LogIn size={16} className="hidden sm:block" />
+                </button>
+              </div>
+            </nav>
           </div>
         </div>
-      </main>
 
-      {/* Pricing Section */}
-      <section className="relative z-10 bg-black pt-24 pb-32 border-t border-neutral-900 px-6">
-        <div className="max-w-7xl mx-auto flex flex-col items-center">
-          <h2 className="text-3xl sm:text-5xl font-display font-black uppercase tracking-tighter italic text-center mb-4">
-            Um valor justo por<br/><span className="text-primary">Paz de Espírito</span>
-          </h2>
-          <p className="text-neutral-400 text-sm sm:text-base mb-16 text-center max-w-lg">
-            Menos do que o casal gasta em um lanche de fim de semana.
-          </p>
+        {/* Hero Content */}
+        <div className="relative z-10 px-6 md:px-12 lg:px-16 flex-1 flex flex-col justify-end pb-16 md:pb-24 max-w-7xl mx-auto w-full">
+          <div className="w-full lg:grid lg:grid-cols-12 gap-12 items-end">
+            
+            {/* Left Column */}
+            <div className="w-full lg:col-span-8">
+              <AnimatedHeading text={"O fim das brigas\npor dinheiro."} />
+              
+              <FadeIn delay={800} duration={1000} className="mb-8">
+                <p className="text-lg md:text-xl lg:text-2xl text-neutral-200 max-w-2xl font-light leading-relaxed drop-shadow-md">
+                  Para casais que constroem juntos. Sincronize gastos, atinja metas e tenha o controle do futuro de vocês.
+                </p>
+              </FadeIn>
+              
+              <FadeIn delay={1200} duration={1000}>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                  <button onClick={onStartClick} className="bg-primary text-neutral-950 px-8 py-4 rounded-full text-xs font-black uppercase tracking-widest hover:bg-yellow-300 transition-all shadow-glow hover:scale-105 flex items-center space-x-2 w-full sm:w-auto justify-center group">
+                    <span>Começar Teste Grátis</span>
+                    <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                  </button>
+                  <button className="liquid-glass border border-white/20 text-white px-8 py-4 rounded-full text-xs font-bold tracking-widest uppercase transition-all hover:bg-white/10 hover:border-white w-full sm:w-auto justify-center">
+                    Ver Funcionalidades
+                  </button>
+                </div>
+              </FadeIn>
+            </div>
 
-          <div className="w-full max-w-md bg-neutral-900 border-2 border-primary/30 rounded-[3rem] p-10 relative shadow-glow">
-            <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-primary text-neutral-950 font-black uppercase text-[10px] tracking-widest px-4 py-2 rounded-full">
-              Plano Casal Premium
+            {/* Right Column */}
+            <div className="w-full lg:col-span-4 flex items-end justify-start lg:justify-end mt-12 lg:mt-0">
+              <FadeIn delay={1400} duration={1000}>
+                <div className="liquid-glass border-l-4 border-l-primary border-t border-t-white/10 border-r border-r-white/10 border-b border-b-white/10 pl-6 pr-8 py-5 rounded-2xl inline-flex flex-col backdrop-blur-md bg-black/40">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-primary mb-1">Estatística</span>
+                  <p className="text-2xl font-light text-white leading-tight">
+                    <span className="font-bold">68%</span> das brigas<br/>são financeiras.
+                  </p>
+                  <span className="text-xs text-neutral-400 mt-2">Mude essa realidade hoje.</span>
+                </div>
+              </FadeIn>
             </div>
             
-            <div className="text-center mb-8">
-              <span className="text-primary text-2xl font-bold pr-1">R$</span>
-              <span className="text-6xl font-display font-black italic tracking-tighter">19</span>
-              <span className="text-2xl font-bold">,90</span>
-              <span className="text-neutral-500 font-bold ml-2">/ mês</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Features Section */}
+      <section id="funcionalidades" className="py-24 bg-neutral-950 px-6 md:px-12 lg:px-16 border-t border-neutral-900 relative">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-20">
+             <h2 className="text-primary font-black uppercase tracking-widest text-xs mb-4">A Ferramenta Definitiva</h2>
+             <h3 className="text-4xl md:text-5xl font-medium tracking-tight mb-6">Criado especificamente<br/>para a vida a dois.</h3>
+             <p className="text-neutral-400 max-w-2xl mx-auto text-lg leading-relaxed">Esqueça planilhas complexas ou aplicativos individuais que não conversam entre si. A Nossa Carteira sincroniza tudo magicamente.</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+             <FeatureCard 
+               icon={<RefreshCw strokeWidth={1.5} className="text-primary" size={32} />} 
+               title="Sincronização em Tempo Real" 
+               description="Você adiciona uma compra no mercado, e instantaneamente aparece no celular do seu parceiro."
+             />
+             <FeatureCard 
+               icon={<Target strokeWidth={1.5} className="text-primary" size={32} />} 
+               title="Metas Compartilhadas" 
+               description="A viagem dos sonhos ou a compra da casa. Guardem dinheiro juntos para os mesmos objetivos."
+             />
+             <FeatureCard 
+               icon={<Heart strokeWidth={1.5} className="text-primary" size={32} />} 
+               title="Sem Julgamentos" 
+               description="Tenha visibilidade das contas da casa enquanto mantêm a individualidade e privacidade necessárias."
+             />
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Section */}
+      <section className="relative z-10 bg-neutral-950 pt-24 pb-32 border-t border-neutral-900 px-6">
+        <div className="max-w-7xl mx-auto flex flex-col items-center">
+          <div className="text-center mb-16">
+            <h2 className="text-primary font-black uppercase tracking-widest text-xs mb-4">Planos e Preços</h2>
+            <h3 className="text-4xl md:text-5xl font-medium tracking-tight mb-6">
+              Um valor justo por<br/>paz de espírito
+            </h3>
+            <p className="text-neutral-400 max-w-lg mx-auto text-lg leading-relaxed">
+              Menos do que o casal gasta em um lanche de fim de semana.
+            </p>
+          </div>
+
+          <div className="w-full max-w-md bg-neutral-900 border border-neutral-800 rounded-[3rem] p-10 relative shadow-2xl">
+            <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-primary text-neutral-950 font-black uppercase text-[10px] tracking-widest px-6 py-2 rounded-full shadow-glow">
+              Plano Casal
+            </div>
+            
+            <div className="text-center mb-10 mt-4">
+              <span className="text-neutral-400 text-xl font-medium pr-1">R$</span>
+              <span className="text-7xl font-display font-medium tracking-tighter text-white">19</span>
+              <span className="text-2xl font-medium text-neutral-400">,90</span>
+              <span className="text-neutral-500 font-bold ml-2 text-sm">/ mês</span>
             </div>
 
-            <div className="space-y-4 mb-10">
+            <div className="space-y-5 mb-10">
               {[
-                'Acesso para 2 contas conectadas',
-                'Lançamentos ilimitados',
-                'Extratos em formato PDF (TBA)',
-                'Sistema de Metas inteligente',
-                'Widgets de recomendação'
+                'Acesso para 2 contas simultâneas',
+                'Lançamentos e sincronização ilimitada',
+                'Gestão de metas compartilhadas',
+                'Faturas e lista de mercado',
+                'Relatórios avançados'
               ].map((feature, i) => (
-                <div key={i} className="flex items-center space-x-3 text-sm font-medium text-neutral-300">
-                  <CheckCircle2 size={18} className="text-primary shrink-0" />
+                <div key={i} className="flex items-center space-x-4 text-sm font-medium text-neutral-300">
+                  <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                    <CheckCircle2 size={14} className="text-primary" strokeWidth={3} />
+                  </div>
                   <span>{feature}</span>
                 </div>
               ))}
@@ -120,20 +255,43 @@ export const Landing: React.FC<{ onStartClick: () => void }> = ({ onStartClick }
 
             <button 
               onClick={onStartClick}
-              className="w-full bg-white text-neutral-950 py-5 rounded-2xl font-black uppercase tracking-widest text-[11px] hover:bg-neutral-200 transition-colors"
+              className="w-full bg-white text-neutral-950 py-5 rounded-2xl font-black uppercase tracking-widest text-[11px] hover:bg-neutral-200 transition-all shadow-xl hover:scale-105 active:scale-95 flex justify-center items-center gap-2"
             >
-              Assinar Agora
+              <span>Assinar Agora</span>
+              <ArrowRight size={16} />
             </button>
+            <p className="text-center text-xs text-neutral-500 mt-6">Teste 30 dias grátis. Cancele quando quiser.</p>
           </div>
         </div>
       </section>
-      
+
+      {/* Social Proof / CTA Section */}
+      <section className="py-24 px-6 md:px-12 lg:px-16 bg-neutral-900/50 border-t border-neutral-900 text-center">
+        <h3 className="text-3xl md:text-4xl font-medium mb-6">Prontos para organizar a vida financeira?</h3>
+        <p className="text-neutral-400 mb-10 max-w-xl mx-auto">Junte-se à Nossa Carteira e transforme a maneira como você e seu parceiro lidam com o dinheiro.</p>
+        <button onClick={onStartClick} className="bg-primary text-neutral-950 px-10 py-5 rounded-full text-sm font-bold uppercase tracking-widest hover:bg-yellow-300 hover:scale-105 transition-all shadow-glow">
+           Criar Conta do Casal
+        </button>
+      </section>
+
       {/* Footer */}
-      <footer className="relative z-10 border-t border-neutral-900 py-10 text-center">
-        <p className="text-[10px] font-bold text-neutral-600 uppercase tracking-widest">
-          © {new Date().getFullYear()} NOSSA CARTEIRA S.A.
-        </p>
+      <footer className="py-8 text-center text-neutral-500 text-xs border-t border-neutral-900 flex flex-col md:flex-row items-center justify-between px-6 md:px-12 lg:px-16 max-w-7xl mx-auto w-full">
+         <div className="flex items-center space-x-2 mb-4 md:mb-0">
+            <Heart size={14} className="text-primary" />
+            <span className="font-bold tracking-wider uppercase">Nossa Carteira</span>
+         </div>
+         <p>© {new Date().getFullYear()} Nossa Carteira. Todos os direitos reservados.</p>
       </footer>
     </div>
   );
 };
+
+const FeatureCard = ({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) => (
+  <div className="bg-neutral-900/50 border border-neutral-800 p-8 rounded-3xl hover:bg-neutral-900 hover:border-neutral-700 transition-colors group">
+    <div className="w-16 h-16 bg-neutral-950 border border-primary/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-glow">
+      {icon}
+    </div>
+    <h4 className="text-xl font-bold mb-3 text-white">{title}</h4>
+    <p className="text-neutral-400 leading-relaxed text-sm">{description}</p>
+  </div>
+);

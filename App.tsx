@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { USERS } from './constants';
 import { Transaction, User, Goal, ShoppingItem, AppTab, Invoice } from './types';
@@ -14,7 +13,7 @@ import { InvoiceManager } from './components/InvoiceManager';
 import { AddTransactionModal } from './components/AddTransactionModal';
 import { ConfirmationModal } from './components/ui/ConfirmationModal';
 import { Login } from './components/Login';
-import { auth, syncData, listenToData, listenToFirestoreTransactions, updateFirestoreTransaction, deleteFirestoreTransaction, firestore } from './services/firebase';
+import { auth, syncData, listenToData, listenToFirestoreTransactions, updateFirestoreTransaction, deleteFirestoreTransaction, firestore, requestNotificationPermission } from './services/firebase';
 import { onAuthStateChanged, signOut, User as FirebaseUser } from 'firebase/auth';
 import { collection, addDoc } from 'firebase/firestore';
 import { 
@@ -74,9 +73,7 @@ const App: React.FC = () => {
   }, [users]);
 
   useEffect(() => {
-    if ("Notification" in window && Notification.permission === "default") {
-      Notification.requestPermission();
-    }
+    requestNotificationPermission();
   }, []);
 
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -142,9 +139,6 @@ const App: React.FC = () => {
       });
       setTransactions(mappedTransactions);
     }, (type, data) => {
-       // Evitar notificação se eu mesmo fiz a alteração noutro separador, 
-       // mas a variável hasPendingWrites deveria cobrir isso. 
-       // Adicionalmente filtramos o deviceOwner
        if (deviceOwner && data.updatedByDevice === deviceOwner) return;
 
        const updaterId = data.updatedByDevice || data.userId;
@@ -533,7 +527,6 @@ const MobileNavItem = ({ icon, label, active, onClick }: { icon: any, label: str
     <span className={`text-[9px] font-black uppercase tracking-widest mt-1 transition-all duration-300 ${active ? 'opacity-100' : 'opacity-0 h-0 hidden'}`}>
       {label}
     </span>
-    {/* active dot for non-active states that become active, replaced by label now, but kept for transition smoothness if wanted */}
   </button>
 );
 

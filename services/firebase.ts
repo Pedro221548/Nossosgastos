@@ -3,6 +3,7 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getDatabase, ref, set, onValue } from "firebase/database";
 import { getFirestore, collection, onSnapshot, query, orderBy, where, addDoc, updateDoc, deleteDoc, doc } from "firebase/firestore";
+import { getMessaging, getToken, onMessage } from "firebase/messaging";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBSA3ggl68i-g8rgLzUyc7gbXizdbv5Frk",
@@ -19,6 +20,53 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getDatabase(app);
 export const firestore = getFirestore(app);
+
+let messaging: any = null;
+if (typeof window !== "undefined") {
+  try {
+    messaging = getMessaging(app);
+  } catch (error) {
+    console.error("Firebase Messaging Error:", error);
+  }
+}
+
+export const requestNotificationPermission = async () => {
+  if (!messaging) return null;
+  try {
+    const permission = await Notification.requestPermission();
+    if (permission === 'granted') {
+      const token = await getToken(messaging, { 
+        vapidKey: 'BAepgjOi6ihE23jXjULM4Lt3UxL-PBGZ5VhXILuyEQkmODzry86zwQ5VnIvTcSVA5uLDWTH0wJxK3GwXw5iYyr4' 
+      });
+      console.log('Push notification token:', token);
+      
+      const user = auth.currentUser;
+      if (user) {
+        await set(ref(db, `users/${user.uid}/pushToken`), token);
+      }
+      
+      return token;
+    }
+  } catch (error) {
+    console.error("Background Push Notifications error:", error);
+    return null;
+  }
+};
+
+if (messaging) {
+  onMessage(messaging, (payload) => {
+    console.log('Message received. ', payload);
+    if (payload.notification) {
+      if ("Notification" in window && Notification.permission === "granted" && !document.hidden) {
+         new Notification(payload.notification.title || "Notificação", { 
+           body: payload.notification.body, 
+           icon: '/icon-192x192.png' 
+         });
+      }
+    }
+  });
+}
+
 
 // Helpers para Realtime Database (Configurações e Perfil)
 export const syncData = async (path: string, data: any) => {

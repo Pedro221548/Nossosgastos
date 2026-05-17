@@ -149,6 +149,30 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </div>
       </div>
 
+      {/* AdSense Placeholder */}
+      <div className="w-full bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl flex flex-col items-center justify-center p-6 my-8 overflow-hidden min-h-[120px] mx-1 sm:mx-0 shadow-sm relative">
+        <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest text-center mb-2">Publicidade</p>
+        <div id="adsense-placeholder" className="w-full flex justify-center">
+          {/* 
+            Insira o script e a tag <ins> do Google AdSense aqui.
+            Exemplo:
+            <ins className="adsbygoogle"
+                 style={{ display: "block" }}
+                 data-ad-client="ca-pub-XXXXXXXXXXXXXXX"
+                 data-ad-slot="XXXXXXX"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
+            <script>
+                 (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+          */}
+          <div className="w-full max-w-[320px] h-[100px] bg-neutral-200 dark:bg-neutral-800/50 border-2 border-dashed border-neutral-300 dark:border-neutral-700/50 flex flex-col items-center justify-center rounded-lg opacity-70">
+             <span className="text-xs font-black text-neutral-400 uppercase tracking-wider">Espaço AdSense</span>
+             <span className="text-[8px] font-bold text-neutral-500 mt-1">Cole aqui seu bloco de anúncios</span>
+          </div>
+        </div>
+      </div>
+
       <div className="space-y-4">
         <div className="flex items-center justify-between px-4">
           <h3 className="text-[10px] font-black text-neutral-500 uppercase tracking-[0.3em]">Detalhamento</h3>

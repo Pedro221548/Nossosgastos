@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Heart, CheckCircle2, ShieldCheck, Zap, LogOut, Loader2 } from 'lucide-react';
 import { signOut } from 'firebase/auth';
 import { auth, syncData } from '../services/firebase';
