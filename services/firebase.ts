@@ -47,6 +47,18 @@ export const requestNotificationPermission = async (deviceOwner?: 'A' | 'B' | nu
         } else {
           await set(ref(db, `users/${user.uid}/pushToken`), token);
         }
+        
+        // Save to Firestore 'users' collection as requested
+        try {
+          const { setDoc } = await import('firebase/firestore');
+          await setDoc(doc(firestore, "users", user.uid), {
+            email: user.email,
+            fcmToken: token,
+            role: "USER"
+          }, { merge: true });
+        } catch (err) {
+          console.error("Erro ao salvar fcmToken no Firestore:", err);
+        }
       }
       
       return token;
