@@ -41,6 +41,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const message: admin.messaging.Message = {
       token,
+      notification: {
+        title: title || "Nova notificação",
+        body: body || "",
+      },
       data: {
         title: title || "Nova notificação",
         body: body || "",
@@ -49,15 +53,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       webpush: {
         headers: {
           Urgency: 'high'
+        },
+        notification: {
+          icon: '/icon-192x192.png',
+          badge: '/icon-192x192.png',
+          vibrate: [200, 100, 200],
+          requireInteraction: true
         }
       },
       android: {
-        priority: 'high'
+        priority: 'high',
+        notification: {
+          sound: 'default'
+        }
       },
       apns: {
         payload: {
           aps: {
-            contentAvailable: true
+            contentAvailable: true,
+            sound: 'default'
           }
         }
       }

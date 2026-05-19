@@ -17,19 +17,20 @@ const messaging = firebase.messaging();
 messaging.onBackgroundMessage((payload) => {
   console.log('[firebase-messaging-sw.js] Received background message ', payload);
   
-  const notificationTitle = payload?.data?.title || "Nova Atualização";
-  const notificationOptions = {
-    body: payload?.data?.body || "",
-    icon: '/icon-192x192.png',
-    badge: '/icon-192x192.png',
-    vibrate: [200, 100, 200, 100, 200, 100, 200], // Long vibration pattern
-    requireInteraction: true,
-    data: {
-      url: self.location.origin
-    }
-  };
-
-  self.registration.showNotification(notificationTitle, notificationOptions);
+  if (!payload.notification) {
+    const notificationTitle = payload?.data?.title || "Nova Atualização";
+    const notificationOptions = {
+      body: payload?.data?.body || "",
+      icon: '/icon-192x192.png',
+      badge: '/icon-192x192.png',
+      vibrate: [200, 100, 200, 100, 200, 100, 200], // Long vibration pattern
+      requireInteraction: true,
+      data: {
+        url: self.location.origin
+      }
+    };
+    self.registration.showNotification(notificationTitle, notificationOptions);
+  }
 });
 
 self.addEventListener('notificationclick', function(event) {
