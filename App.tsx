@@ -13,7 +13,7 @@ import { InvoiceManager } from './components/InvoiceManager';
 import { AddTransactionModal } from './components/AddTransactionModal';
 import { ConfirmationModal } from './components/ui/ConfirmationModal';
 import { Login } from './components/Login';
-import { auth, syncData, listenToData, listenToFirestoreTransactions, updateFirestoreTransaction, deleteFirestoreTransaction, firestore, requestNotificationPermission, sendNotificationToPartner } from './services/firebase';
+import { auth, syncData, listenToData, listenToFirestoreTransactions, updateFirestoreTransaction, deleteFirestoreTransaction, firestore, requestNotificationPermission, notifyDevices } from './services/firebase';
 import { onAuthStateChanged, signOut, User as FirebaseUser } from 'firebase/auth';
 import { collection, addDoc } from 'firebase/firestore';
 import { 
@@ -237,17 +237,15 @@ const App: React.FC = () => {
         : currentPaidMonths.filter(m => m !== targetMonth);
       await updateFirestoreTransaction(id, { paidMonths: updatedMonths, updatedByDevice: deviceOwner });
       
-      if (isPaying && deviceOwner) {
-        const partner = deviceOwner === 'A' ? 'B' : 'A';
-        await sendNotificationToPartner(partner, "Conta Paga", `A conta ${tx.title} foi paga`);
+      if (isPaying) {
+        await notifyDevices(deviceOwner, "Conta Paga", `A conta ${tx.title} foi paga`);
       }
     } else {
       const isPaying = !tx.isPaid;
       await updateFirestoreTransaction(id, { pago: isPaying, updatedByDevice: deviceOwner });
       
-      if (isPaying && deviceOwner) {
-        const partner = deviceOwner === 'A' ? 'B' : 'A';
-        await sendNotificationToPartner(partner, "Conta Paga", `A conta ${tx.title} foi paga`);
+      if (isPaying) {
+        await notifyDevices(deviceOwner, "Conta Paga", `A conta ${tx.title} foi paga`);
       }
     }
   };
@@ -276,6 +274,12 @@ const App: React.FC = () => {
       if (editingTransaction) {
         const isoDate = `${y}-${m}-${d}`;
         await updateFirestoreTransaction(editingTransaction.id, createPayload(isoDate, tx.installments?.current));
+        
+        await notifyDevices(
+          deviceOwner, 
+          "Conta Alterada", 
+          `A conta ${tx.title} foi alterada.`
+        );
       } else {
         if (tx.installments && tx.installments.total > 1) {
           const promises = [];
@@ -293,14 +297,11 @@ const App: React.FC = () => {
           await addDoc(collection(firestore, "transacoes"), createPayload(isoDate));
         }
 
-        if (deviceOwner) {
-          const partner = deviceOwner === 'A' ? 'B' : 'A';
-          await sendNotificationToPartner(
-            partner, 
-            "Nova Transação", 
-            `A conta ${tx.title} foi adicionada no valor R$ ${tx.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
-          );
-        }
+        await notifyDevices(
+          deviceOwner, 
+          "Nova Transação", 
+          `A conta ${tx.title} foi adicionada no valor R$ ${tx.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
+        );
       }
       setIsAddModalOpen(false);
       setEditingTransaction(null);
@@ -314,7 +315,11 @@ const App: React.FC = () => {
       message: 'Esta ação removerá o registro permanentemente.',
       variant: 'danger',
       onConfirm: async () => {
+        const tx = transactions.find(t => t.id === id);
         await deleteFirestoreTransaction(id);
+        if (tx) {
+          await notifyDevices(deviceOwner, 'Item Excluído', `A conta ${tx.title} foi removida.`);
+        }
         setConfirmModal(prev => ({ ...prev, isOpen: false }));
       }
     });

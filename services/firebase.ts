@@ -170,34 +170,46 @@ export const deleteFirestoreTransaction = async (id: string) => {
 };
 
 export const sendNotificationToPartner = async (partnerOwner: 'A' | 'B', title: string, body: string) => {
+  return notifyDevices(partnerOwner === 'A' ? 'B' : 'A', title, body); 
+};
+
+export const notifyDevices = async (excludeDevice: 'A' | 'B' | null, title: string, body: string) => {
   const user = auth.currentUser;
   if (!user) return false;
 
   try {
-    const tokenRef = ref(db, `users/${user.uid}/pushTokens/${partnerOwner}`);
-    const snapshot = await get(tokenRef);
-    const token = snapshot.val();
+    const tokensRef = ref(db, `users/${user.uid}/pushTokens`);
+    const snapshot = await get(tokensRef);
+    const tokens = snapshot.val();
     
-    if (!token) {
-      console.log(`No pushToken found for partner ${partnerOwner}`);
-      return false;
+    if (!tokens) return false;
+
+    const targets = [];
+    if (tokens.A && excludeDevice !== 'A') targets.push(tokens.A);
+    if (tokens.B && excludeDevice !== 'B') targets.push(tokens.B);
+
+    let success = false;
+    for (const token of targets) {
+      try {
+        const response = await fetch('/api/send_notification', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            token,
+            title,
+            body
+          })
+        });
+        if (response.ok) success = true;
+      } catch (err) {
+        console.error("Error sending to a token:", err);
+      }
     }
-
-    const response = await fetch('/api/send_notification', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        token,
-        title,
-        body
-      })
-    });
-
-    return response.ok;
+    return success;
   } catch (error) {
-    console.error("Failed to send notification to partner:", error);
+    console.error("Failed to send notification:", error);
     return false;
   }
 };
