@@ -231,12 +231,24 @@ const App: React.FC = () => {
 
     if (tx.isFixed && targetMonth) {
       const currentPaidMonths = tx.paidMonths || [];
-      const updatedMonths = currentPaidMonths.includes(targetMonth)
-        ? currentPaidMonths.filter(m => m !== targetMonth)
-        : [...currentPaidMonths, targetMonth];
+      const isPaying = !currentPaidMonths.includes(targetMonth);
+      const updatedMonths = isPaying
+        ? [...currentPaidMonths, targetMonth]
+        : currentPaidMonths.filter(m => m !== targetMonth);
       await updateFirestoreTransaction(id, { paidMonths: updatedMonths, updatedByDevice: deviceOwner });
+      
+      if (isPaying && deviceOwner) {
+        const partner = deviceOwner === 'A' ? 'B' : 'A';
+        await sendNotificationToPartner(partner, "Conta Paga", `O item ${tx.title} foi marcado como pago.`);
+      }
     } else {
-      await updateFirestoreTransaction(id, { pago: !tx.isPaid, updatedByDevice: deviceOwner });
+      const isPaying = !tx.isPaid;
+      await updateFirestoreTransaction(id, { pago: isPaying, updatedByDevice: deviceOwner });
+      
+      if (isPaying && deviceOwner) {
+        const partner = deviceOwner === 'A' ? 'B' : 'A';
+        await sendNotificationToPartner(partner, "Conta Paga", `O item ${tx.title} foi marcado como pago.`);
+      }
     }
   };
 
@@ -282,13 +294,12 @@ const App: React.FC = () => {
         }
 
         if (deviceOwner) {
-           const partner = deviceOwner === 'A' ? 'B' : 'A';
-           const fromName = deviceOwner === 'A' ? users.A.name : users.B.name;
-           await sendNotificationToPartner(
-             partner, 
-             "Nova Transação", 
-             `O ${fromName} adicionou uma nova transação: ${tx.title}.`
-           );
+          const partner = deviceOwner === 'A' ? 'B' : 'A';
+          await sendNotificationToPartner(
+            partner, 
+            "Nova Transação", 
+            `A conta ${tx.title} foi adicionada no valor R$ ${tx.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
+          );
         }
       }
       setIsAddModalOpen(false);

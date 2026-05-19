@@ -2,7 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getDatabase, ref, set, get, onValue } from "firebase/database";
-import { getFirestore, collection, onSnapshot, query, orderBy, where, addDoc, updateDoc, deleteDoc, doc } from "firebase/firestore";
+import { getFirestore, collection, onSnapshot, query, orderBy, where, addDoc, updateDoc, deleteDoc, doc, setDoc } from "firebase/firestore";
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
 
 const firebaseConfig = {
@@ -50,7 +50,6 @@ export const requestNotificationPermission = async (deviceOwner?: 'A' | 'B' | nu
         
         // Save to Firestore 'users' collection as requested
         try {
-          const { setDoc } = await import('firebase/firestore');
           await setDoc(doc(firestore, "users", user.uid), {
             email: user.email,
             fcmToken: token,
