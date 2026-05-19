@@ -161,9 +161,6 @@ const App: React.FC = () => {
        const msg = `${updaterName} ${action} uma ${typeStr}: ${data.descricao} de ${amount} que já consta como ${paidInfo}${extraInfo}.`;
 
        setToastData({ title, message: msg });
-       if ("Notification" in window && Notification.permission === "granted" && document.hidden) {
-         new Notification(title, { body: msg, icon: '/icon-192x192.png' });
-       }
        setTimeout(() => setToastData(null), 8000);
     });
 
@@ -189,14 +186,19 @@ const App: React.FC = () => {
     const updated = [...invoices, invoice];
     setInvoices(updated);
     await syncData('invoices', updated);
+    await notifyDevices(deviceOwner, 'Nova Fatura', `Fatura de ${invoice.issuer} - R$ ${invoice.amount.toLocaleString('pt-BR', {minimumFractionDigits:2})}`);
     setIsSyncing(false);
   };
 
   const handleDeleteInvoice = async (id: string) => {
     setIsSyncing(true);
+    const invoice = invoices.find(i => i.id === id);
     const updated = invoices.filter(i => i.id !== id);
     setInvoices(updated);
     await syncData('invoices', updated);
+    if (invoice) {
+      await notifyDevices(deviceOwner, 'Fatura Excluída', `Fatura de ${invoice.issuer} apagada`);
+    }
     setIsSyncing(false);
   };
 
@@ -206,22 +208,31 @@ const App: React.FC = () => {
     let updatedGoals = existing ? goals.map(g => g.id === goal.id ? goal : g) : [...goals, goal];
     setGoals(updatedGoals);
     await syncData('goals', updatedGoals);
+    await notifyDevices(deviceOwner, 'Objetivo', existing ? `Objetivo atualizado: ${goal.name}` : `Novo objetivo: ${goal.name}`);
     setIsSyncing(false);
   };
 
   const handleUpdateGoalProgress = async (goalId: string, amountToAdd: number) => {
     setIsSyncing(true);
+    const goal = goals.find(g => g.id === goalId);
     const updated = goals.map(g => g.id === goalId ? { ...g, currentAmount: g.currentAmount + amountToAdd } : g);
     setGoals(updated);
     await syncData('goals', updated);
+    if (goal) {
+      await notifyDevices(deviceOwner, 'Objetivo', `Adicionado R$ ${amountToAdd} no objetivo ${goal.name}`);
+    }
     setIsSyncing(false);
   };
 
   const handleDeleteGoal = async (goalId: string) => {
     setIsSyncing(true);
+    const goal = goals.find(g => g.id === goalId);
     const updated = goals.filter(g => g.id !== goalId);
     setGoals(updated);
     await syncData('goals', updated);
+    if (goal) {
+      await notifyDevices(deviceOwner, 'Objetivo', `Objetivo ${goal.name} apagado`);
+    }
     setIsSyncing(false);
   };
 
@@ -237,16 +248,16 @@ const App: React.FC = () => {
         : currentPaidMonths.filter(m => m !== targetMonth);
       await updateFirestoreTransaction(id, { paidMonths: updatedMonths, updatedByDevice: deviceOwner });
       
-      if (isPaying) {
-        await notifyDevices(deviceOwner, "Conta Paga", `A conta ${tx.title} foi paga`);
-      }
+      const statusTitle = isPaying ? "Conta Paga" : "Conta Pendente";
+      const statusMessage = isPaying ? `A conta ${tx.title} foi paga` : `A conta ${tx.title} foi marcada como pendente`;
+      await notifyDevices(deviceOwner, statusTitle, statusMessage);
     } else {
       const isPaying = !tx.isPaid;
       await updateFirestoreTransaction(id, { pago: isPaying, updatedByDevice: deviceOwner });
       
-      if (isPaying) {
-        await notifyDevices(deviceOwner, "Conta Paga", `A conta ${tx.title} foi paga`);
-      }
+      const statusTitle = isPaying ? "Conta Paga" : "Conta Pendente";
+      const statusMessage = isPaying ? `A conta ${tx.title} foi paga` : `A conta ${tx.title} foi marcada como pendente`;
+      await notifyDevices(deviceOwner, statusTitle, statusMessage);
     }
   };
 
@@ -336,18 +347,27 @@ const App: React.FC = () => {
     const updated = [...shoppingItems, newItem];
     setShoppingItems(updated);
     await syncData('shoppingItems', updated);
+    await notifyDevices(deviceOwner, 'Mercado', `Item adicionado: ${newItem.text}`);
   };
 
   const handleToggleShopping = async (id: string) => {
+    const item = shoppingItems.find(i => i.id === id);
     const updated = shoppingItems.map(i => i.id === id ? { ...i, completed: !i.completed } : i);
     setShoppingItems(updated);
     await syncData('shoppingItems', updated);
+    if (item) {
+      await notifyDevices(deviceOwner, 'Mercado', `Item marcado: ${item.text}`);
+    }
   };
 
   const handleDeleteShopping = async (id: string) => {
+    const item = shoppingItems.find(i => i.id === id);
     const updated = shoppingItems.filter(i => i.id !== id);
     setShoppingItems(updated);
     await syncData('shoppingItems', updated);
+    if (item) {
+      await notifyDevices(deviceOwner, 'Mercado', `Item apagado: ${item.text}`);
+    }
   };
 
   const handleClearShoppingHistory = async () => {
@@ -355,6 +375,7 @@ const App: React.FC = () => {
     const updated = shoppingItems.map(i => i.completed && !i.archivedAt ? { ...i, archivedAt: now } : i);
     setShoppingItems(updated);
     await syncData('shoppingItems', updated);
+    await notifyDevices(deviceOwner, 'Mercado', 'Histórico de mercado limpo');
   };
 
   const triggerSync = async (path: string, data: any) => {

@@ -178,15 +178,46 @@ export const notifyDevices = async (excludeDevice: 'A' | 'B' | null, title: stri
   if (!user) return false;
 
   try {
+    const targets = new Set<string>();
+
     const tokensRef = ref(db, `users/${user.uid}/pushTokens`);
     const snapshot = await get(tokensRef);
     const tokens = snapshot.val();
     
-    if (!tokens) return false;
+    if (tokens) {
+      if (tokens.A && excludeDevice !== 'A') targets.add(tokens.A);
+      if (tokens.B && excludeDevice !== 'B') targets.add(tokens.B);
+    }
 
-    const targets = [];
-    if (tokens.A && excludeDevice !== 'A') targets.push(tokens.A);
-    if (tokens.B && excludeDevice !== 'B') targets.push(tokens.B);
+    const singleTokenRef = ref(db, `users/${user.uid}/pushToken`);
+    const singleSnapshot = await get(singleTokenRef);
+    const singleToken = singleSnapshot.val();
+    if (singleToken) targets.add(singleToken);
+
+    try {
+        const userDocRef = doc(firestore, "users", user.uid);
+        const { getDoc } = await import('firebase/firestore');
+        const userDoc = await getDoc(userDocRef);
+        if (userDoc.exists() && userDoc.data().fcmToken) {
+            targets.add(userDoc.data().fcmToken);
+        }
+    } catch(err) {
+        console.error('Error fetching firestore token', err);
+    }
+
+    try {
+      const { getToken } = await import('firebase/messaging');
+      if (typeof window !== 'undefined' && messaging) {
+         const currentToken = await getToken(messaging, { vapidKey: 'BAepgjOi6ihE23jXjULM4Lt3UxL-PBGZ5VhXILuyEQkmODzry86zwQ5VnIvTcSVA5uLDWTH0wJxK3GwXw5iYyr4' }).catch(() => null);
+         if (currentToken) {
+             targets.delete(currentToken);
+         }
+      }
+    } catch(err) {
+      console.log('Could not get current token', err);
+    }
+
+    if (targets.size === 0) return false;
 
     let success = false;
     for (const token of targets) {
