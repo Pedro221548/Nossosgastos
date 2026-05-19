@@ -239,7 +239,7 @@ const App: React.FC = () => {
       
       if (isPaying && deviceOwner) {
         const partner = deviceOwner === 'A' ? 'B' : 'A';
-        await sendNotificationToPartner(partner, "Conta Paga", `O item ${tx.title} foi marcado como pago.`);
+        await sendNotificationToPartner(partner, "Conta Paga", `A conta ${tx.title} foi paga`);
       }
     } else {
       const isPaying = !tx.isPaid;
@@ -247,7 +247,7 @@ const App: React.FC = () => {
       
       if (isPaying && deviceOwner) {
         const partner = deviceOwner === 'A' ? 'B' : 'A';
-        await sendNotificationToPartner(partner, "Conta Paga", `O item ${tx.title} foi marcado como pago.`);
+        await sendNotificationToPartner(partner, "Conta Paga", `A conta ${tx.title} foi paga`);
       }
     }
   };
