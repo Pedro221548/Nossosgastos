@@ -56,7 +56,7 @@ export const requestNotificationPermission = async (deviceOwner?: 'A' | 'B' | nu
             role: "USER"
           }, { merge: true });
         } catch (err) {
-          console.error("Erro ao salvar fcmToken no Firestore:", err);
+          // Ignore, RTDB is the primary source
         }
       }
       
@@ -202,7 +202,7 @@ export const notifyDevices = async (excludeDevice: 'A' | 'B' | null, title: stri
             targets.add(userDoc.data().fcmToken);
         }
     } catch(err) {
-        console.error('Error fetching firestore token', err);
+        // Silently ignore firestore permission errors as we primarily use Realtime Database
     }
 
     try {
