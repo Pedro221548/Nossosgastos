@@ -12,6 +12,7 @@ import {
   CircleDashed,
   Share2
 } from 'lucide-react';
+import { filterTransactionsByMonth, calculateFinancialStats } from '../utils/financial';
 
 interface DashboardProps {
   transactions: Transaction[];
@@ -44,39 +45,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const monthLabel = `${month.charAt(0).toUpperCase() + month.slice(1)} ${currentDate.getFullYear()}`;
 
   const filteredList = useMemo(() => {
-    return transactions.filter(t => {
-      const [day, month, year] = t.date.split('/').map(Number);
-      
-      let refMonth = month - 1;
-      let refYear = year;
-      if (t.referenceMonth) {
-         const [ry, rm] = t.referenceMonth.split('-');
-         refYear = Number(ry);
-         refMonth = Number(rm) - 1;
-      }
-      
-      const isCurrentMonth = refMonth === currentDate.getMonth() && refYear === currentDate.getFullYear();
-      const isFixedAndRelevant = t.isFixed && (refYear < currentDate.getFullYear() || (refYear === currentDate.getFullYear() && refMonth <= currentDate.getMonth()));
-      return isCurrentMonth || isFixedAndRelevant;
-    }).sort((a, b) => a.amount - b.amount);
+    return filterTransactionsByMonth(transactions, currentDate).sort((a, b) => a.amount - b.amount);
   }, [transactions, currentDate]);
 
   const stats = useMemo(() => {
-    const expenses = filteredList.filter(t => t.type === 'expense');
-    const revenues = filteredList.filter(t => t.type === 'revenue');
-    const totalExtraRevenue = revenues.reduce((acc, t) => acc + t.amount, 0);
-    const effectiveIncome = baseIncome + totalExtraRevenue;
-    const paidExpenses = expenses.filter(t => t.isFixed ? t.paidMonths?.includes(currentMonthKey) : t.isPaid)
-                                .reduce((acc, t) => acc + t.amount, 0);
-    const pendingExpenses = expenses.filter(t => t.isFixed ? !t.paidMonths?.includes(currentMonthKey) : !t.isPaid)
-                                   .reduce((acc, t) => acc + t.amount, 0);
-
-    return {
-      income: effectiveIncome,
-      paid: paidExpenses,
-      pending: pendingExpenses,
-      balance: effectiveIncome - paidExpenses - pendingExpenses
-    };
+    return calculateFinancialStats(filteredList, baseIncome, currentMonthKey);
   }, [filteredList, baseIncome, currentMonthKey]);
 
   const handleShareWhatsApp = () => {
@@ -114,9 +87,9 @@ export const Dashboard: React.FC<DashboardProps> = ({
           </div>
         </div>
         <div className="flex items-center bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-[1.5rem] md:rounded-2xl p-1.5 shadow-xl sm:w-auto w-full justify-between sm:justify-start">
-          <button onClick={() => onMonthChange('prev')} className="p-4 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-xl transition-all active:scale-90 flex-1 sm:flex-none flex justify-center"><ChevronLeft size={24} /></button>
+          <button aria-label="Militar mês anterior" onClick={() => onMonthChange('prev')} className="p-4 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-xl transition-all active:scale-90 flex-1 sm:flex-none flex justify-center"><ChevronLeft size={24} /></button>
           <div className="w-px h-8 bg-neutral-100 dark:bg-neutral-800 mx-2" />
-          <button onClick={() => onMonthChange('next')} className="p-4 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-xl transition-all active:scale-90 flex-1 sm:flex-none flex justify-center"><ChevronRight size={24} /></button>
+          <button aria-label="Avançar próximo mês" onClick={() => onMonthChange('next')} className="p-4 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-xl transition-all active:scale-90 flex-1 sm:flex-none flex justify-center"><ChevronRight size={24} /></button>
         </div>
       </div>
       
@@ -225,6 +198,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                     </p>
                     <div className="flex items-center space-x-2">
                        <button 
+                        aria-label={isActuallyPaid ? "Marcar lançamento como pendente" : "Marcar lançamento como pago"}
                         onClick={() => onTogglePaid(tx.id, tx.isFixed ? currentMonthKey : undefined)} 
                         className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-full border transition-all active:scale-90 ${
                           isActuallyPaid 
@@ -236,8 +210,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
                          <span className="text-[8px] font-black uppercase tracking-widest">{isActuallyPaid ? 'PAGO' : 'PEND'}</span>
                        </button>
                        <div className="flex bg-neutral-950 rounded-full border border-neutral-800 p-0.5 shadow-inner">
-                          <button onClick={() => onEdit(tx)} className="p-1.5 text-neutral-500 hover:text-primary transition-colors active:scale-90"><Edit3 className="w-3.5 h-3.5" /></button>
-                          <button onClick={() => onDelete(tx.id)} className="p-1.5 text-neutral-500 hover:text-red-500 transition-colors active:scale-90"><Trash2 className="w-3.5 h-3.5" /></button>
+                          <button aria-label="Editar lançamento" onClick={() => onEdit(tx)} className="p-1.5 text-neutral-500 hover:text-primary transition-colors active:scale-90"><Edit3 className="w-3.5 h-3.5" /></button>
+                          <button aria-label="Excluir lançamento" onClick={() => onDelete(tx.id)} className="p-1.5 text-neutral-500 hover:text-red-500 transition-colors active:scale-90"><Trash2 className="w-3.5 h-3.5" /></button>
                        </div>
                     </div>
                   </div>

@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Transaction, Goal, User, AppTab, ShoppingItem } from '../types';
+import { TimeDisplay } from './TimeDisplay';
 import { 
   Plus, 
   Target, 
@@ -45,15 +46,8 @@ export const Home: React.FC<HomeProps> = ({
   onOpenAddModal,
   onUpdateUser
 }) => {
-  const [now, setNow] = useState(new Date());
+  const now = new Date();
   const [editingBalance, setEditingBalance] = useState<{ userId: string; value: string } | null>(null);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setNow(new Date());
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
 
   const currentMonth = now.getMonth();
   const currentYear = now.getFullYear();
@@ -131,9 +125,6 @@ export const Home: React.FC<HomeProps> = ({
     setEditingBalance(null);
   };
 
-  const formattedDate = now.toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric', month: 'short' }).toUpperCase();
-  const formattedTime = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-
   return (
     <div className="space-y-8 xs:space-y-10 animate-slide-up pb-24 px-1 sm:px-0">
       <div className="flex flex-col items-center justify-center text-center space-y-5 px-1 pt-6">
@@ -145,14 +136,7 @@ export const Home: React.FC<HomeProps> = ({
           <h2 className="text-3xl md:text-4xl font-sans font-light text-neutral-900 dark:text-white uppercase tracking-widest leading-none truncate max-w-[320px] md:max-w-none">
             {familyName.split(' ')[0]} <span className="font-semibold text-primary">SINC</span>
           </h2>
-          <div className="flex items-center justify-center space-x-4 mt-6">
-            <p className="text-[10px] font-medium text-neutral-500 uppercase tracking-[0.2em]">{formattedDate}</p>
-            <span className="text-neutral-300 dark:text-neutral-800 opacity-30">|</span>
-            <div className="flex items-center space-x-2">
-              <Clock size={12} className="text-primary" />
-              <p className="text-[10px] font-medium text-neutral-600 dark:text-neutral-400 uppercase tracking-widest tabular-nums">{formattedTime}</p>
-            </div>
-          </div>
+          <TimeDisplay />
         </div>
       </div>
 

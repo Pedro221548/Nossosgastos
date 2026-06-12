@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #FACC15;
+  --color-neutral-850: #171717;
+  --color-neutral-900: #0F0F0F;
+  --color-neutral-950: #050505;
+  
+  --font-sans: "Inter", sans-serif;
+  --font-display: "Plus Jakarta Sans", sans-serif;
+  
+  --screen-xs: 375px;
+}

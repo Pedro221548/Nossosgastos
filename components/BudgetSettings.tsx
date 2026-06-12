@@ -1,7 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { User } from '../types';
-import { Wallet, Camera, Sun, Moon, LogOut, Loader2, Check, Heart } from 'lucide-react';
+import { Wallet, Camera, Sun, Moon, LogOut, Loader2, Check, Heart, Bell } from 'lucide-react';
 
 interface BudgetSettingsProps {
   users: { A: User; B: User };
@@ -14,6 +14,7 @@ interface BudgetSettingsProps {
   onLogout: () => void;
   onForceSync: (overrideUsers?: { A: User; B: User }, overrideFamilyName?: string, overrideThreshold?: number) => Promise<void>;
   isSyncing: boolean;
+  onRequestNotifications: () => void;
 }
 
 export const BudgetSettings: React.FC<BudgetSettingsProps> = ({ 
@@ -26,7 +27,8 @@ export const BudgetSettings: React.FC<BudgetSettingsProps> = ({
   onThemeToggle,
   onLogout,
   onForceSync,
-  isSyncing
+  isSyncing,
+  onRequestNotifications
 }) => {
   const [incomeA, setIncomeA] = useState(users.A.income.toString());
   const [nameA, setNameA] = useState(users.A.name);
@@ -164,6 +166,25 @@ export const BudgetSettings: React.FC<BudgetSettingsProps> = ({
         <div className="space-y-1.5 md:space-y-2">
           <label className="text-[8px] md:text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">Nome da Família / Conta</label>
           <input type="text" value={familyName} onChange={e => setFamilyName(e.target.value)} className="w-full bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl md:rounded-2xl px-5 py-3 md:px-6 md:py-4 text-base md:text-lg font-bold text-neutral-900 dark:text-white outline-none focus:border-primary transition-all" placeholder="Ex: Família Silva" />
+        </div>
+      </div>
+
+      <div className="p-6 md:p-8 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-[2rem] md:rounded-[2.5rem] shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center space-x-4">
+            <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/10 rounded-xl md:rounded-2xl flex items-center justify-center text-primary border border-primary/20 shrink-0"><Bell className="w-5 h-5 md:w-6 md:h-6" /></div>
+            <div>
+              <h3 className="text-xs md:text-sm font-bold text-neutral-900 dark:text-white uppercase tracking-widest leading-none">Notificações Ativas</h3>
+              <p className="text-[10px] text-neutral-500 font-medium mt-1">Clique abaixo para ativar as notificações push e alertas de gastos neste dispositivo.</p>
+            </div>
+          </div>
+          <button 
+            type="button"
+            onClick={onRequestNotifications} 
+            className="w-full sm:w-auto px-6 py-4 bg-primary text-neutral-950 font-black uppercase text-[10px] tracking-widest rounded-xl shadow-glow transition-all active:scale-95 text-center"
+          >
+            Ativar Alertas de Gastos
+          </button>
         </div>
       </div>
 

@@ -29,14 +29,29 @@ interface AnimatedHeadingProps {
 
 const AnimatedHeading: React.FC<AnimatedHeadingProps> = ({ text }) => {
   const [started, setStarted] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   
   useEffect(() => {
     const t = setTimeout(() => setStarted(true), 200); // 200ms initial delay
-    return () => clearTimeout(t);
+    
+    // Check prefers-reduced-motion
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mediaQuery.matches);
+    const listener = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener('change', listener);
+    }
+    
+    return () => {
+      clearTimeout(t);
+      if (mediaQuery.removeEventListener) {
+        mediaQuery.removeEventListener('change', listener);
+      }
+    };
   }, []);
 
   const lines = text.split('\n');
-  const charDelay = 30;
+  const wordDelay = 80;
 
   return (
     <h1 
@@ -44,26 +59,28 @@ const AnimatedHeading: React.FC<AnimatedHeadingProps> = ({ text }) => {
       style={{ letterSpacing: '-0.04em' }}
     >
       {lines.map((line, lineIndex) => {
-        const lineLength = line.length;
-        
         return (
           <div key={lineIndex} className="block">
-            {line.split('').map((char, charIndex) => {
-              const delay = (lineIndex * lineLength * charDelay) + (charIndex * charDelay);
+            {line.split(' ').map((word, wordIndex) => {
+              const delay = (lineIndex * 4 * wordDelay) + (wordIndex * wordDelay);
               
               return (
                 <span
-                  key={charIndex}
-                  className="inline-block transition-all"
-                  style={{
+                  key={wordIndex}
+                  className="inline-block mr-3.5 transition-all"
+                  style={prefersReducedMotion ? {
                     opacity: started ? 1 : 0,
-                    transform: started ? 'translateX(0)' : 'translateX(-18px)',
+                    transitionDuration: '300ms',
+                    transitionDelay: `${delay}ms`
+                  } : {
+                    opacity: started ? 1 : 0,
+                    transform: started ? 'translateY(0)' : 'translateY(12px)',
                     transitionDuration: '500ms',
                     transitionDelay: `${delay}ms`,
                     transitionTimingFunction: 'ease-out'
                   }}
                 >
-                  {char === ' ' ? '\u00A0' : char}
+                  {word}
                 </span>
               );
             })}

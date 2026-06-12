@@ -6,14 +6,14 @@ import { getFirestore, collection, onSnapshot, query, orderBy, where, addDoc, up
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBSA3ggl68i-g8rgLzUyc7gbXizdbv5Frk",
-  authDomain: "nossos-gastos-f495d.firebaseapp.com",
-  databaseURL: "https://nossos-gastos-f495d-default-rtdb.firebaseio.com",
-  projectId: "nossos-gastos-f495d",
-  storageBucket: "nossos-gastos-f495d.firebasestorage.app",
-  messagingSenderId: "247154942228",
-  appId: "1:247154942228:web:5aad334ac029df17a1e201",
-  measurementId: "G-VLF5HD290Z"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
 const app = initializeApp(firebaseConfig);
@@ -36,7 +36,7 @@ export const requestNotificationPermission = async (deviceOwner?: 'A' | 'B' | nu
     const permission = await Notification.requestPermission();
     if (permission === 'granted') {
       const token = await getToken(messaging, { 
-        vapidKey: 'BAepgjOi6ihE23jXjULM4Lt3UxL-PBGZ5VhXILuyEQkmODzry86zwQ5VnIvTcSVA5uLDWTH0wJxK3GwXw5iYyr4' 
+        vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY 
       });
       console.log('Push notification token:', token);
       
@@ -208,7 +208,7 @@ export const notifyDevices = async (excludeDevice: 'A' | 'B' | null, title: stri
     try {
       const { getToken } = await import('firebase/messaging');
       if (typeof window !== 'undefined' && messaging) {
-         const currentToken = await getToken(messaging, { vapidKey: 'BAepgjOi6ihE23jXjULM4Lt3UxL-PBGZ5VhXILuyEQkmODzry86zwQ5VnIvTcSVA5uLDWTH0wJxK3GwXw5iYyr4' }).catch(() => null);
+         const currentToken = await getToken(messaging, { vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY }).catch(() => null);
          if (currentToken) {
              targets.delete(currentToken);
          }

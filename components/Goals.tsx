@@ -42,10 +42,10 @@ export const Goals: React.FC<GoalsProps> = ({ goals, onUpdateGoal, onSaveGoal, o
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
                 <div className="absolute top-4 right-4 flex space-x-2">
                    {goal.purchaseUrl && (
-                     <a href={goal.purchaseUrl} target="_blank" rel="noopener noreferrer" className="p-3 bg-white/90 rounded-2xl text-primary hover:scale-110 transition-transform"><LinkIcon size={16} /></a>
+                     <a aria-label="Acessar link de compra do objetivo" href={goal.purchaseUrl} target="_blank" rel="noopener noreferrer" className="p-3 bg-white/90 rounded-2xl text-primary hover:scale-110 transition-transform"><LinkIcon size={16} /></a>
                    )}
-                   <button onClick={() => handleOpenEdit(goal)} className="p-3 bg-white/90 rounded-2xl text-neutral-600 hover:text-primary"><Edit3 size={16} /></button>
-                   <button onClick={() => setConfirmDelete({ isOpen: true, id: goal.id })} className="p-3 bg-white/90 rounded-2xl text-neutral-600 hover:text-red-500"><Trash2 size={16} /></button>
+                   <button aria-label="Editar objetivo" onClick={() => handleOpenEdit(goal)} className="p-3 bg-white/90 rounded-2xl text-neutral-600 hover:text-primary"><Edit3 size={16} /></button>
+                   <button aria-label="Excluir objetivo" onClick={() => setConfirmDelete({ isOpen: true, id: goal.id })} className="p-3 bg-white/90 rounded-2xl text-neutral-600 hover:text-red-500"><Trash2 size={16} /></button>
                 </div>
                 <h3 className="absolute bottom-4 left-6 text-white font-display font-black text-2xl uppercase tracking-tight italic">{goal.title}</h3>
               </div>
@@ -126,7 +126,7 @@ const GoalModal = ({ isOpen, onClose, onSave, goal }: any) => {
         
         <div className="flex justify-between items-center mb-10">
            <h2 className="text-3xl font-display font-black text-white uppercase italic tracking-tighter leading-none">Novo Objetivo</h2>
-           <button onClick={onClose} className="p-3 bg-neutral-900 rounded-full text-neutral-500 hover:text-white transition-all"><X size={24} /></button>
+           <button aria-label="Fechar modal" onClick={onClose} className="p-3 bg-neutral-900 rounded-full text-neutral-500 hover:text-white transition-all"><X size={24} /></button>
         </div>
 
         <div className="space-y-6">

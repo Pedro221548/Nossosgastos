@@ -33,54 +33,21 @@ import {
   X
 } from 'lucide-react';
 
+import { useFamilyData, useSubscription, useNotifications, useTransactions } from './hooks/useAppData';
+
 type Theme = 'dark' | 'light';
 
 const App: React.FC = () => {
   const [user, setUser] = useState<FirebaseUser | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [showLogin, setShowLogin] = useState(false);
-  const [subscription, setSubscription] = useState<any>(null);
-  const [subscriptionLoaded, setSubscriptionLoaded] = useState(false);
-  const [isSyncing, setIsSyncing] = useState(false);
   const [activeTab, setActiveTab] = useState<AppTab>('home');
   const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem('nc_theme') as Theme) || 'dark');
   const [nowMs, setNowMs] = useState(Date.now());
-  const [forcePaywall, setForcePaywall] = useState(false);
   
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [goals, setGoals] = useState<Goal[]>([]);
-  const [shoppingItems, setShoppingItems] = useState<ShoppingItem[]>([]);
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
-  const [users, setUsers] = useState<{ A: User; B: User }>(USERS);
-  const usersRef = React.useRef(users);
-  const [familyName, setFamilyName] = useState('Nossa Família');
-  const [alertThreshold, setAlertThreshold] = useState(15);
-  const [toastData, setToastData] = useState<{title: string, message: string} | null>(null);
   const [deviceOwner, setDeviceOwner] = useState<'A' | 'B' | null>(() => {
     return localStorage.getItem('deviceOwner') as 'A' | 'B' | null;
   });
-
-  useEffect(() => {
-    if (deviceOwner) {
-      localStorage.setItem('deviceOwner', deviceOwner);
-    } else {
-      localStorage.removeItem('deviceOwner');
-    }
-  }, [deviceOwner]);
-
-  useEffect(() => {
-    usersRef.current = users;
-  }, [users]);
-
-  useEffect(() => {
-    if (user && deviceOwner) {
-      requestNotificationPermission(deviceOwner);
-    }
-  }, [user, deviceOwner]);
-
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
 
   const [confirmModal, setConfirmModal] = useState<{
     isOpen: boolean;
@@ -91,85 +58,81 @@ const App: React.FC = () => {
   }>({ isOpen: false, title: '', message: '', variant: 'danger', onConfirm: () => {} });
 
   useEffect(() => {
+    if (deviceOwner) {
+      localStorage.setItem('deviceOwner', deviceOwner);
+    } else {
+      localStorage.removeItem('deviceOwner');
+    }
+  }, [deviceOwner]);
+
+  useEffect(() => {
     return onAuthStateChanged(auth, (firebaseUser) => {
       setUser(firebaseUser);
       setAuthLoading(false);
     });
   }, []);
 
+  // 1. Hook for couple configurations, family names, goals, budgets, invoices.
+  const {
+    users,
+    setUsers,
+    familyName,
+    setFamilyName,
+    alertThreshold,
+    setAlertThreshold,
+    currentDate,
+    setCurrentDate,
+    goals,
+    setGoals,
+    shoppingItems,
+    setShoppingItems,
+    invoices,
+    setInvoices,
+    isSyncing,
+    setIsSyncing,
+    triggerSync,
+    handleUpdateUser,
+    handleUpdateFamilySettings,
+    forceFullSync
+  } = useFamilyData(user, deviceOwner);
+
+  const usersRef = React.useRef(users);
   useEffect(() => {
-    if (!user) return;
-    
-    const unsubGoals = listenToData('goals', (data: Goal[]) => data && setGoals(data));
-    const unsubShopping = listenToData('shoppingItems', (data: ShoppingItem[]) => data && setShoppingItems(data));
-    const unsubInvoices = listenToData('invoices', (data: Invoice[]) => data && setInvoices(data));
-    const unsubUsers = listenToData('users', (data: { A: User; B: User }) => data && setUsers(data));
-    const unsubFamily = listenToData('familyName', (data: string) => data && setFamilyName(data));
-    const unsubThreshold = listenToData('alertThreshold', (data: number) => data && setAlertThreshold(data));
-    const unsubSubscription = listenToData('subscription', (data: any) => {
-      setSubscription(data);
-      setSubscriptionLoaded(true);
-    });
-    
-    // Fallback if no subscription data is found quickly
-    const subTimeout = setTimeout(() => {
-      setSubscriptionLoaded(true);
-    }, 1000);
+    usersRef.current = users;
+  }, [users]);
 
-    const unsubFirestore = listenToFirestoreTransactions((data: any[]) => {
-      const mappedTransactions: Transaction[] = data.map(item => {
-        let formattedDate = item.data;
-        if (formattedDate && formattedDate.includes('-') && formattedDate.split('-').length === 3) {
-           const [y, m, d] = formattedDate.split('-');
-           formattedDate = `${d}/${m}/${y}`;
-        }
+  // 2. Hook for checking subscription state securely on the server
+  const {
+    subscription,
+    setSubscription,
+    subscriptionLoaded,
+    forcePaywall,
+    setForcePaywall,
+    hasActiveTrial,
+    daysUntilDeletion,
+    hasSubscription,
+    isLocked,
+    trialDaysLeft,
+    trialHoursLeft
+  } = useSubscription(user, nowMs);
 
-        return {
-          id: item.id,
-          title: item.descricao || 'Sem título',
-          amount: Number(item.valor) || 0,
-          category: item.categoria || 'Geral',
-          date: formattedDate || new Date().toLocaleDateString('pt-BR'),
-          spenderId: item.userId || 'unknown',
-          emoji: item.emoji || (item.tipo === 'despesa' ? '💸' : '💰'),
-          type: item.tipo === 'despesa' ? 'expense' : 'revenue',
-          isPaid: item.pago ?? false,
-          isFixed: item.isFixed ?? false,
-          paidMonths: item.paidMonths || [],
-          installments: item.installments || undefined
-        };
-      });
-      setTransactions(mappedTransactions);
-    }, (type, data) => {
-       if (deviceOwner && data.updatedByDevice === deviceOwner) return;
+  // 3. Hook for toast warnings and custom alerts (moved permission call to manual activation)
+  const {
+    toastData,
+    setToastData,
+    triggerNotificationPermission
+  } = useNotifications(user, deviceOwner, usersRef);
 
-       const updaterId = data.updatedByDevice || data.userId;
-       const updaterName = updaterId && usersRef.current[updaterId as 'A'|'B'] ? usersRef.current[updaterId as 'A'|'B'].name : 'Seu parceiro';
-       const title = type === 'added' ? 'Nova Transação' : 'Transação Editada';
-       const action = type === 'added' ? 'adicionou' : 'editou';
-       
-       let extraInfo = '';
-       if (data.isFixed) {
-          extraInfo = ' (Fixo)';
-       } else if (data.installments?.total > 1) {
-          extraInfo = ` (Parcelado em ${data.installments.total}x)`;
-       }
-       
-       const paidInfo = data.pago ? 'pago(a)' : 'lançado(a)';
-       const amount = Number(data.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-       const typeStr = data.tipo === 'despesa' ? 'despesa' : 'receita';
-       const msg = `${updaterName} ${action} uma ${typeStr}: ${data.descricao} de ${amount} que já consta como ${paidInfo}${extraInfo}.`;
-
-       setToastData({ title, message: msg });
-       setTimeout(() => setToastData(null), 8000);
-    });
-
-    return () => {
-      unsubGoals?.(); unsubShopping?.(); unsubInvoices?.(); unsubUsers?.(); unsubFamily?.(); 
-      unsubThreshold?.(); unsubSubscription?.(); unsubFirestore?.();
-      clearTimeout(subTimeout);
-    };
-  }, [user]);
+  // 4. Hook for transaction management (handles listening, paging, deleting, adding, toggling pay status)
+  const {
+    transactions,
+    isAddModalOpen,
+    setIsAddModalOpen,
+    editingTransaction,
+    setEditingTransaction,
+    handleTogglePaid,
+    handleAddOrUpdateTransaction
+  } = useTransactions(user, deviceOwner, usersRef, setToastData, setIsSyncing);
 
   useEffect(() => {
     localStorage.setItem('nc_theme', theme);
@@ -185,8 +148,8 @@ const App: React.FC = () => {
     setIsSyncing(true);
     const updated = [...invoices, invoice];
     setInvoices(updated);
-    await syncData('invoices', updated);
-    await notifyDevices(deviceOwner, 'Nova Fatura', `Fatura de ${invoice.issuer} - R$ ${invoice.amount.toLocaleString('pt-BR', {minimumFractionDigits:2})}`);
+    await triggerSync('invoices', updated);
+    await notifyDevices(deviceOwner, 'Nova Fatura', `Fatura de ${invoice.bankName} - R$ ${invoice.totalAmount.toLocaleString('pt-BR', {minimumFractionDigits:2})}`);
     setIsSyncing(false);
   };
 
@@ -195,9 +158,9 @@ const App: React.FC = () => {
     const invoice = invoices.find(i => i.id === id);
     const updated = invoices.filter(i => i.id !== id);
     setInvoices(updated);
-    await syncData('invoices', updated);
+    await triggerSync('invoices', updated);
     if (invoice) {
-      await notifyDevices(deviceOwner, 'Fatura Excluída', `Fatura de ${invoice.issuer} apagada`);
+      await notifyDevices(deviceOwner, 'Fatura Excluída', `Fatura de ${invoice.bankName} apagada`);
     }
     setIsSyncing(false);
   };
@@ -207,8 +170,8 @@ const App: React.FC = () => {
     const existing = goals.find(g => g.id === goal.id);
     let updatedGoals = existing ? goals.map(g => g.id === goal.id ? goal : g) : [...goals, goal];
     setGoals(updatedGoals);
-    await syncData('goals', updatedGoals);
-    await notifyDevices(deviceOwner, 'Objetivo', existing ? `Objetivo atualizado: ${goal.name}` : `Novo objetivo: ${goal.name}`);
+    await triggerSync('goals', updatedGoals);
+    await notifyDevices(deviceOwner, 'Objetivo', existing ? `Objetivo atualizado: ${goal.title}` : `Novo objetivo: ${goal.title}`);
     setIsSyncing(false);
   };
 
@@ -217,9 +180,9 @@ const App: React.FC = () => {
     const goal = goals.find(g => g.id === goalId);
     const updated = goals.map(g => g.id === goalId ? { ...g, currentAmount: g.currentAmount + amountToAdd } : g);
     setGoals(updated);
-    await syncData('goals', updated);
+    await triggerSync('goals', updated);
     if (goal) {
-      await notifyDevices(deviceOwner, 'Objetivo', `Adicionado R$ ${amountToAdd} no objetivo ${goal.name}`);
+      await notifyDevices(deviceOwner, 'Objetivo', `Adicionado R$ ${amountToAdd} no objetivo ${goal.title}`);
     }
     setIsSyncing(false);
   };
@@ -229,94 +192,11 @@ const App: React.FC = () => {
     const goal = goals.find(g => g.id === goalId);
     const updated = goals.filter(g => g.id !== goalId);
     setGoals(updated);
-    await syncData('goals', updated);
+    await triggerSync('goals', updated);
     if (goal) {
-      await notifyDevices(deviceOwner, 'Objetivo', `Objetivo ${goal.name} apagado`);
+      await notifyDevices(deviceOwner, 'Objetivo', `Objetivo ${goal.title} apagado`);
     }
     setIsSyncing(false);
-  };
-
-  const handleTogglePaid = async (id: string, targetMonth?: string) => {
-    const tx = transactions.find(t => t.id === id);
-    if (!tx) return;
-
-    if (tx.isFixed && targetMonth) {
-      const currentPaidMonths = tx.paidMonths || [];
-      const isPaying = !currentPaidMonths.includes(targetMonth);
-      const updatedMonths = isPaying
-        ? [...currentPaidMonths, targetMonth]
-        : currentPaidMonths.filter(m => m !== targetMonth);
-      await updateFirestoreTransaction(id, { paidMonths: updatedMonths, updatedByDevice: deviceOwner });
-      
-      const statusTitle = isPaying ? "Conta Paga" : "Conta Pendente";
-      const statusMessage = isPaying ? `A conta ${tx.title} foi paga` : `A conta ${tx.title} foi marcada como pendente`;
-      await notifyDevices(deviceOwner, statusTitle, statusMessage);
-    } else {
-      const isPaying = !tx.isPaid;
-      await updateFirestoreTransaction(id, { pago: isPaying, updatedByDevice: deviceOwner });
-      
-      const statusTitle = isPaying ? "Conta Paga" : "Conta Pendente";
-      const statusMessage = isPaying ? `A conta ${tx.title} foi paga` : `A conta ${tx.title} foi marcada como pendente`;
-      await notifyDevices(deviceOwner, statusTitle, statusMessage);
-    }
-  };
-
-  const handleAddOrUpdateTransaction = async (tx: Transaction) => {
-    setIsSyncing(true);
-    try {
-      const [d, m, y] = tx.date.split('/');
-      
-      const createPayload = (currentDate: string, currentInstallment?: number) => ({
-        descricao: tx.title,
-        valor: tx.amount,
-        category: tx.category,
-        data: currentDate,
-        userId: tx.spenderId,
-        emoji: tx.emoji,
-        tipo: tx.type === 'expense' ? 'despesa' : 'receita',
-        pago: tx.isPaid,
-        isFixed: tx.isFixed,
-        paidMonths: tx.paidMonths || [],
-        installments: currentInstallment ? { current: currentInstallment, total: tx.installments!.total } : null,
-        tenantId: user?.uid,
-        updatedByDevice: deviceOwner
-      });
-
-      if (editingTransaction) {
-        const isoDate = `${y}-${m}-${d}`;
-        await updateFirestoreTransaction(editingTransaction.id, createPayload(isoDate, tx.installments?.current));
-        
-        await notifyDevices(
-          deviceOwner, 
-          "Conta Alterada", 
-          `A conta ${tx.title} foi alterada.`
-        );
-      } else {
-        if (tx.installments && tx.installments.total > 1) {
-          const promises = [];
-          const startDate = new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
-          
-          for (let i = 0; i < tx.installments.total; i++) {
-            const nextDate = new Date(startDate);
-            nextDate.setMonth(startDate.getMonth() + i);
-            const isoDateString = `${nextDate.getFullYear()}-${(nextDate.getMonth() + 1).toString().padStart(2, '0')}-${nextDate.getDate().toString().padStart(2, '0')}`;
-            promises.push(addDoc(collection(firestore, "transacoes"), createPayload(isoDateString, i + 1)));
-          }
-          await Promise.all(promises);
-        } else {
-          const isoDate = `${y}-${m}-${d}`;
-          await addDoc(collection(firestore, "transacoes"), createPayload(isoDate));
-        }
-
-        await notifyDevices(
-          deviceOwner, 
-          "Nova Transação", 
-          `A conta ${tx.title} foi adicionada no valor R$ ${tx.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
-        );
-      }
-      setIsAddModalOpen(false);
-      setEditingTransaction(null);
-    } catch (e) { console.error(e); } finally { setIsSyncing(false); }
   };
 
   const handleDeleteTransaction = (id: string) => {
@@ -346,7 +226,7 @@ const App: React.FC = () => {
     };
     const updated = [...shoppingItems, newItem];
     setShoppingItems(updated);
-    await syncData('shoppingItems', updated);
+    await triggerSync('shoppingItems', updated);
     await notifyDevices(deviceOwner, 'Mercado', `Item adicionado: ${newItem.text}`);
   };
 
@@ -354,7 +234,7 @@ const App: React.FC = () => {
     const item = shoppingItems.find(i => i.id === id);
     const updated = shoppingItems.map(i => i.id === id ? { ...i, completed: !i.completed } : i);
     setShoppingItems(updated);
-    await syncData('shoppingItems', updated);
+    await triggerSync('shoppingItems', updated);
     if (item) {
       await notifyDevices(deviceOwner, 'Mercado', `Item marcado: ${item.text}`);
     }
@@ -364,7 +244,7 @@ const App: React.FC = () => {
     const item = shoppingItems.find(i => i.id === id);
     const updated = shoppingItems.filter(i => i.id !== id);
     setShoppingItems(updated);
-    await syncData('shoppingItems', updated);
+    await triggerSync('shoppingItems', updated);
     if (item) {
       await notifyDevices(deviceOwner, 'Mercado', `Item apagado: ${item.text}`);
     }
@@ -374,29 +254,8 @@ const App: React.FC = () => {
     const now = new Date().toLocaleDateString('pt-BR');
     const updated = shoppingItems.map(i => i.completed && !i.archivedAt ? { ...i, archivedAt: now } : i);
     setShoppingItems(updated);
-    await syncData('shoppingItems', updated);
+    await triggerSync('shoppingItems', updated);
     await notifyDevices(deviceOwner, 'Mercado', 'Histórico de mercado limpo');
-  };
-
-  const triggerSync = async (path: string, data: any) => {
-    setIsSyncing(true);
-    await syncData(path, data);
-    setTimeout(() => setIsSyncing(false), 1000);
-  };
-
-  const forceFullSync = async (overrideUsers?: { A: User; B: User }, overrideFamilyName?: string, overrideThreshold?: number) => {
-    setIsSyncing(true);
-    try {
-      await Promise.all([
-        syncData('goals', goals),
-        syncData('shoppingItems', shoppingItems),
-        syncData('invoices', invoices),
-        syncData('users', overrideUsers || users),
-        syncData('familyName', overrideFamilyName || familyName),
-        syncData('alertThreshold', overrideThreshold || alertThreshold)
-      ]);
-    } catch (e) { console.error(e); }
-    setTimeout(() => setIsSyncing(false), 1000);
   };
 
   if (authLoading) return <div className="min-h-screen bg-neutral-950 flex items-center justify-center"><Loader2 className="text-primary animate-spin" size={48} /></div>;
@@ -421,24 +280,9 @@ const App: React.FC = () => {
     return <div className="min-h-screen bg-neutral-950 flex items-center justify-center"><Loader2 className="text-primary animate-spin" size={48} /></div>;
   }
 
-  const creationTimeMs = user ? new Date(user.metadata.creationTime || Date.now()).getTime() : Date.now();
-  const trialEndMs = creationTimeMs + (30 * 24 * 3600 * 1000);
-  const trialTimeLeftMs = trialEndMs - nowMs;
-  const hasActiveTrial = trialTimeLeftMs > 0;
-  
-  const deletionEndMs = trialEndMs + (10 * 24 * 3600 * 1000);
-  const deletionTimeLeftMs = deletionEndMs - nowMs;
-  const daysUntilDeletion = Math.max(0, Math.ceil(deletionTimeLeftMs / (24 * 3600 * 1000)));
-
-  const hasSubscription = (subscription && subscription.status === 'active') || user?.email === 'pedroassfernandes.25@gmail.com';
-  const isLocked = (!hasSubscription && !hasActiveTrial) || forcePaywall;
-
   if (isLocked) {
     return <Paywall onSubscribeSuccess={() => { setSubscription({ status: 'active' }); setForcePaywall(false); }} onCancel={hasActiveTrial ? () => setForcePaywall(false) : undefined} daysUntilDeletion={daysUntilDeletion} />;
   }
-
-  const trialDaysLeft = Math.floor(trialTimeLeftMs / (24 * 3600 * 1000));
-  const trialHoursLeft = Math.floor((trialTimeLeftMs % (24 * 3600 * 1000)) / (3600 * 1000));
 
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-200 flex flex-col md:flex-row transition-colors duration-300">
@@ -465,12 +309,12 @@ const App: React.FC = () => {
       )}
 
       {toastData && (
-        <div className="fixed top-10 left-1/2 -translate-x-1/2 z-[150] bg-neutral-900 border border-primary/20 shadow-2xl rounded-3xl p-4 flex items-center space-x-4 text-white max-w-[90vw] w-[400px] mx-auto animate-in fade-in slide-in-from-top-10 duration-500">
-          <div className="w-12 h-12 bg-primary/20 rounded-2xl flex items-center justify-center text-primary shrink-0 shadow-glow">
-            <Bell size={24} />
+        <div className={`fixed top-10 left-1/2 -translate-x-1/2 z-[150] bg-neutral-900 border ${toastData.variant === 'error' ? 'border-red-500/30' : 'border-primary/20'} shadow-2xl rounded-3xl p-4 flex items-center space-x-4 text-white max-w-[90vw] w-[400px] mx-auto animate-in fade-in slide-in-from-top-10 duration-500`}>
+          <div className={`w-12 h-12 ${toastData.variant === 'error' ? 'bg-red-500/20 text-red-500 shadow-[0_0_15px_rgba(239,68,68,0.15)]' : 'bg-primary/20 text-primary shadow-glow'} rounded-2xl flex items-center justify-center shrink-0`}>
+            {toastData.variant === 'error' ? <Bell className="animate-bounce" size={24} /> : <Bell size={24} />}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-[10px] font-black tracking-widest text-primary uppercase mb-0.5">{toastData.title}</p>
+            <p className={`text-[10px] font-black tracking-widest ${toastData.variant === 'error' ? 'text-red-500' : 'text-primary'} uppercase mb-0.5`}>{toastData.title}</p>
             <p className="text-xs font-semibold leading-relaxed text-neutral-200">{toastData.message}</p>
           </div>
           <button onClick={() => setToastData(null)} className="text-neutral-500 hover:text-white transition-colors p-2"><X size={16}/></button>
@@ -533,13 +377,13 @@ const App: React.FC = () => {
       </aside>
 
       <main className="flex-1 max-w-6xl mx-auto w-full px-4 py-8 md:px-12 md:py-20 lg:py-24 pb-40 lg:pb-24 pt-[calc(2rem+env(safe-area-inset-top))]">
-        {activeTab === 'home' && <Home transactions={transactions} goals={goals} shoppingItems={shoppingItems} users={users} familyName={familyName} onNavigate={setActiveTab} onOpenAddModal={() => setIsAddModalOpen(true)} onUpdateUser={(uid, data) => { const key = uid === users.A.id ? 'A' : 'B'; const updated = { ...users, [key]: { ...users[key], ...data } }; setUsers(updated); triggerSync('users', updated); }} />}
+        {activeTab === 'home' && <Home transactions={transactions} goals={goals} shoppingItems={shoppingItems} users={users} familyName={familyName} onNavigate={setActiveTab} onOpenAddModal={() => setIsAddModalOpen(true)} onUpdateUser={handleUpdateUser} />}
         {activeTab === 'dashboard' && <Dashboard transactions={transactions} totalIncome={users.A.income + users.B.income} currentDate={currentDate} users={users} familyName={familyName} alertThreshold={alertThreshold} onMonthChange={(dir: 'prev' | 'next') => { const nd = new Date(currentDate); nd.setMonth(nd.getMonth() + (dir === 'next' ? 1 : -1)); setCurrentDate(nd); }} onDelete={handleDeleteTransaction} onTogglePaid={handleTogglePaid} onEdit={(tx: Transaction) => { setEditingTransaction(tx); setIsAddModalOpen(true); }} onClearAll={() => {}} onOpenShopping={() => setActiveTab('shopping')} onOpenAddModal={() => { setEditingTransaction(null); setIsAddModalOpen(true); }} />}
         {activeTab === 'invoices' && <InvoiceManager invoices={invoices} onSaveInvoice={handleSaveInvoice} onDeleteInvoice={handleDeleteInvoice} />}
         {activeTab === 'analytics' && <Analytics transactions={transactions} baseIncome={users.A.income + users.B.income} currentDate={currentDate} onMonthChange={(dir: 'prev' | 'next') => { const nd = new Date(currentDate); nd.setMonth(nd.getMonth() + (dir === 'next' ? 1 : -1)); setCurrentDate(nd); }} />}
         {activeTab === 'goals' && <Goals goals={goals} onUpdateGoal={handleUpdateGoalProgress} onSaveGoal={handleSaveGoal} onDeleteGoal={handleDeleteGoal} />}
         {activeTab === 'shopping' && <ShoppingList items={shoppingItems} onAdd={handleAddShoppingItem} onToggle={handleToggleShopping} onDelete={handleDeleteShopping} onClearHistory={handleClearShoppingHistory} />}
-        {activeTab === 'budget' && <BudgetSettings users={users} familyName={familyName} alertThreshold={alertThreshold} onUpdateUser={(uid: string, data: Partial<User>) => { const key = uid === users.A.id ? 'A' : 'B'; const updated = { ...users, [key]: { ...users[key], ...data } }; setUsers(updated); triggerSync('users', updated); }} onUpdateFamilySettings={(name: string, threshold: number) => { setFamilyName(name); setAlertThreshold(threshold); triggerSync('familyName', name); triggerSync('alertThreshold', threshold); }} currentTheme={theme} onThemeToggle={setTheme} onLogout={() => signOut(auth)} onForceSync={forceFullSync} isSyncing={isSyncing} />}
+        {activeTab === 'budget' && <BudgetSettings users={users} familyName={familyName} alertThreshold={alertThreshold} onUpdateUser={handleUpdateUser} onUpdateFamilySettings={handleUpdateFamilySettings} currentTheme={theme} onThemeToggle={setTheme} onLogout={() => signOut(auth)} onForceSync={forceFullSync} isSyncing={isSyncing} onRequestNotifications={triggerNotificationPermission} />}
       </main>
 
       <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-[calc(80px+env(safe-area-inset-bottom))] bg-white/95 dark:bg-neutral-950/95 backdrop-blur-3xl border-t border-neutral-200 dark:border-neutral-800 flex justify-around items-start z-[100] shadow-[0_-10px_40px_rgba(0,0,0,0.1)] px-1 pt-2 pb-[env(safe-area-inset-bottom)]">

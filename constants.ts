@@ -4,16 +4,16 @@ import { User, Transaction, Goal } from './types';
 export const USERS: { A: User; B: User } = {
   A: {
     id: 'user_a',
-    name: 'Pedro',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Pedro',
-    income: 5000,
+    name: 'Parceiro A',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ParceiroA',
+    income: 0,
     currentBalance: 0
   },
   B: {
     id: 'user_b',
-    name: 'Emilly',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Emilly',
-    income: 3500,
+    name: 'Parceiro B',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ParceiroB',
+    income: 0,
     currentBalance: 0
   },
 };
@@ -27,10 +27,18 @@ export const TOTAL_FAMILY_INCOME = USERS.A.income + USERS.B.income;
 
 export const CATEGORIES = [
   { id: 'Mercado', emoji: '🛒' },
+  { id: 'Alimentação', emoji: '🍔' },
   { id: 'Lazer', emoji: '🎉' },
   { id: 'Transporte', emoji: '⛽' },
   { id: 'Casa', emoji: '🏠' },
   { id: 'Saúde', emoji: '💊' },
+  { id: 'Educação', emoji: '🎓' },
+  { id: 'Assinaturas', emoji: '📺' },
+  { id: 'Vestuário', emoji: '👕' },
+  { id: 'Viagem', emoji: '✈️' },
+  { id: 'Pets', emoji: '🐶' },
+  { id: 'Investimentos', emoji: '📈' },
+  { id: 'Presente', emoji: '🎁' },
 ];
 
 export const MOCK_TRANSACTIONS: Transaction[] = [
