@@ -1,26 +1,41 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import * as admin from 'firebase-admin';
 
+let initError: any = null;
+
 if (!admin.apps.length) {
   try {
-    if (process.env.FIREBASE_CLIENT_EMAIL && process.env.FIREBASE_PRIVATE_KEY) {
+    const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+    const privateKey = process.env.FIREBASE_PRIVATE_KEY;
+    const serviceAccountVar = process.env.FIREBASE_SERVICE_ACCOUNT;
+
+    if (clientEmail && privateKey) {
+      let cleanedKey = privateKey.trim();
+      if ((cleanedKey.startsWith('"') && cleanedKey.endsWith('"')) ||
+          (cleanedKey.startsWith("'") && cleanedKey.endsWith("'"))) {
+        cleanedKey = cleanedKey.substring(1, cleanedKey.length - 1).trim();
+      }
+      cleanedKey = cleanedKey.replace(/\\n/g, '\n');
+
       admin.initializeApp({
         credential: admin.credential.cert({
           projectId: 'nossos-gastos-f495d',
-          clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-          privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+          clientEmail,
+          privateKey: cleanedKey,
         }),
       });
-    } else if (process.env.FIREBASE_SERVICE_ACCOUNT) {
-      const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+    } else if (serviceAccountVar) {
+      const serviceAccount = JSON.parse(serviceAccountVar);
       admin.initializeApp({
         credential: admin.credential.cert(serviceAccount),
       });
     } else {
-      console.warn("Credentials not fully set in environment vars. Initializing defaults.");
+      initError = new Error("Neither separate Firebase credentials (FIREBASE_CLIENT_EMAIL & FIREBASE_PRIVATE_KEY) nor FIREBASE_SERVICE_ACCOUNT variable is defined.");
+      console.warn(initError.message);
       admin.initializeApp();
     }
-  } catch (error) {
+  } catch (error: any) {
+    initError = error;
     console.error('Firebase admin initialization error:', error);
   }
 }
@@ -38,6 +53,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method Not Allowed' });
+  }
+
+  if (initError) {
+    return res.status(500).json({ 
+      error: "Erro de inicialização do Firebase Admin", 
+      details: initError.message || String(initError),
+      hint: "Verifique se as variáveis de ambiente FIREBASE_CLIENT_EMAIL e FIREBASE_PRIVATE_KEY (ou FIREBASE_SERVICE_ACCOUNT) estão configuradas corretamente no painel do Vercel."
+    });
   }
 
   try {
