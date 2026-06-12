@@ -1,9 +1,9 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import * as admin from 'firebase-admin';
 
-let initError: any = null;
+function initializeFirebaseAdmin() {
+  if (admin.apps.length > 0) return null;
 
-if (!admin.apps.length) {
   try {
     const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
     const privateKey = process.env.FIREBASE_PRIVATE_KEY;
@@ -24,19 +24,19 @@ if (!admin.apps.length) {
           privateKey: cleanedKey,
         }),
       });
+      return null;
     } else if (serviceAccountVar) {
       const serviceAccount = JSON.parse(serviceAccountVar);
       admin.initializeApp({
         credential: admin.credential.cert(serviceAccount),
       });
+      return null;
     } else {
-      initError = new Error("Neither separate Firebase credentials (FIREBASE_CLIENT_EMAIL & FIREBASE_PRIVATE_KEY) nor FIREBASE_SERVICE_ACCOUNT variable is defined.");
-      console.warn(initError.message);
-      admin.initializeApp();
+      throw new Error("Neither separate Firebase credentials (FIREBASE_CLIENT_EMAIL & FIREBASE_PRIVATE_KEY) nor FIREBASE_SERVICE_ACCOUNT is defined in the environment.");
     }
   } catch (error: any) {
-    initError = error;
     console.error('Firebase admin initialization error:', error);
+    return error;
   }
 }
 
@@ -55,11 +55,34 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
+  const initError = initializeFirebaseAdmin();
+
   if (initError) {
+    const email = process.env.FIREBASE_CLIENT_EMAIL;
+    const key = process.env.FIREBASE_PRIVATE_KEY;
+    const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT;
+
+    let keyAnalysis = "Not set";
+    if (key) {
+      const trimmed = key.trim();
+      const hasBegin = trimmed.includes("BEGIN PRIVATE KEY");
+      const hasEnd = trimmed.includes("END PRIVATE KEY");
+      const hasEscapedNewlines = trimmed.includes("\\n");
+      const hasRealNewlines = trimmed.includes("\n");
+      keyAnalysis = `Set (length: ${key.length}). Starts with BEGIN: ${hasBegin}, Ends with END: ${hasEnd}, Contains \\n: ${hasEscapedNewlines}, Contains actual newlines: ${hasRealNewlines}`;
+    }
+
     return res.status(500).json({ 
       error: "Erro de inicialização do Firebase Admin", 
       details: initError.message || String(initError),
-      hint: "Verifique se as variáveis de ambiente FIREBASE_CLIENT_EMAIL e FIREBASE_PRIVATE_KEY (ou FIREBASE_SERVICE_ACCOUNT) estão configuradas corretamente no painel do Vercel."
+      stack: initError.stack || null,
+      debug: {
+        FIREBASE_CLIENT_EMAIL: email ? `Set (length: ${email.length})` : "Not set",
+        FIREBASE_PRIVATE_KEY_ANALYSIS: keyAnalysis,
+        FIREBASE_SERVICE_ACCOUNT: serviceAccount ? `Set (length: ${serviceAccount.length})` : "Not set",
+        appsLoadedCount: admin.apps.length
+      },
+      hint: "Verifique se as variáveis de ambiente FIREBASE_CLIENT_EMAIL e FIREBASE_PRIVATE_KEY (ou FIREBASE_SERVICE_ACCOUNT) foram criadas e salvas com sucesso no painel de controle do Vercel."
     });
   }
 
