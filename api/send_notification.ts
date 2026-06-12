@@ -3,13 +3,21 @@ import * as admin from 'firebase-admin';
 
 if (!admin.apps.length) {
   try {
-    if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+    if (process.env.FIREBASE_CLIENT_EMAIL && process.env.FIREBASE_PRIVATE_KEY) {
+      admin.initializeApp({
+        credential: admin.credential.cert({
+          projectId: 'nossos-gastos-f495d',
+          clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+          privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+        }),
+      });
+    } else if (process.env.FIREBASE_SERVICE_ACCOUNT) {
       const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
       admin.initializeApp({
         credential: admin.credential.cert(serviceAccount),
       });
     } else {
-      console.warn("FIREBASE_SERVICE_ACCOUNT is not set. Initialize without cert might not work for FCM.");
+      console.warn("Credentials not fully set in environment vars. Initializing defaults.");
       admin.initializeApp();
     }
   } catch (error) {
